@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Resultado Punto de Equilibrio{% endblock %}
+
+{% block content %}
+<a href="/punto-equilibrio" class="btn back-btn">← Volver al formulario</a>
+
+<h1>Resultado del Punto de Equilibrio</h1>
+<h2 style="color: #666; font-weight: normal;">
+    Para {{ datos.cantidad_trabajadoras }} trabajadora(s) y {{ datos.cantidad_practicantes }} practicante(s)
+</h2>
+<div style="text-align: right; color: #888; font-size: 14px; margin-bottom: 20px;">
+    📅 {{ fecha_hora_bogota }}
+</div>
+
+<div class="result-section">
+    <h3 style="margin-top: 0; color: #333;">Análisis de Costos:</h3>
+    
+    <div class="cost-item">
+        <span class="cost-label">Costo Fijo Total Diario:</span>
+        <span class="cost-value">${{ "{:,}".format(datos.costo_fijo_total) }} COP</span>
+    </div>
+    
+    <div class="cost-item">
+        <span class="cost-label">Precio de Pago por Unidad:</span>
+        <span class="cost-value">${{ "{:,}".format(datos.precio_unidad) }} COP</span>
+    </div>
+
+    
+ 
+    
+    <div class="cost-item">
+        <span class="cost-label total">UNIDADES A FABRICAR (PUNTO DE EQUILIBRIO):</span>
+        <span class="cost-value total">{{ "{:,.0f}".format(datos.punto_equilibrio) }} unidades</span>
+    </div>
+</div>
+
+<div style="margin-top: 20px; padding: 20px; background-color: #d1ecf1; border-radius: 5px; border-left: 4px solid #17a2b8;">
+    <h3 style="margin-top: 0; color: #0c5460;">📈 Desglose del Costo Fijo Total:</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+        <div>
+            <h4 style="color: #0c5460; margin-bottom: 10px;">Personal:</h4>
+            <div style="color: #0c5460;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Trabajadoras ({{ datos.cantidad_trabajadoras }}): </span>
+                    <span>${{ "{:,}".format(datos.costo_trabajadoras) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Practicantes ({{ datos.cantidad_practicantes }}): </span>
+                    <span>${{ "{:,}".format(datos.costo_practicantes) }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <h4 style="color: #0c5460; margin-bottom: 10px;">Gastos Operativos:</h4>
+            <div style="color: #0c5460;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Arriendo diario: </span>
+                    <span>${{ "{:,}".format(datos.arriendo_diario) }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Gastos fijos: </span>
+                    <span>${{ "{:,}".format(datos.gastos_fijos_total) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 20px; padding: 15px; background-color: #d4edda; border-radius: 5px; border-left: 4px solid #28a745;">
+    <h4 style="margin-top: 0; color: #155724;">✅ Resumen del Análisis:</h4>
+    <p style="color: #155724; margin-bottom: 8px;">
+        <strong>Para cubrir todos los gastos de operación,</strong> debe fabricar al menos <strong>{{ "{:,.0f}".format(datos.punto_equilibrio) }} unidades diarias</strong>
+    </p>
+    <p style="color: #155724; margin-bottom: 8px;">
+        <strong>Ingresos necesarios para equilibrio:</strong> ${{ "{:,}".format(datos.ingresos_equilibrio) }} COP
+    </p>
+    
+</div>
+
+
+
+{% if datos.unidades_fabricadas > 0 %}
+<div style="margin-top: 20px; padding: 20px; background-color: #e7f3ff; border-radius: 5px; border-left: 4px solid #007bff;">
+    <h3 style="margin-top: 0; color: #004085;">💰 Análisis de Ganancia Real del Día</h3>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+        <div>
+            <h4 style="color: #004085; margin-bottom: 10px;">Producción del Día:</h4>
+            <div style="color: #004085;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Unidades fabricadas: </span>
+                    <span><strong>{{ "{:,}".format(datos.unidades_fabricadas) }}</strong></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Ingresos totales: </span>
+                    <span>${{ "{:,}".format(datos.ingresos_reales) }} COP</span>
+                </div>
+            
+            </div>
+        </div>
+        
+        <div>
+            <h4 style="color: #004085; margin-bottom: 10px;">Resultado Final:</h4>
+            <div style="color: #004085;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span>Costos fijos del día: </span>
+                    <span>${{ "{:,}".format(datos.costo_fijo_total) }} COP</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; border-top: 1px solid #007bff; padding-top: 8px; margin-top: 8px;">
+                    <span>GANANCIA/PÉRDIDA NETA: </span>
+                    {% if datos.utilidad_neta >= 0 %}
+                        <span style="color: #28a745;">+${{ "{:,}".format(datos.utilidad_neta) }} COP</span>
+                    {% else %}
+                        <span style="color: #dc3545;">${{ "{:,}".format(datos.utilidad_neta) }} COP</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if datos.utilidad_neta >= 0 %}
+        <div style="margin-top: 15px; padding: 10px; background-color: #d4edda; border-radius: 4px;">
+            <p style="color: #155724; margin: 0; text-align: center;">
+                <strong>✅ ¡Felicitaciones!</strong> Hoy tuvo una ganancia de ${{ "{:,}".format(datos.utilidad_neta) }} COP
+            </p>
+        </div>
+    {% else %}
+        <div style="margin-top: 15px; padding: 10px; background-color: #f8d7da; border-radius: 4px;">
+            <p style="color: #721c24; margin: 0; text-align: center;">
+                <strong>⚠️ Pérdida del día:</strong> Necesita fabricar {{ "{:,.0f}".format(datos.punto_equilibrio - datos.unidades_fabricadas) }} unidades más para alcanzar el equilibrio
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<div style="margin-top: 30px; text-align: center;">
+    <a href="/punto-equilibrio" class="btn" style="margin-right: 10px;">Calcular Nuevamente</a>
+    <a href="/" class="btn" style="background-color: #6c757d;">Ir al Menú Principal</a>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Calculadora Punto de Equilibrio{% endblock %}
+
+{% block content %}
+<a href="/" class="btn back-btn">← Volver al menú principal</a>
+
+<h1>Calculadora de Punto de Equilibrio</h1>
+<p style="text-align: center; color: #666; margin-bottom: 30px;">
+    Determine cuántas unidades necesita fabricar para cubrir todos los gastos de operación
+</p>
+
+<form action="/calcular-equilibrio" method="post">
+    <div class="form-group">
+        <label for="cantidad_trabajadoras">Cantidad de Trabajadoras (Operarias):</label>
+        <input 
+            type="number" 
+            id="cantidad_trabajadoras" 
+            name="cantidad_trabajadoras" 
+            min="0" 
+            value="1" 
+            required
+        >
+        <small style="color: #666;">Para calcular el costo de operación base</small>
+    </div>
+
+    <div class="form-group">
+        <label for="cantidad_practicantes">Cantidad de Practicantes (Aprendices):</label>
+        <input 
+            type="number" 
+            id="cantidad_practicantes" 
+            name="cantidad_practicantes" 
+            min="0" 
+            value="0" 
+            required
+        >
+        <small style="color: #666;">Para calcular el costo de operación base</small>
+    </div>
+
+    <div class="form-group">
+        <label for="precio_unidad">Precio de Unidad:</label>
+        <input 
+            type="number" 
+            id="precio_unidad" 
+            name="precio_unidad" 
+            min="0" 
+            step="0.01"
+            placeholder="0.00" 
+            required
+        >
+        <small style="color: #666;">Precio al que pagaran cada unidad (COP)</small>
+    </div>
+
+    <div class="form-group">
+
+        <small style="color: #666;">Costo de materiales, insumos, etc. por unidad (COP)</small>
+    </div>
+
+    <div class="form-group">
+        <label for="unidades_fabricadas">Unidades Fabricadas Hoy (Opcional):</label>
+        <input 
+            type="number" 
+            id="unidades_fabricadas" 
+            name="unidades_fabricadas" 
+            min="0" 
+            step="1"
+            placeholder="0" 
+        >
+        <small style="color: #666;">Si desea calcular la ganancia real del día, ingrese las unidades fabricadas hoy</small>
+    </div>
+
+    <button type="submit" class="btn">Calcular Punto de Equilibrio</button>
+</form>
+
+<div style="margin-top: 30px; padding: 20px; background-color: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+    <h3 style="margin-top: 0; color: #856404;">💡 ¿Qué es el Punto de Equilibrio?</h3>
+    <p style="color: #856404; margin-bottom: 10px;">
+        El punto de equilibrio es la cantidad mínima de unidades que debe fabricar para cubrir todos sus costos (fijos y variables).
+    </p>
+    <ul style="color: #856404;">
+        <li><strong>Costos Fijos:</strong> Gastos que no cambian independiente de la producción (arriendo, salarios, servicios)</li>
+        <li><strong>Costos Variables:</strong> Gastos que cambian según la cantidad producida (materiales, insumos por unidad)</li>
+        <li><strong>Fórmula:</strong> Punto de Equilibrio = Costos Fijos ÷ (Precio de Pago - Costo Variable por Unidad)</li>
+    </ul>
+</div>
+{% endblock %}
