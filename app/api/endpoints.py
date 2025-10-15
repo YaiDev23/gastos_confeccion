@@ -33,7 +33,7 @@ async def calcular_produccion(request: Request):
     
     # Inicializar totales por talla
     totales_por_talla = {
-        "6-12": 0, "12-18": 0, "18-24": 0, "24-36": 0, "36-48": 0,
+        "18-24": 0, "24-36": 0, "36-48": 0,
         "2": 0, "4": 0, "6": 0, "8": 0, "10": 0, "12": 0, "14": 0,
         "16": 0, "18": 0
     }
@@ -44,8 +44,7 @@ async def calcular_produccion(request: Request):
             continue
             
         tallas_color = {
-            "6-12": int(form.get(f'talla_6_12_{i}', 0)),
-            "12-18": int(form.get(f'talla_12_18_{i}', 0)),
+         
             "18-24": int(form.get(f'talla_18_24_{i}', 0)),
             "24-36": int(form.get(f'talla_24_36_{i}', 0)),
             "36-48": int(form.get(f'talla_36_48_{i}', 0)),
