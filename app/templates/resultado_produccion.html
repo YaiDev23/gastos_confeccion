@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/styles.css">
+
+<div class="container mt-5">
+    <h2 class="mb-4">Resultado de Producción</h2>
+    <p class="text-muted">Fecha y hora del cálculo: {{ fecha_hora_bogota }}</p>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Resumen de Producción</h3>
+        </div>
+        <div class="card-body">
+            <h4>Total de Unidades: {{ datos.total_unidades }}</h4>
+            
+            <div class="table-responsive mt-4">
+                                <div class="table-title" style="margin-bottom: 5px;">inferior</div>
+                <table class="production-table">
+                    <thead>
+                        <tr>
+                            <th class="color-column" style="border-bottom: 2px solid #000;">colores</th>
+                            <th>6-12</th>
+                            <th>12-18</th>
+                            <th>18-24</th>
+                            <th>24-36</th>
+                            <th>36-48</th>
+                            <th>2</th>
+                            <th>4</th>
+                            <th>6</th>
+                            <th>8</th>
+                            <th>10</th>
+                            <th>12</th>
+                            <th>14</th>
+                            <th>16</th>
+                            <th>18</th>
+                            <th class="total-column">total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for color in datos.produccion_por_color %}
+                        <tr>
+                            <td>{{ color.nombre }}</td>
+                        
+                            <td>{{ color.tallas["18-24"] }}</td>
+                            <td>{{ color.tallas["24-36"] }}</td>
+                            <td>{{ color.tallas["36-48"] }}</td>
+                            <td>{{ color.tallas["2"] }}</td>
+                            <td>{{ color.tallas["4"] }}</td>
+                            <td>{{ color.tallas["6"] }}</td>
+                            <td>{{ color.tallas["8"] }}</td>
+                            <td>{{ color.tallas["10"] }}</td>
+                            <td>{{ color.tallas["12"] }}</td>
+                            <td>{{ color.tallas["14"] }}</td>
+                            <td>{{ color.tallas["16"] }}</td>
+                            <td>{{ color.tallas["18"] }}</td>
+                            <td><strong>{{ color.total }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="total-row">
+                            <td class="color-column">Total por Talla</td>
+                            <td class="total-size">{{ datos.totales_por_talla["6-12"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["12-18"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["18-24"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["24-36"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["36-48"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["2"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["4"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["6"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["8"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["10"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["12"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["14"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["16"] }}</td>
+                            <td class="total-size">{{ datos.totales_por_talla["18"] }}</td>
+                            <td class="total-column">{{ datos.total_unidades }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <a href="/produccion" class="btn btn-primary">Nuevo Cálculo</a>
+    <a href="/" class="btn btn-secondary">Volver al Menú</a>
+</div>
+{% endblock %}

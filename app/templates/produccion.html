@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/styles.css">
+
+<div class="container mt-5">
+    <h2 class="mb-4">Cálculo de Producción</h2>
+    <form action="/calcular-produccion" method="post" enctype="multipart/form-data">
+        <div id="colores-container">
+            <div class="color-group mb-4">
+                <h4>Color #1</h4>
+                <div class="form-group">
+                    <label>Nombre del Color:</label>
+                    <input type="text" name="color_1" class="form-control" required>
+                </div>
+                                <div class="tallas-container mt-3">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                               
+                                    <th>18-24</th>
+                                    <th>24-36</th>
+                                    <th>36-48</th>
+                                    <th>2</th>
+                                    <th>4</th>
+                                    <th>6</th>
+                                    <th>8</th>
+                                    <th>10</th>
+                                    <th>12</th>
+                                    <th>14</th>
+                                    <th>16</th>
+                                    <th>18</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="number" name="talla_6_12_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_12_18_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_18_24_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_24_36_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_36_48_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_2_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_4_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_6_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_8_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_10_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_12_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_14_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_16_1" class="form-control" value="0" min="0"></td>
+                                    <td><input type="number" name="talla_18_1" class="form-control" value="0" min="0"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="button" class="btn btn-secondary mt-3" onclick="agregarColor()">Agregar Otro Color</button>
+        <button type="submit" class="btn btn-primary mt-3 ml-2">Calcular Producción</button>
+    </form>
+</div>
+
+<script>
+let colorCount = 1;
+
+function agregarColor() {
+    colorCount++;
+    const container = document.getElementById('colores-container');
+    const nuevoColor = `
+        <div class="color-group mb-4">
+            <h4>Color #${colorCount}</h4>
+            <div class="form-group">
+                <label>Nombre del Color:</label>
+                <input type="text" name="color_${colorCount}" class="form-control" required>
+            </div>
+            <div class="tallas-container mt-3">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                            
+                                <th>18-24</th>
+                                <th>24-36</th>
+                                <th>36-48</th>
+                                <th>2</th>
+                                <th>4</th>
+                                <th>6</th>
+                                <th>8</th>
+                                <th>10</th>
+                                <th>12</th>
+                                <th>14</th>
+                                <th>16</th>
+                                <th>18</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="number" name="talla_6_12_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_12_18_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_18_24_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_24_36_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_36_48_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_2_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_4_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_6_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_8_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_10_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_12_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_14_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_16_${colorCount}" class="form-control" value="0" min="0"></td>
+                                <td><input type="number" name="talla_18_${colorCount}" class="form-control" value="0" min="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', nuevoColor);
+}
+</script>
+{% endblock %}

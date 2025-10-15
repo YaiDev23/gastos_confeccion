@@ -9,6 +9,9 @@ app = FastAPI()
 # Configurar templates
 templates = Jinja2Templates(directory="app/templates")
 
+# Configurar archivos estáticos
+app.mount("/static", StaticFiles(directory="app/static"), name="static_files")
+
 app.include_router(router)
 
 if __name__ == "__main__":

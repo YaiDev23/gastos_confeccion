@@ -18,6 +18,75 @@ def obtener_fecha_hora_bogota():
 async def mostrar_menu(request: Request):
     return templates.TemplateResponse("menu.html", {"request": request})
 
+@router.get("/produccion", response_class=HTMLResponse)
+async def mostrar_produccion(request: Request):
+    return templates.TemplateResponse("produccion.html", {"request": request})
+
+@router.post("/calcular-produccion", response_class=HTMLResponse)
+async def calcular_produccion(request: Request):
+    form = await request.form()
+    produccion_por_color = []
+    total_unidades = 0
+    
+    # Determinar cuántos colores hay en el formulario
+    color_count = len([k for k in form.keys() if k.startswith('color_')])
+    
+    # Inicializar totales por talla
+    totales_por_talla = {
+        "6-12": 0, "12-18": 0, "18-24": 0, "24-36": 0, "36-48": 0,
+        "2": 0, "4": 0, "6": 0, "8": 0, "10": 0, "12": 0, "14": 0,
+        "16": 0, "18": 0
+    }
+    
+    for i in range(1, color_count + 1):
+        color = form.get(f'color_{i}')
+        if not color:
+            continue
+            
+        tallas_color = {
+            "6-12": int(form.get(f'talla_6_12_{i}', 0)),
+            "12-18": int(form.get(f'talla_12_18_{i}', 0)),
+            "18-24": int(form.get(f'talla_18_24_{i}', 0)),
+            "24-36": int(form.get(f'talla_24_36_{i}', 0)),
+            "36-48": int(form.get(f'talla_36_48_{i}', 0)),
+            "2": int(form.get(f'talla_2_{i}', 0)),
+            "4": int(form.get(f'talla_4_{i}', 0)),
+            "6": int(form.get(f'talla_6_{i}', 0)),
+            "8": int(form.get(f'talla_8_{i}', 0)),
+            "10": int(form.get(f'talla_10_{i}', 0)),
+            "12": int(form.get(f'talla_12_{i}', 0)),
+            "14": int(form.get(f'talla_14_{i}', 0)),
+            "16": int(form.get(f'talla_16_{i}', 0)),
+            "18": int(form.get(f'talla_18_{i}', 0))
+        }
+        
+        # Actualizar totales por talla
+        for talla, cantidad in tallas_color.items():
+            totales_por_talla[talla] += cantidad
+        
+        total_color = sum(tallas_color.values())
+        total_unidades += total_color
+        
+        produccion_por_color.append({
+            'nombre': color,
+            'tallas': tallas_color,
+            'total': total_color
+        })
+    
+    datos = {
+        'produccion_por_color': produccion_por_color,
+        'total_unidades': total_unidades,
+        'totales_por_talla': totales_por_talla
+    }
+    
+    fecha_hora_bogota = obtener_fecha_hora_bogota()
+    
+    return templates.TemplateResponse("resultado_produccion.html", {
+        "request": request,
+        "datos": datos,
+        "fecha_hora_bogota": fecha_hora_bogota
+    })
+
 @router.get("/costo-operacion", response_class=HTMLResponse)
 async def mostrar_formulario(request: Request):
     return templates.TemplateResponse("formulario.html", {"request": request})
