@@ -10,7 +10,7 @@
 
 <form action="/calcular" method="post">
     <div class="form-group">
-        <label for="cantidad_trabajadoras">Cantidad de Trabajadoras (Operarias):</label>
+        <label for="cantidad_trabajadoras">Cantidad de Trabajadoras (Operarias sin prestaciones):</label>
         <input 
             type="number" 
             id="cantidad_trabajadoras" 
@@ -19,7 +19,20 @@
             value="0" 
             required
         >
-        <small style="color: #666;">Salario diario: $64,000 COP</small>
+        <small style="color: #666;">Salario diario: $56,000 COP</small>
+    </div>
+
+    <div class="form-group">
+        <label for="cantidad_trabajadoras_prestaciones">Cantidad de Trabajadoras (Con prestaciones):</label>
+        <input 
+            type="number" 
+            id="cantidad_trabajadoras_prestaciones" 
+            name="cantidad_trabajadoras_prestaciones" 
+            min="0" 
+            value="0" 
+            required
+        >
+        <small style="color: #666;">Salario diario con prestaciones: $50,300 COP</small>
     </div>
 
     <div class="form-group">

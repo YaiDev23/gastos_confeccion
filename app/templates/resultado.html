@@ -4,7 +4,7 @@
 <a href="/costo-operacion" class="btn back-btn">← Volver al formulario</a>
 
 <h1>Resumen de Costos de Operación</h1>
-<h2 style="color: #666; font-weight: normal;">Cálculo para {{ datos.cantidad_trabajadoras }} trabajadora(s) y {{ datos.cantidad_practicantes }} practicante(s)</h2>
+<h2 style="color: #666; font-weight: normal;">Cálculo para {{ datos.cantidad_trabajadoras }} trabajadora(s) sin prestaciones, {{ datos.cantidad_trabajadoras_prestaciones }} con prestaciones y {{ datos.cantidad_practicantes }} practicante(s)</h2>
 <div style="text-align: right; color: #888; font-size: 14px; margin-bottom: 20px;">
     📅 {{ fecha_hora_bogota }}
 </div>
@@ -13,8 +13,13 @@
     <h3 style="margin-top: 0; color: #333;">Desglose de Gastos Diarios:</h3>
     
     <div class="cost-item">
-        <span class="cost-label">Personal - Trabajadoras ({{ datos.cantidad_trabajadoras }} × $64,000):</span>
+        <span class="cost-label">Personal - Trabajadoras sin prestaciones ({{ datos.cantidad_trabajadoras }} × $56,000):</span>
         <span class="cost-value">${{ "{:,}".format(datos.costo_trabajadoras) }} COP</span>
+    </div>
+
+    <div class="cost-item">
+        <span class="cost-label">Personal - Trabajadoras con prestaciones ({{ datos.cantidad_trabajadoras_prestaciones }} × $50,300):</span>
+        <span class="cost-value">${{ "{:,}".format(datos.costo_trabajadoras_prestaciones) }} COP</span>
     </div>
     
     <div class="cost-item">

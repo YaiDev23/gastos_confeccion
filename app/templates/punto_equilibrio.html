@@ -12,7 +12,7 @@
 
 <form action="/calcular-equilibrio" method="post">
     <div class="form-group">
-        <label for="cantidad_trabajadoras">Cantidad de Trabajadoras (Operarias):</label>
+        <label for="cantidad_trabajadoras">Cantidad de Trabajadoras (Sin prestaciones):</label>
         <input 
             type="number" 
             id="cantidad_trabajadoras" 
@@ -21,7 +21,20 @@
             value="1" 
             required
         >
-        <small style="color: #666;">Para calcular el costo de operación base</small>
+        <small style="color: #666;">Para calcular el costo de operación base - $56,000/día</small>
+    </div>
+
+    <div class="form-group">
+        <label for="cantidad_trabajadoras_prestaciones">Cantidad de Trabajadoras (Con prestaciones):</label>
+        <input 
+            type="number" 
+            id="cantidad_trabajadoras_prestaciones" 
+            name="cantidad_trabajadoras_prestaciones" 
+            min="0" 
+            value="0" 
+            required
+        >
+        <small style="color: #666;">Para calcular el costo de operación base - $50,300/día</small>
     </div>
 
     <div class="form-group">

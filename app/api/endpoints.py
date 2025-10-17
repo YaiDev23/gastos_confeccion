@@ -98,16 +98,17 @@ async def mostrar_punto_equilibrio(request: Request):
 async def calcular_costo(
     request: Request,
     cantidad_trabajadoras: int = Form(...),
+    cantidad_trabajadoras_prestaciones: int = Form(...),
     cantidad_practicantes: int = Form(...)
 ):
     # Datos base
     arriendo = 750000
     arriendo_diario = arriendo / 30
 
-    salario = {
-        'operaria': 64000,
-        'aprendiz': 30000
-    }
+    from app.api.schemas.operator_schema import OperatorSchema
+    salario = OperatorSchema.operaria['salario']
+    salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
+    salario_aprendiz = OperatorSchema.aprendiz['salario']
 
     gastos_fijos = {
         'gasolina': 10000,
@@ -117,11 +118,13 @@ async def calcular_costo(
     }
 
     # Cálculos
-    costo_trabajadoras = cantidad_trabajadoras * salario['operaria']
-    costo_practicantes = cantidad_practicantes * salario['aprendiz']
+    costo_trabajadoras = cantidad_trabajadoras * salario
+    costo_trabajadoras_prestaciones = cantidad_trabajadoras_prestaciones * salario_prestaciones
+    costo_practicantes = cantidad_practicantes * salario_aprendiz
     gastos_fijos_total = sum(gastos_fijos.values())
     
     costo_operacion = (costo_trabajadoras + 
+                      costo_trabajadoras_prestaciones +
                       costo_practicantes + 
                       gastos_fijos_total + 
                       arriendo_diario)
@@ -129,8 +132,10 @@ async def calcular_costo(
     # Datos para el template
     datos = {
         'cantidad_trabajadoras': cantidad_trabajadoras,
+        'cantidad_trabajadoras_prestaciones': cantidad_trabajadoras_prestaciones,
         'cantidad_practicantes': cantidad_practicantes,
         'costo_trabajadoras': costo_trabajadoras,
+        'costo_trabajadoras_prestaciones': costo_trabajadoras_prestaciones,
         'costo_practicantes': costo_practicantes,
         'arriendo_diario': int(arriendo_diario),
         'gastos_fijos': gastos_fijos,
@@ -151,6 +156,7 @@ async def calcular_costo(
 async def calcular_punto_equilibrio(
     request: Request,
     cantidad_trabajadoras: int = Form(...),
+    cantidad_trabajadoras_prestaciones: int = Form(...),
     cantidad_practicantes: int = Form(...),
     precio_unidad: float = Form(...),
     unidades_fabricadas: int = Form(0)
@@ -159,10 +165,10 @@ async def calcular_punto_equilibrio(
     arriendo = 750000
     arriendo_diario = arriendo / 30
 
-    salario = {
-        'operaria': 64000,
-        'aprendiz': 30000
-    }
+    from app.api.schemas.operator_schema import OperatorSchema
+    salario = OperatorSchema.operaria['salario']
+    salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
+    salario_aprendiz = OperatorSchema.aprendiz['salario']
 
     gastos_fijos = {
         'gasolina': 10000,
@@ -172,11 +178,13 @@ async def calcular_punto_equilibrio(
     }
 
     # Cálculo del costo fijo total
-    costo_trabajadoras = cantidad_trabajadoras * salario['operaria']
-    costo_practicantes = cantidad_practicantes * salario['aprendiz']
+    costo_trabajadoras = cantidad_trabajadoras * salario
+    costo_trabajadoras_prestaciones = cantidad_trabajadoras_prestaciones * salario_prestaciones
+    costo_practicantes = cantidad_practicantes * salario_aprendiz
     gastos_fijos_total = sum(gastos_fijos.values())
     
     costo_fijo_total = (costo_trabajadoras + 
+                       costo_trabajadoras_prestaciones +
                        costo_practicantes + 
                        gastos_fijos_total + 
                        arriendo_diario)
@@ -202,8 +210,10 @@ async def calcular_punto_equilibrio(
     # Datos para el template
     datos = {
         'cantidad_trabajadoras': cantidad_trabajadoras,
+        'cantidad_trabajadoras_prestaciones': cantidad_trabajadoras_prestaciones,
         'cantidad_practicantes': cantidad_practicantes,
         'costo_trabajadoras': costo_trabajadoras,
+        'costo_trabajadoras_prestaciones': costo_trabajadoras_prestaciones,
         'costo_practicantes': costo_practicantes,
         'arriendo_diario': int(arriendo_diario),
         'gastos_fijos_total': gastos_fijos_total,
@@ -227,14 +237,14 @@ async def calcular_punto_equilibrio(
     })
 
 @router.get("/cost_operation")
-def get_cost_operation(cantidad_trabajadoras: int, cantidad_practicantes: int):
+def get_cost_operation(cantidad_trabajadoras: int, cantidad_trabajadoras_prestaciones: int, cantidad_practicantes: int):
     arriendo = 750000
     arriendo_x_dia = arriendo / 30
 
-    salario = {
-        'operaria': 64000,
-        'aprendiz': 30000
-    }
+    from app.api.schemas.operator_schema import OperatorSchema
+    salario = OperatorSchema.operaria['salario']
+    salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
+    salario_aprendiz = OperatorSchema.aprendiz['salario']
 
     gastos_fijos = {
         'gasolina': 10000,
@@ -243,8 +253,9 @@ def get_cost_operation(cantidad_trabajadoras: int, cantidad_practicantes: int):
         'maquinas': 10000
     }
 
-    costo_operacion = (cantidad_trabajadoras * salario['operaria'] + 
-                      cantidad_practicantes * salario['aprendiz'] + 
+    costo_operacion = (cantidad_trabajadoras * salario + 
+                      cantidad_trabajadoras_prestaciones * salario_prestaciones +
+                      cantidad_practicantes * salario_aprendiz + 
                       gastos_fijos['gasolina'] + 
                       gastos_fijos['hilos'] + 
                       gastos_fijos['luz'] + 
