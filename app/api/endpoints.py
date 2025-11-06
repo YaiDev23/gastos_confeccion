@@ -272,3 +272,45 @@ def get_breakeven_point(precio_producto: float, costo_variable_unitario: float, 
     punto_equilibrio = costo_fijo_total / (precio_producto - costo_variable_unitario)
     
     return {"punto_equilibrio": punto_equilibrio}
+
+@router.get("/justicia-pago", response_class=HTMLResponse)
+async def mostrar_justicia_pago(request: Request):
+    return templates.TemplateResponse("justicia_pago.html", {"request": request})
+
+@router.post("/calcular-justicia-pago", response_class=HTMLResponse)
+async def calcular_justicia_pago(
+    request: Request,
+    tiempo_unitario: float = Form(...),
+    cantidad: int = Form(...),
+    pago_lote: float = Form(...),
+    tarifa_minuto: float = Form(...)
+):
+    # Cálculos según la fórmula proporcionada
+    tiempo_total = tiempo_unitario * cantidad
+    costo_real = tiempo_total * tarifa_minuto
+    
+    # Evitar división por cero
+    if costo_real > 0:
+        porcentaje_justicia = (pago_lote / costo_real) * 100
+    else:
+        porcentaje_justicia = 0
+    
+    # Datos para el template
+    datos = {
+        'tiempo_unitario': tiempo_unitario,
+        'cantidad': cantidad,
+        'pago_lote': pago_lote,
+        'tarifa_minuto': tarifa_minuto,
+        'tiempo_total': tiempo_total,
+        'costo_real': costo_real,
+        'porcentaje_justicia': porcentaje_justicia
+    }
+    
+    # Obtener fecha y hora de Bogotá
+    fecha_hora_bogota = obtener_fecha_hora_bogota()
+    
+    return templates.TemplateResponse("resultado_justicia_pago.html", {
+        "request": request,
+        "datos": datos,
+        "fecha_hora_bogota": fecha_hora_bogota
+    })

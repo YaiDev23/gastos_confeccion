@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis de Justicia de Pago - Calculadora de Costos{% endblock %}
+
+{% block content %}
+<h1>🧮 Análisis de Justicia de Pago de Lotes</h1>
+<p style="text-align: center; color: #666; margin-bottom: 30px;">
+    Evalúe si un lote está bien pagado comparando el pago recibido con el costo real del tiempo invertido
+</p>
+
+<div style="background-color: #f8f9fa; border: 2px solid #ff9800; border-radius: 10px; padding: 30px; max-width: 600px; margin: 0 auto;">
+    <form method="POST" action="/calcular-justicia-pago">
+        <div style="margin-bottom: 25px;">
+            <label for="tiempo_unitario" style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                ⏱️ Tiempo por unidad (en minutos)
+            </label>
+            <input 
+                type="number" 
+                id="tiempo_unitario" 
+                name="tiempo_unitario" 
+                step="0.1"
+                min="0"
+                required 
+                placeholder="Ej: 12"
+                style="width: 100%; padding: 12px; border: 2px solid #ff9800; border-radius: 5px; font-size: 16px;"
+            />
+            <small style="color: #999; display: block; margin-top: 5px;">¿Cuántos minutos tarda una unidad?</small>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label for="cantidad" style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                📦 Cantidad de unidades en el lote
+            </label>
+            <input 
+                type="number" 
+                id="cantidad" 
+                name="cantidad" 
+                min="1"
+                required 
+                placeholder="Ej: 1000"
+                style="width: 100%; padding: 12px; border: 2px solid #ff9800; border-radius: 5px; font-size: 16px;"
+            />
+            <small style="color: #999; display: block; margin-top: 5px;">¿Cuántas unidades conforman el lote?</small>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label for="pago_lote" style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                💰 Pago total del lote
+            </label>
+            <input 
+                type="number" 
+                id="pago_lote" 
+                name="pago_lote" 
+                step="0.01"
+                min="0"
+                required 
+                placeholder="Ej: 1200000"
+                style="width: 100%; padding: 12px; border: 2px solid #ff9800; border-radius: 5px; font-size: 16px;"
+            />
+            <small style="color: #999; display: block; margin-top: 5px;">¿Cuánto te pagan en total por este lote?</small>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label for="tarifa_minuto" style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">
+                💵 Tarifa de tu trabajo (por minuto)
+            </label>
+            <input 
+                type="number" 
+                id="tarifa_minuto" 
+                name="tarifa_minuto" 
+                step="0.01"
+                min="0"
+                required 
+                placeholder="Ej: 500"
+                style="width: 100%; padding: 12px; border: 2px solid #ff9800; border-radius: 5px; font-size: 16px;"
+            />
+            <small style="color: #999; display: block; margin-top: 5px;">
+                💡 Si trabajas 8 horas diarias (480 minutos) y ganas $240,000: tarifa = 240000 ÷ 480 = 500/minuto
+            </small>
+        </div>
+
+        <div style="background-color: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; margin-bottom: 25px; border-radius: 5px;">
+            <h4 style="margin: 0 0 10px 0; color: #856404;">📝 Nota sobre la tarifa:</h4>
+            <p style="margin: 0; color: #856404; font-size: 14px;">
+                Divida su salario diario entre los minutos trabajados para obtener la tarifa por minuto.
+                O si prefiere, divida su salario por hora entre 60.
+            </p>
+        </div>
+
+        <button 
+            type="submit" 
+            style="width: 100%; padding: 15px; background-color: #ff9800; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s;"
+        >
+            ✅ Calcular Justicia de Pago
+        </button>
+    </form>
+</div>
+
+<div style="margin-top: 40px; padding: 20px; background-color: #e8f5e9; border-radius: 10px; border-left: 4px solid #4CAF50;">
+    <h3 style="color: #2e7d32; margin-top: 0;">📚 Cómo funciona:</h3>
+    <ol style="color: #555; line-height: 1.8;">
+        <li><strong>Tiempo total del lote:</strong> tiempo_unitario × cantidad</li>
+        <li><strong>Costo real del trabajo:</strong> tiempo_total × tarifa_minuto</li>
+        <li><strong>Porcentaje de justicia:</strong> (pago_lote ÷ costo_real) × 100</li>
+    </ol>
+    <ul style="color: #555;">
+        <li>📊 Si el porcentaje es ≈ 100%: El lote está justamente pagado</li>
+        <li>📉 Si es menor a 100%: Estás cobrando por debajo del valor real</li>
+        <li>📈 Si es mayor a 100%: Tienes ganancia extra sobre el valor real</li>
+    </ul>
+</div>
+
+<a href="/" style="display: inline-block; margin-top: 30px; padding: 12px 20px; background-color: #666; color: white; text-decoration: none; border-radius: 5px;">
+    ← Volver al menú
+</a>
+
+{% endblock %}
