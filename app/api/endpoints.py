@@ -2,11 +2,15 @@ from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import datetime
+
+from api.schemas.gastos_schema import GastoSchema
 import pytz
 
 templates = Jinja2Templates(directory="app/templates")
 
 router = APIRouter()
+gastos_fijos = GastoSchema.gastos_fijos
+arriendo = GastoSchema.arriendo
 
 def obtener_fecha_hora_bogota():
     """Obtiene la fecha y hora actual en zona horaria de Bogotá"""
@@ -42,21 +46,26 @@ async def calcular_produccion(request: Request):
         color = form.get(f'color_{i}')
         if not color:
             continue
+        
+        def safe_int(value):
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return 0
             
         tallas_color = {
-         
-            "18-24": int(form.get(f'talla_18_24_{i}', 0)),
-            "24-36": int(form.get(f'talla_24_36_{i}', 0)),
-            "36-48": int(form.get(f'talla_36_48_{i}', 0)),
-            "2": int(form.get(f'talla_2_{i}', 0)),
-            "4": int(form.get(f'talla_4_{i}', 0)),
-            "6": int(form.get(f'talla_6_{i}', 0)),
-            "8": int(form.get(f'talla_8_{i}', 0)),
-            "10": int(form.get(f'talla_10_{i}', 0)),
-            "12": int(form.get(f'talla_12_{i}', 0)),
-            "14": int(form.get(f'talla_14_{i}', 0)),
-            "16": int(form.get(f'talla_16_{i}', 0)),
-            "18": int(form.get(f'talla_18_{i}', 0))
+            "18-24": safe_int(form.get(f'talla_18_24_{i}')),
+            "24-36": safe_int(form.get(f'talla_24_36_{i}')),
+            "36-48": safe_int(form.get(f'talla_36_48_{i}')),
+            "2": safe_int(form.get(f'talla_2_{i}')),
+            "4": safe_int(form.get(f'talla_4_{i}')),
+            "6": safe_int(form.get(f'talla_6_{i}')),
+            "8": safe_int(form.get(f'talla_8_{i}')),
+            "10": safe_int(form.get(f'talla_10_{i}')),
+            "12": safe_int(form.get(f'talla_12_{i}')),
+            "14": safe_int(form.get(f'talla_14_{i}')),
+            "16": safe_int(form.get(f'talla_16_{i}')),
+            "18": safe_int(form.get(f'talla_18_{i}'))
         }
         
         # Actualizar totales por talla
@@ -102,20 +111,15 @@ async def calcular_costo(
     cantidad_practicantes: int = Form(...)
 ):
     # Datos base
-    arriendo = 750000
+    
     arriendo_diario = arriendo / 30
-
-    from app.api.schemas.operator_schema import OperatorSchema
+    
+    from api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
-
-    gastos_fijos = {
-        'gasolina': 10000,
-        'hilos': 10000,
-        'luz': 5000,
-        'maquinas': 10000
-    }
+    
+    
 
     # Cálculos
     costo_trabajadoras = cantidad_trabajadoras * salario
@@ -162,20 +166,12 @@ async def calcular_punto_equilibrio(
     unidades_fabricadas: int = Form(0)
 ):
     # Datos base (mismo cálculo que en costo de operación)
-    arriendo = 750000
     arriendo_diario = arriendo / 30
 
-    from app.api.schemas.operator_schema import OperatorSchema
+    from api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
-
-    gastos_fijos = {
-        'gasolina': 10000,
-        'hilos': 10000,
-        'luz': 5000,
-        'maquinas': 10000
-    }
 
     # Cálculo del costo fijo total
     costo_trabajadoras = cantidad_trabajadoras * salario
@@ -238,25 +234,16 @@ async def calcular_punto_equilibrio(
 
 @router.get("/cost_operation")
 def get_cost_operation(cantidad_trabajadoras: int, cantidad_trabajadoras_prestaciones: int, cantidad_practicantes: int):
-    arriendo = 750000
     arriendo_x_dia = arriendo / 30
 
-    from app.api.schemas.operator_schema import OperatorSchema
+    from api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
 
-    gastos_fijos = {
-        'gasolina': 10000,
-        'hilos': 10000,
-        'luz': 5000,
-        'maquinas': 10000
-    }
-
     costo_operacion = (cantidad_trabajadoras * salario + 
                       cantidad_trabajadoras_prestaciones * salario_prestaciones +
                       cantidad_practicantes * salario_aprendiz + 
-                      gastos_fijos['gasolina'] + 
                       gastos_fijos['hilos'] + 
                       gastos_fijos['luz'] + 
                       gastos_fijos['maquinas'] + 
