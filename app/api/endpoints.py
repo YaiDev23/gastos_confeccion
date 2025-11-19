@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from datetime import datetime
 
-from api.schemas.gastos_schema import GastoSchema
+from app.api.schemas.gastos_schema import GastoSchema
 import pytz
 
 templates = Jinja2Templates(directory="app/templates")

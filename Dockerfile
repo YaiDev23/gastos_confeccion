@@ -24,4 +24,4 @@ COPY . /app
 # The FastAPI app module lives at app/main.py, so point Uvicorn to app.main:app
 EXPOSE 10001
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
