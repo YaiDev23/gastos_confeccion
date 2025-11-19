@@ -114,7 +114,7 @@ async def calcular_costo(
     
     arriendo_diario = arriendo / 30
     
-    from api.schemas.operator_schema import OperatorSchema
+    from app.api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
