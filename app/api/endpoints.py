@@ -168,7 +168,7 @@ async def calcular_punto_equilibrio(
     # Datos base (mismo cálculo que en costo de operación)
     arriendo_diario = arriendo / 30
 
-    from api.schemas.operator_schema import OperatorSchema
+    from app.api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
@@ -236,7 +236,7 @@ async def calcular_punto_equilibrio(
 def get_cost_operation(cantidad_trabajadoras: int, cantidad_trabajadoras_prestaciones: int, cantidad_practicantes: int):
     arriendo_x_dia = arriendo / 30
 
-    from api.schemas.operator_schema import OperatorSchema
+    from app.api.schemas.operator_schema import OperatorSchema
     salario = OperatorSchema.operaria['salario']
     salario_prestaciones = OperatorSchema.operaria_prestaciones['salario']
     salario_aprendiz = OperatorSchema.aprendiz['salario']
