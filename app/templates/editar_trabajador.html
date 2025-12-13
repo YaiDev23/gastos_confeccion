@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Trabajador - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<a href="/trabajadores" class="btn back-btn">
+    <i style="margin-right: 8px;">←</i> Volver a lista
+</a>
+
+<h1>✏️ Editar Trabajador</h1>
+<p class="subtitle">
+    Actualiza la información del trabajador
+</p>
+
+<div style="max-width: 600px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+    <form id="formulario_editar" style="display: none;">
+        <div style="margin-bottom: 20px;">
+            <label for="nombre" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Nombre
+            </label>
+            <input type="text" id="nombre" name="nombre" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="apellido" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Apellido
+            </label>
+            <input type="text" id="apellido" name="apellido" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="cedula" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Cédula (No editable)
+            </label>
+            <input type="text" id="cedula" name="cedula" disabled style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; background-color: #f8f9fa; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="email" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Email
+            </label>
+            <input type="email" id="email" name="email" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="telefono" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Teléfono
+            </label>
+            <input type="tel" id="telefono" name="telefono" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="cargo" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Cargo
+            </label>
+            <select id="cargo" name="cargo" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                <option value="">Selecciona un cargo</option>
+                <option value="Operaria">Operaria</option>
+                <option value="Aprendiz">Aprendiz</option>
+                <option value="Supervisor">Supervisor</option>
+                <option value="Administrador">Administrador</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="salario" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Salario
+            </label>
+            <input type="number" id="salario" name="salario" step="0.01" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+            <button type="submit" class="btn" style="flex: 1; background: linear-gradient(135deg, #27ae60 0%, #229954 100%);">
+                💾 Guardar Cambios
+            </button>
+            <a href="/trabajadores" class="btn" style="flex: 1; background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+
+    <div id="contenedor_carga" style="text-align: center; padding: 40px;">
+        <p style="color: #7f8c8d; font-size: 16px;">
+            <i style="margin-right: 8px;">⏳</i> Cargando información...
+        </p>
+    </div>
+</div>
+
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const trabajadorId = urlParams.get('id');
+
+async function cargarTrabajador() {
+    if (!trabajadorId) {
+        alert('Error: ID de trabajador no proporcionado');
+        window.location.href = '/trabajadores';
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/trabajadores/${trabajadorId}`);
+        const resultado = await response.json();
+
+        if (resultado.success && resultado.data) {
+            const trabajador = resultado.data;
+            
+            // Llenar el formulario con los datos
+            document.getElementById('nombre').value = trabajador.nombre || '';
+            document.getElementById('apellido').value = trabajador.apellido || '';
+            document.getElementById('cedula').value = trabajador.cedula || '';
+            document.getElementById('email').value = trabajador.email || '';
+            document.getElementById('telefono').value = trabajador.telefono || '';
+            document.getElementById('cargo').value = trabajador.cargo || '';
+            document.getElementById('salario').value = trabajador.salario || '';
+
+            // Mostrar formulario
+            document.getElementById('contenedor_carga').style.display = 'none';
+            document.getElementById('formulario_editar').style.display = 'block';
+        } else {
+            alert('Error: Trabajador no encontrado');
+            window.location.href = '/trabajadores';
+        }
+    } catch (error) {
+        alert('Error al cargar el trabajador: ' + error.message);
+        window.location.href = '/trabajadores';
+    }
+}
+
+document.getElementById('formulario_editar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('nombre', document.getElementById('nombre').value);
+    formData.append('apellido', document.getElementById('apellido').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('telefono', document.getElementById('telefono').value);
+    formData.append('cargo', document.getElementById('cargo').value);
+    formData.append('salario', document.getElementById('salario').value);
+
+    try {
+        const response = await fetch(`/api/trabajadores/${trabajadorId}`, {
+            method: 'PUT',
+            body: formData
+        });
+
+        const resultado = await response.json();
+
+        if (resultado.success) {
+            alert('Trabajador actualizado correctamente');
+            window.location.href = '/trabajadores';
+        } else {
+            alert('Error: ' + resultado.error);
+        }
+    } catch (error) {
+        alert('Error al actualizar trabajador: ' + error.message);
+    }
+});
+
+// Cargar trabajador al abrir la página
+document.addEventListener('DOMContentLoaded', cargarTrabajador);
+</script>
+{% endblock %}

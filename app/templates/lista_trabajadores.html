@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Trabajadores - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<a href="/" class="btn back-btn">
+    <i style="margin-right: 8px;">←</i> Volver al menú
+</a>
+
+<h1>👥 Lista de Trabajadores</h1>
+<p class="subtitle">
+    Gestión de trabajadores registrados en el sistema
+</p>
+
+<div style="margin-bottom: 20px;">
+    <a href="/agregar-trabajador" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block;">
+        <i style="margin-right: 8px;">➕</i> Agregar Nuevo Trabajador
+    </a>
+</div>
+
+<div id="contenedor_trabajadores">
+    <p style="text-align: center; color: #7f8c8d; font-size: 16px;">
+        <i style="margin-right: 8px;">⏳</i> Cargando trabajadores...
+    </p>
+</div>
+
+<script>
+async function cargarTrabajadores() {
+    try {
+        const response = await fetch('/api/trabajadores');
+        const resultado = await response.json();
+        const contenedor = document.getElementById('contenedor_trabajadores');
+
+        if (resultado.success && resultado.data.length > 0) {
+            let html = `
+                <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">👤 Nombre Completo</th>
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">🆔 Cédula</th>
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">📧 Email</th>
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">💼 Cargo</th>
+                            <th style="padding: 15px; text-align: right; border: none; font-weight: 600;">💰 Salario</th>
+                            <th style="padding: 15px; text-align: center; border: none; font-weight: 600;">⚙️ Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            resultado.data.forEach((trabajador, index) => {
+                const esParImpar = index % 2 === 0 ? '#f8f9fa' : 'white';
+                html += `
+                    <tr style="background-color: ${esParImpar}; border-bottom: 1px solid #ecf0f1; transition: background-color 0.2s;">
+                        <td style="padding: 15px; border: none; font-weight: 500;">${trabajador.nombre} ${trabajador.apellido}</td>
+                        <td style="padding: 15px; border: none; color: #667eea;">${trabajador.cedula}</td>
+                        <td style="padding: 15px; border: none; color: #7f8c8d;">${trabajador.email || '—'}</td>
+                        <td style="padding: 15px; border: none;">
+                            <span style="background-color: #e3f2fd; color: #667eea; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                ${trabajador.cargo}
+                            </span>
+                        </td>
+                        <td style="padding: 15px; border: none; text-align: right; font-weight: 600; color: #27ae60;">
+                            $${parseFloat(trabajador.salario).toLocaleString('es-CO')}
+                        </td>
+                        <td style="padding: 15px; border: none; text-align: center;">
+                            <button onclick="editarTrabajador(${trabajador.id})" class="btn" style="padding: 8px 14px; font-size: 13px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); margin-right: 5px; width: auto;">✏️ Editar</button>
+                            <button onclick="eliminarTrabajador(${trabajador.id})" class="btn" style="padding: 8px 14px; font-size: 13px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); width: auto;">🗑️ Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                </div>
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 12px; text-align: center; border-left: 5px solid #667eea; margin-top: 20px;">
+                    <strong style="color: #2c3e50; font-size: 16px;">👥 Total de trabajadores:</strong>
+                    <span style="color: #667eea; font-size: 20px; font-weight: bold; margin-left: 10px;">${resultado.cantidad}</span>
+                </div>
+            `;
+
+            contenedor.innerHTML = html;
+        } else {
+            contenedor.innerHTML = `
+                <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 40px; border-radius: 12px; text-align: center; border-left: 5px solid #e74c3c;">
+                    <p style="color: #721c24; font-size: 18px; margin-bottom: 15px;">
+                        <i style="font-size: 32px; margin-right: 10px;">📭</i>
+                        <strong>No hay trabajadores registrados</strong>
+                    </p>
+                    <p style="color: #721c24; margin-bottom: 15px;">Registre el primer trabajador para comenzar</p>
+                    <a href="/agregar-trabajador" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: auto;">
+                        <i style="margin-right: 8px;">➕</i> Agregar Trabajador
+                    </a>
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('contenedor_trabajadores').innerHTML = `
+            <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 40px; border-radius: 12px; text-align: center; border-left: 5px solid #e74c3c;">
+                <p style="color: #721c24; font-size: 16px; margin-bottom: 10px;">
+                    <i style="font-size: 32px; margin-right: 10px;">⚠️</i>
+                    <strong>Error al cargar trabajadores</strong>
+                </p>
+                <p style="color: #721c24;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function editarTrabajador(id) {
+    window.location.href = `/editar-trabajador?id=${id}`;
+}
+
+function eliminarTrabajador(id) {
+    if (confirm('¿Está seguro de que desea eliminar este trabajador?')) {
+        fetch(`/api/trabajadores/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(resultado => {
+            if (resultado.success) {
+                alert('Trabajador eliminado correctamente');
+                cargarTrabajadores();
+            } else {
+                alert('Error: ' + resultado.error);
+            }
+        })
+        .catch(error => {
+            alert('Error al eliminar trabajador: ' + error.message);
+        });
+    }
+}
+
+// Cargar trabajadores al abrir la página
+document.addEventListener('DOMContentLoaded', cargarTrabajadores);
+</script>
+{% endblock %}
