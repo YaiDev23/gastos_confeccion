@@ -47,6 +47,7 @@ async def calcular_produccion(request: Request):
     form = await request.form()
     produccion_por_lote = []
     total_unidades = 0
+    total_venta = 0
     
     # Determinar cuántos lotes hay en el formulario
     lote_count = len([k for k in form.keys() if k.startswith('tipo_lote_')])
@@ -58,18 +59,25 @@ async def calcular_produccion(request: Request):
         "16": 0, "18": 0
     }
     
+    def safe_int(value):
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return 0
+    
+    def safe_float(value):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return 0.0
+    
     for i in range(1, lote_count + 1):
         tipo_lote = form.get(f'tipo_lote_{i}')
         color = form.get(f'color_{i}')
+        precio = safe_float(form.get(f'precio_{i}', 0))
         
         if not tipo_lote or not color:
             continue
-        
-        def safe_int(value):
-            try:
-                return int(value)
-            except (TypeError, ValueError):
-                return 0
             
         tallas_lote = {
             "18-24": safe_int(form.get(f'talla_18_24_{i}')),
@@ -92,13 +100,17 @@ async def calcular_produccion(request: Request):
         
         total_lote = sum(tallas_lote.values())
         total_unidades += total_lote
+        valor_lote = total_lote * precio if precio > 0 else 0
+        total_venta += valor_lote
         
         produccion_por_lote.append({
             'tipo_lote': tipo_lote,
             'color': color,
             'etiqueta': f"{tipo_lote} {color}",
             'tallas': tallas_lote,
-            'total': total_lote
+            'total': total_lote,
+            'precio': precio,
+            'valor_total': valor_lote
         })
     
     # Ordenar por tipo de lote y luego por color
@@ -107,7 +119,8 @@ async def calcular_produccion(request: Request):
     datos = {
         'produccion_por_lote': produccion_por_lote,
         'total_unidades': total_unidades,
-        'totales_por_talla': totales_por_talla
+        'totales_por_talla': totales_por_talla,
+        'total_venta': total_venta
     }
     
     fecha_hora_bogota = obtener_fecha_hora_bogota()
