@@ -264,7 +264,7 @@ async def descargar_produccion_pdf(request: Request):
 
 @router.get("/costo-operacion", response_class=HTMLResponse)
 async def mostrar_formulario(request: Request):
-    return templates.TemplateResponse("formulario.html", {"request": request})
+    return templates.TemplateResponse("calcular_ costo_operacion.html", {"request": request})
 
 @router.get("/punto-equilibrio", response_class=HTMLResponse)
 async def mostrar_punto_equilibrio(request: Request):
