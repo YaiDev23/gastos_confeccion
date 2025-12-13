@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Request, Form, HTTPException, status
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from datetime import datetime
+import io
+import json
 
 from app.api.schemas.gastos_schema import GastoSchema
 from app.db.connection import get_db
@@ -43,11 +45,11 @@ async def mostrar_produccion(request: Request):
 @router.post("/calcular-produccion", response_class=HTMLResponse)
 async def calcular_produccion(request: Request):
     form = await request.form()
-    produccion_por_color = []
+    produccion_por_lote = []
     total_unidades = 0
     
-    # Determinar cuántos colores hay en el formulario
-    color_count = len([k for k in form.keys() if k.startswith('color_')])
+    # Determinar cuántos lotes hay en el formulario
+    lote_count = len([k for k in form.keys() if k.startswith('tipo_lote_')])
     
     # Inicializar totales por talla
     totales_por_talla = {
@@ -56,9 +58,11 @@ async def calcular_produccion(request: Request):
         "16": 0, "18": 0
     }
     
-    for i in range(1, color_count + 1):
+    for i in range(1, lote_count + 1):
+        tipo_lote = form.get(f'tipo_lote_{i}')
         color = form.get(f'color_{i}')
-        if not color:
+        
+        if not tipo_lote or not color:
             continue
         
         def safe_int(value):
@@ -67,7 +71,7 @@ async def calcular_produccion(request: Request):
             except (TypeError, ValueError):
                 return 0
             
-        tallas_color = {
+        tallas_lote = {
             "18-24": safe_int(form.get(f'talla_18_24_{i}')),
             "24-36": safe_int(form.get(f'talla_24_36_{i}')),
             "36-48": safe_int(form.get(f'talla_36_48_{i}')),
@@ -83,20 +87,25 @@ async def calcular_produccion(request: Request):
         }
         
         # Actualizar totales por talla
-        for talla, cantidad in tallas_color.items():
+        for talla, cantidad in tallas_lote.items():
             totales_por_talla[talla] += cantidad
         
-        total_color = sum(tallas_color.values())
-        total_unidades += total_color
+        total_lote = sum(tallas_lote.values())
+        total_unidades += total_lote
         
-        produccion_por_color.append({
-            'nombre': color,
-            'tallas': tallas_color,
-            'total': total_color
+        produccion_por_lote.append({
+            'tipo_lote': tipo_lote,
+            'color': color,
+            'etiqueta': f"{tipo_lote} {color}",
+            'tallas': tallas_lote,
+            'total': total_lote
         })
     
+    # Ordenar por tipo de lote y luego por color
+    produccion_por_lote.sort(key=lambda x: (x['tipo_lote'].lower(), x['color'].lower()))
+    
     datos = {
-        'produccion_por_color': produccion_por_color,
+        'produccion_por_lote': produccion_por_lote,
         'total_unidades': total_unidades,
         'totales_por_talla': totales_por_talla
     }
@@ -108,6 +117,137 @@ async def calcular_produccion(request: Request):
         "datos": datos,
         "fecha_hora_bogota": fecha_hora_bogota
     })
+
+@router.post("/descargar-produccion-pdf")
+async def descargar_produccion_pdf(request: Request):
+    """
+    Genera y descarga un PDF del reporte de producción
+    """
+    try:
+        from reportlab.lib.pagesizes import landscape, A4
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+        from reportlab.lib import colors
+        
+        # Obtener los datos del formulario enviado
+        form_data = await request.json()
+        datos = form_data.get('datos', {})
+        fecha_hora = form_data.get('fecha_hora', '')
+        
+        # Crear el PDF en memoria
+        pdf_buffer = io.BytesIO()
+        doc = SimpleDocTemplate(pdf_buffer, pagesize=landscape(A4), topMargin=0.5*inch, bottomMargin=0.5*inch)
+        
+        # Elementos del documento
+        elements = []
+        
+        # Título
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            textColor=colors.HexColor('#667eea'),
+            spaceAfter=10,
+            alignment=1  # Centro
+        )
+        elements.append(Paragraph('📊 Reporte de Producción', title_style))
+        elements.append(Spacer(1, 0.3*inch))
+        
+        # Información general
+        info_style = ParagraphStyle(
+            'Info',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor=colors.grey
+        )
+        elements.append(Paragraph(f'Fecha y hora: {fecha_hora}', info_style))
+        elements.append(Paragraph(f'Total de unidades: <b>{datos.get("total_unidades", 0)}</b>', info_style))
+        elements.append(Spacer(1, 0.2*inch))
+        
+        # Crear tabla
+        table_data = [['Tipo de Lote', 'Color', '18-24', '24-36', '36-48', '2', '4', '6', '8', '10', '12', '14', '16', '18', 'Total']]
+        
+        # Agregar datos de producción
+        produccion = datos.get('produccion_por_lote', [])
+        for lote in produccion:
+            row = [
+                lote.get('tipo_lote', ''),
+                lote.get('color', ''),
+                str(lote.get('tallas', {}).get('18-24', 0)),
+                str(lote.get('tallas', {}).get('24-36', 0)),
+                str(lote.get('tallas', {}).get('36-48', 0)),
+                str(lote.get('tallas', {}).get('2', 0)),
+                str(lote.get('tallas', {}).get('4', 0)),
+                str(lote.get('tallas', {}).get('6', 0)),
+                str(lote.get('tallas', {}).get('8', 0)),
+                str(lote.get('tallas', {}).get('10', 0)),
+                str(lote.get('tallas', {}).get('12', 0)),
+                str(lote.get('tallas', {}).get('14', 0)),
+                str(lote.get('tallas', {}).get('16', 0)),
+                str(lote.get('tallas', {}).get('18', 0)),
+                str(lote.get('total', 0))
+            ]
+            table_data.append(row)
+        
+        # Fila de totales
+        totales = datos.get('totales_por_talla', {})
+        totales_row = ['Total por Talla', '', 
+                      str(totales.get('18-24', 0)),
+                      str(totales.get('24-36', 0)),
+                      str(totales.get('36-48', 0)),
+                      str(totales.get('2', 0)),
+                      str(totales.get('4', 0)),
+                      str(totales.get('6', 0)),
+                      str(totales.get('8', 0)),
+                      str(totales.get('10', 0)),
+                      str(totales.get('12', 0)),
+                      str(totales.get('14', 0)),
+                      str(totales.get('16', 0)),
+                      str(totales.get('18', 0)),
+                      str(datos.get('total_unidades', 0))]
+        table_data.append(totales_row)
+        
+        # Crear tabla
+        table = Table(table_data, colWidths=[1*inch]*15)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#667eea')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.lightgrey])
+        ]))
+        
+        elements.append(table)
+        
+        # Construir PDF
+        doc.build(elements)
+        
+        # Retornar el PDF
+        pdf_buffer.seek(0)
+        return FileResponse(
+            iter([pdf_buffer.getvalue()]),
+            media_type="application/pdf",
+            headers={"Content-Disposition": "attachment; filename=Reporte_Produccion.pdf"}
+        )
+    
+    except ImportError:
+        # Si no está disponible reportlab, retornar error
+        raise HTTPException(
+            status_code=400,
+            detail="Librería reportlab no disponible. Usa la descarga desde el navegador."
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al generar PDF: {str(e)}"
+        )
 
 @router.get("/costo-operacion", response_class=HTMLResponse)
 async def mostrar_formulario(request: Request):
