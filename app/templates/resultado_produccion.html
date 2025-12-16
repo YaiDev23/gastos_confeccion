@@ -23,7 +23,7 @@
                 <!-- Tarjeta Total Venta -->
                 <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Valor Total de Venta</div>
-                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ "%.2f"|format(datos.get('total_venta', 0)) }}</div>
+                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ datos.get('total_venta')}}</div>
                     <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">💰 ingresos totales</div>
                 </div>
                 
@@ -31,7 +31,7 @@
                 {% if datos.total_unidades > 0 and datos.get('total_venta', 0) > 0 %}
                 <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Precio Promedio Unitario</div>
-                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ "%.2f"|format(datos.get('total_venta', 0) / datos.total_unidades) }}</div>
+                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ datos.get('total_venta') / datos.total_unidades }}</div>
                     <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">📊 precio por unidad</div>
                 </div>
                 {% endif %}
@@ -67,7 +67,7 @@
                             <div style="font-weight: 600; color: #333; margin-bottom: 0.8rem;">{{ tipo_lote }}</div>
                             <div style="font-size: 1.5rem; color: #667eea; font-weight: 700; margin-bottom: 0.3rem;">{{ totales_lote[tipo_lote] }}<span style="font-size: 0.8rem; color: #999;"> unidades</span></div>
                             {% if valores_lote.get(tipo_lote, 0) > 0 %}
-                            <div style="font-size: 1.1rem; color: #28a745; font-weight: 600;">$ {{ "%.2f"|format(valores_lote.get(tipo_lote, 0)) }}</div>
+                            <div style="font-size: 1.1rem; color: #28a745; font-weight: 600;">$ {{valores_lote.get(tipo_lote, 0) }}</div>
                             {% endif %}
                         </div>
                     {% endfor %}
@@ -115,15 +115,15 @@
                             <td>{{ lote.tallas["16"] }}</td>
                             <td>{{ lote.tallas["18"] }}</td>
                             <td style="text-align: center;"><strong style="color: #667eea;">{{ lote.total }}</strong></td>
-                            <td style="text-align: right;">$ {{ "%.2f"|format(lote.get('precio', 0)) }}</td>
-                            <td style="text-align: right;"><strong style="color: #28a745;">$ {{ "%.2f"|format(lote.get('valor_total', 0)) }}</strong></td>
+                            <td style="text-align: right;">$ {{ lote.get('precio', 0)}}</td>
+                            <td style="text-align: right;"><strong style="color: #28a745;">$ {{ lote.get('valor_total', 0)}}</strong></td>
                         </tr>
                         {% endfor %}
                         <tr class="total-row">
                             <td colspan="14" style="text-align: right; font-weight: 600;">📊 Totales:</td>
                             <td style="text-align: center; font-weight: 600;">{{ datos.total_unidades }}</td>
                             <td style="text-align: right;"></td>
-                            <td class="total-column" style="text-align: right; font-weight: 600;"><strong style="color: #28a745;">$ {{ "%.2f"|format(datos.get('total_venta', 0)) }}</strong></td>
+                            <td class="total-column" style="text-align: right; font-weight: 600;"><strong style="color: #28a745;">$ {{ datos.get('total_venta', 0) }}</strong></td>
                         </tr>
                     </tbody>
                 </table>

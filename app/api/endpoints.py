@@ -65,16 +65,10 @@ async def calcular_produccion(request: Request):
         except (TypeError, ValueError):
             return 0
     
-    def safe_float(value):
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            return 0.0
-    
     for i in range(1, lote_count + 1):
         tipo_lote = form.get(f'tipo_lote_{i}')
         color = form.get(f'color_{i}')
-        precio = safe_float(form.get(f'precio_{i}', 0))
+        precio = int(form.get(f'precio_{i}', 0))
         
         if not tipo_lote or not color:
             continue
