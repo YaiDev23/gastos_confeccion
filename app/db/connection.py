@@ -51,6 +51,13 @@ def get_db(is_development=True):
             from app.db.base import Base
         # This ensures the metadata is bound to this engine
         Base.metadata.bind = engine
+        
+        # Create tables if they don't exist
+        try:
+            Base.metadata.create_all(bind=engine)
+        except Exception as e:
+            print(f"Warning: Could not create tables: {e}")
+        
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         db = SessionLocal()
         
