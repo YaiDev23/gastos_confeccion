@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Marcar Llegada - Sistema de Asistencia{% endblock %}
+
+{% block content %}
+<a href="/" class="btn back-btn">
+    <i style="margin-right: 8px;">←</i> Volver al menú
+</a>
+
+<h1>✅ Marcar Llegada</h1>
+<p class="subtitle">
+    Selecciona un trabajador para registrar su llegada
+</p>
+
+<div style="max-width: 600px; margin: 0 auto;">
+    <div id="mensaje-exito" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
+    </div>
+
+    <div id="mensaje-error" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
+            <i style="color: #667eea; margin-right: 8px;">👤</i> Selecciona un trabajador:
+        </label>
+        <div id="trabajadores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <p style="text-align: center; color: #666; grid-column: 1/-1;">Cargando trabajadores...</p>
+        </div>
+    </div>
+
+    <input type="hidden" id="trabajador_seleccionado" value="">
+
+    <button type="button" onclick="marcarLlegada()" class="btn" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px; font-weight: bold;">
+        <i style="margin-right: 8px;">🕐</i> Registrar Llegada
+    </button>
+</div>
+
+<div style="max-width: 600px; margin: 40px auto;">
+    <h2>📊 Asistencias Registradas Hoy</h2>
+    <div id="asistencias-container" style="margin-top: 20px;">
+        <p style="text-align: center; color: #666;">Cargando asistencias...</p>
+    </div>
+</div>
+
+<script>
+    // Cargar trabajadores activos al abrir la página
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarTrabajadores();
+        cargarAsistencias();
+        // Actualizar asistencias cada 10 segundos
+        setInterval(cargarAsistencias, 10000);
+    });
+
+    async function cargarTrabajadores() {
+        try {
+            const response = await fetch('/assistence/api/trabajadores');
+            const data = await response.json();
+            
+            if (data.success) {
+                const container = document.getElementById('trabajadores-container');
+                container.innerHTML = '';
+                
+                if (data.data.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1/-1;">No hay trabajadores disponibles</p>';
+                    return;
+                }
+                
+                data.data.forEach(trabajador => {
+                    const card = document.createElement('div');
+                    card.className = 'trabajador-card';
+                    card.id = `card-${trabajador.id}`;
+                    card.style.cssText = `
+                        padding: 15px;
+                        border: 2px solid #ddd;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        text-align: center;
+                        transition: all 0.3s ease;
+                        background-color: white;
+                    `;
+                    card.innerHTML = `
+                        <div style="font-size: 24px; margin-bottom: 10px;">👤</div>
+                        <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 5px;">${trabajador.nombre_completo}</div>
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">${trabajador.cargo}</div>
+                        <div style="font-size: 11px; color: #999;">ID: ${trabajador.cedula}</div>
+                    `;
+                    
+                    card.addEventListener('mouseenter', function() {
+                        this.style.borderColor = '#667eea';
+                        this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
+                        this.style.backgroundColor = '#f0f4ff';
+                    });
+                    
+                    card.addEventListener('mouseleave', function() {
+                        const isSelected = document.getElementById('trabajador_seleccionado').value === trabajador.id.toString();
+                        this.style.borderColor = isSelected ? '#667eea' : '#ddd';
+                        this.style.boxShadow = isSelected ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none';
+                        this.style.backgroundColor = isSelected ? '#e8ecff' : 'white';
+                    });
+                    
+                    card.addEventListener('click', function() {
+                        // Deseleccionar tarjeta anterior
+                        const previousSelected = document.querySelector('.trabajador-card-selected');
+                        if (previousSelected) {
+                            previousSelected.classList.remove('trabajador-card-selected');
+                            previousSelected.style.borderColor = '#ddd';
+                            previousSelected.style.backgroundColor = 'white';
+                            previousSelected.style.boxShadow = 'none';
+                        }
+                        
+                        // Seleccionar nueva tarjeta
+                        document.getElementById('trabajador_seleccionado').value = trabajador.id;
+                        this.classList.add('trabajador-card-selected');
+                        this.style.borderColor = '#667eea';
+                        this.style.backgroundColor = '#e8ecff';
+                        this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                        this.style.borderWidth = '3px';
+                    });
+                    
+                    container.appendChild(card);
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar trabajadores:', error);
+            const container = document.getElementById('trabajadores-container');
+            container.innerHTML = '<p style="text-align: center; color: #e74c3c; grid-column: 1/-1;">Error al cargar trabajadores</p>';
+        }
+    }
+
+    async function marcarLlegada() {
+        const trabajadorId = document.getElementById('trabajador_seleccionado').value;
+        
+        if (!trabajadorId) {
+            mostrarError('Por favor selecciona un trabajador');
+            return;
+        }
+
+        try {
+            const response = await fetch('/assistence/api/marcar-llegada', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    worker_id: parseInt(trabajadorId)
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarExito(data.message);
+                document.getElementById('trabajador_seleccionado').value = '';
+                cargarAsistencias();
+                
+                // Reproducir sonido de éxito
+                reproducirSonido();
+            } else {
+                mostrarError(data.error);
+            }
+        } catch (error) {
+            console.error('Error al marcar llegada:', error);
+            mostrarError('Error al registrar la llegada');
+        }
+    }
+
+    async function marcarSalida(asistenceId) {
+        try {
+            const response = await fetch('/assistence/api/marcar-salida', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_assistence: parseInt(asistenceId)
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarExito(data.message);
+                cargarAsistencias();
+                reproducirSonido();
+            } else {
+                mostrarError(data.error);
+            }
+        } catch (error) {
+            console.error('Error al marcar salida:', error);
+            mostrarError('Error al registrar la salida');
+        }
+    }
+
+    async function cargarAsistencias() {
+        try {
+            const response = await fetch('/assistence/api/asistencias-hoy');
+            const data = await response.json();
+            
+            const container = document.getElementById('asistencias-container');
+            
+            if (data.success && data.data.length > 0) {
+                let html = '<div style="overflow-x: auto;">';
+                html += '<table style="width: 100%; border-collapse: collapse;">';
+                html += '<thead style="background-color: #667eea; color: white;">';
+                html += '<tr>';
+                html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Trabajador</th>';
+                html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Llegada</th>';
+                html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Estado</th>';
+                html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Acción</th>';
+                html += '</tr>';
+                html += '</thead>';
+                html += '<tbody>';
+                
+                data.data.forEach((asistencia, index) => {
+                    const arrival = new Date(asistencia.arrival_time);
+                    const arrivalTime = arrival.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                    const estado = asistencia.estado;
+                    const estadoColor = estado === 'Salida registrada' ? '#28a745' : '#ffc107';
+                    const tienesSalida = asistencia.departure_time !== null;
+                    
+                    let botonAccion = '';
+                    if (!tienesSalida) {
+                        botonAccion = `<button onclick="marcarSalida(${asistencia.id_assistence})" style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">✓ Salida</button>`;
+                    } else {
+                        botonAccion = '<span style="color: #28a745; font-weight: bold;">✓ Completado</span>';
+                    }
+                    
+                    html += '<tr style="background-color: ' + (index % 2 === 0 ? '#f9f9f9' : 'white') + ';">';
+                    html += '<td style="padding: 12px; border: 1px solid #ddd;">' + asistencia.worker + '</td>';
+                    html += '<td style="padding: 12px; border: 1px solid #ddd; text-align: center;">' + arrivalTime + '</td>';
+                    html += '<td style="padding: 12px; border: 1px solid #ddd; text-align: center;"><span style="background-color: ' + estadoColor + '; color: white; padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold;">' + estado + '</span></td>';
+                    html += '<td style="padding: 12px; border: 1px solid #ddd; text-align: center;">' + botonAccion + '</td>';
+                    html += '</tr>';
+                });
+                
+                html += '</tbody>';
+                html += '</table>';
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No hay asistencias registradas hoy</p>';
+            }
+        } catch (error) {
+            console.error('Error al cargar asistencias:', error);
+        }
+    }
+
+    function mostrarExito(mensaje) {
+        const div = document.getElementById('mensaje-exito');
+        div.textContent = mensaje;
+        div.style.display = 'block';
+        
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+            div.style.display = 'none';
+        }, 5000);
+    }
+
+    function mostrarError(mensaje) {
+        const div = document.getElementById('mensaje-error');
+        div.textContent = mensaje;
+        div.style.display = 'block';
+        
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+            div.style.display = 'none';
+        }, 5000);
+    }
+
+    function reproducirSonido() {
+        // Usar Web Audio API para reproducir un tono simple
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.value = 800;
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+    }
+</script>
+{% endblock %}

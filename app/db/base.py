@@ -23,8 +23,7 @@ class Worker(Base):
     cargo = Column(String(100), nullable=False)
     salario = Column(Float, nullable=False)
     activo = Column(Boolean, default=True)
-    fecha_ingreso = Column(DateTime, default=datetime.utcnow)
-    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    
     
     def __repr__(self):
         return f"<Worker(id={self.id}, nombre='{self.nombre}', cedula='{self.cedula}')>"

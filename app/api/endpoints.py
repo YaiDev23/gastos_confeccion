@@ -6,8 +6,17 @@ import io
 import json
 
 from app.api.schemas.gastos_schema import GastoSchema
+from app.api.schemas.worker_schema import (
+    WorkerCreate, WorkerUpdate, WorkerResponse, WorkerListResponse,
+    WorkerCrudResponse, WorkerListCrudResponse
+)
 from app.db.connection import get_db
-from app.service.worker_service import crear_trabajador, listar_trabajadores, obtener_trabajador, actualizar_trabajador, eliminar_trabajador
+from app.service.assistence_service import (
+    marcar_llegada, 
+    marcar_salida, 
+    obtener_asistencias_hoy,
+    obtener_trabajadores_activos
+)
 import pytz
 
 templates = Jinja2Templates(directory="app/templates")
@@ -280,7 +289,7 @@ async def calcular_costo(request: Request):
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return templates.TemplateResponse("error.html", {
@@ -366,7 +375,7 @@ async def calcular_punto_equilibrio(
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return templates.TemplateResponse("error.html", {
@@ -472,7 +481,7 @@ async def get_cost_operation(cantidad_trabajadoras: int, cantidad_trabajadoras_p
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return JSONResponse(
@@ -563,16 +572,8 @@ async def calcular_justicia_pago(
 # ENDPOINTS DE TRABAJADORES
 # =====================
 
-@router.post("/api/trabajadores/crear", response_class=JSONResponse)
-async def crear_nuevo_trabajador(
-    nombre: str = Form(...),
-    apellido: str = Form(...),
-    cedula: str = Form(...),
-    cargo: str = Form(...),
-    salario: float = Form(...),
-    email: str = Form(None),
-    telefono: str = Form(None)
-):
+@router.post("/api/trabajadores/crear", response_model=WorkerCrudResponse, status_code=status.HTTP_201_CREATED)
+async def crear_nuevo_trabajador(worker: WorkerCreate):
     """
     Crea un nuevo trabajador en la base de datos.
     
@@ -595,31 +596,32 @@ async def crear_nuevo_trabajador(
     try:
         resultado = crear_trabajador(
             db=db,
-            nombre=nombre,
-            apellido=apellido,
-            cedula=cedula,
-            cargo=cargo,
-            salario=salario,
-            email=email,
-            telefono=telefono
+            nombre=worker.nombre,
+            apellido=worker.apellido,
+            cedula=worker.cedula,
+            cargo=worker.cargo,
+            salario=worker.salario,
+            email=worker.email,
+            telefono=worker.telefono
         )
         
         if resultado["success"]:
-            return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
-                content=resultado
+            return WorkerCrudResponse(
+                success=True,
+                message="Trabajador creado exitosamente",
+                data=WorkerResponse(**resultado["data"])
             )
         else:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content=resultado
+                detail=resultado.get("error", "Error al crear trabajador")
             )
     finally:
         from app.db.connection import close_connection
         close_connection(db)
 
 
-@router.get("/api/trabajadores", response_class=JSONResponse)
+@router.get("/api/trabajadores", response_model=WorkerListCrudResponse)
 async def obtener_lista_trabajadores():
     """Obtiene la lista de todos los trabajadores activos"""
     db = get_db()
@@ -630,14 +632,26 @@ async def obtener_lista_trabajadores():
         )
     
     try:
-        resultado = listar_trabajadores(db)
-        return JSONResponse(content=resultado)
+        resultado = obtener_trabajadores_activos(db)
+        if resultado["success"]:
+            trabajadores = [WorkerListResponse(**t) for t in resultado["data"]]
+            return WorkerListCrudResponse(
+                success=True,
+                message="Trabajadores obtenidos exitosamente",
+                data=trabajadores,
+                total=len(trabajadores)
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=resultado.get("error", "Error al obtener trabajadores")
+            )
     finally:
         from app.db.connection import close_connection
         close_connection(db)
 
 
-@router.get("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
+@router.get("/api/trabajadores/{trabajador_id}", response_model=WorkerCrudResponse)
 async def obtener_info_trabajador(trabajador_id: int):
     """Obtiene la información de un trabajador específico"""
     db = get_db()
@@ -651,27 +665,25 @@ async def obtener_info_trabajador(trabajador_id: int):
         resultado = obtener_trabajador(db, trabajador_id)
         
         if resultado["success"]:
-            return JSONResponse(content=resultado)
+            return WorkerCrudResponse(
+                success=True,
+                message="Trabajador obtenido exitosamente",
+                data=WorkerResponse(**resultado["data"])
+            )
         else:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
+                detail=resultado.get("error", "Trabajador no encontrado")
             )
     finally:
         from app.db.connection import close_connection
         close_connection(db)
 
 
-@router.put("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
+@router.put("/api/trabajadores/{trabajador_id}", response_model=WorkerCrudResponse)
 async def actualizar_info_trabajador(
     trabajador_id: int,
-    nombre: str = Form(None),
-    apellido: str = Form(None),
-    email: str = Form(None),
-    telefono: str = Form(None),
-    cargo: str = Form(None),
-    salario: float = Form(None),
-    activo: bool = Form(None)
+    worker: WorkerUpdate
 ):
     """Actualiza la información de un trabajador"""
     db = get_db()
@@ -682,31 +694,28 @@ async def actualizar_info_trabajador(
         )
     
     try:
-        kwargs = {
-            "nombre": nombre,
-            "apellido": apellido,
-            "email": email,
-            "telefono": telefono,
-            "cargo": cargo,
-            "salario": salario,
-            "activo": activo
-        }
+        # Filtrar solo los campos que fueron proporcionados
+        update_data = worker.dict(exclude_unset=True)
         
-        resultado = actualizar_trabajador(db, trabajador_id, **kwargs)
+        resultado = actualizar_trabajador(db, trabajador_id, **update_data)
         
         if resultado["success"]:
-            return JSONResponse(content=resultado)
+            return WorkerCrudResponse(
+                success=True,
+                message="Trabajador actualizado exitosamente",
+                data=WorkerResponse(**resultado["data"])
+            )
         else:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
+                detail=resultado.get("error", "Trabajador no encontrado")
             )
     finally:
         from app.db.connection import close_connection
         close_connection(db)
 
 
-@router.delete("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
+@router.delete("/api/trabajadores/{trabajador_id}", response_model=WorkerCrudResponse)
 async def eliminar_info_trabajador(trabajador_id: int):
     """Elimina (desactiva) un trabajador"""
     db = get_db()
@@ -720,14 +729,15 @@ async def eliminar_info_trabajador(trabajador_id: int):
         resultado = eliminar_trabajador(db, trabajador_id)
         
         if resultado["success"]:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content=resultado
+            return WorkerCrudResponse(
+                success=True,
+                message="Trabajador eliminado exitosamente",
+                data=None
             )
         else:
-            return JSONResponse(
+            raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
+                detail=resultado.get("error", "Trabajador no encontrado")
             )
     finally:
         from app.db.connection import close_connection
