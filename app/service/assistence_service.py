@@ -87,6 +87,71 @@ def marcar_llegada(db, worker_id: int):
         }
 
 
+def marcar_llegada_por_reference_id(db, reference_id: str):
+    """
+    Marca la llegada de un trabajador usando el reference_id (código de barras)
+    
+    Args:
+        db: Sesión de base de datos
+        reference_id: Reference ID del trabajador (código de barras)
+        
+    Returns:
+        dict: {"success": bool, "message": str, "data": dict}
+    """
+    try:
+        # Obtener el trabajador por reference_id
+        worker = db.query(Worker).filter(Worker.reference_id == reference_id).first()
+        
+        if not worker:
+            return {
+                "success": False,
+                "error": f"No se encontró trabajador con código {reference_id}"
+            }
+        
+        # Obtener la fecha de hoy en Bogotá
+        ahora = obtener_fecha_hora_bogota()
+        
+        # Verificar si ya hay un registro de llegada hoy
+        asistencia_hoy = db.query(Assistence).filter(
+            Assistence.worker == worker.nombre,
+            func.DATE(Assistence.arrival_time) == ahora.date()
+        ).first()
+        
+        if asistencia_hoy:
+            return {
+                "success": False,
+                "error": f"El trabajador {worker.nombre} ya fue marcado hoy"
+            }
+        
+        # Crear nuevo registro de asistencia
+        nueva_asistencia = Assistence(
+            worker=worker.nombre,
+            arrival_time=ahora
+        )
+        
+        db.add(nueva_asistencia)
+        db.commit()
+        db.refresh(nueva_asistencia)
+        
+        return {
+            "success": True,
+            "message": f"✓ Bienvenida {worker.nombre}",
+            "data": {
+                "id": nueva_asistencia.id_assistence,
+                "worker": f"{worker.nombre} {worker.apellido}",
+                "arrival_time": nueva_asistencia.arrival_time.isoformat(),
+                "fecha": nueva_asistencia.arrival_time.strftime("%d/%m/%Y"),
+                "hora": nueva_asistencia.arrival_time.strftime("%H:%M:%S")
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        return {
+            "success": False,
+            "error": f"Error al marcar llegada: {str(e)}"
+        }
+
+
 def marcar_salida(db, assistence_id: int):
     """
     Marca la salida de un trabajador

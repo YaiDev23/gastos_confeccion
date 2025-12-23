@@ -9,8 +9,18 @@
 
 <h1>✅ Marcar Llegada</h1>
 <p class="subtitle">
-    Selecciona un trabajador para registrar su llegada
+    Selecciona el método para registrar la llegada
 </p>
+
+<!-- Pestañas de opciones -->
+<div style="max-width: 600px; margin: 30px auto; display: flex; gap: 10px; border-bottom: 2px solid #ddd;">
+    <button onclick="cambiarPestana('manual')" id="tab-manual" class="btn" style="flex: 1; background-color: #667eea; border: none; border-radius: 5px 5px 0 0; padding: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 14px;">
+        👤 Selección Manual
+    </button>
+    <button onclick="cambiarPestana('codigo')" id="tab-codigo" class="btn" style="flex: 1; background-color: #ccc; border: none; border-radius: 5px 5px 0 0; padding: 12px; font-weight: bold; color: #333; cursor: pointer; font-size: 14px;">
+        📱 Escanear Código
+    </button>
+</div>
 
 <div style="max-width: 600px; margin: 0 auto;">
     <div id="mensaje-exito" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724;">
@@ -19,21 +29,48 @@
     <div id="mensaje-error" style="display: none; padding: 15px; margin-bottom: 20px; border-radius: 5px; background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24;">
     </div>
 
-    <div style="margin-bottom: 20px;">
-        <label style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
-            <i style="color: #667eea; margin-right: 8px;">👤</i> Selecciona un trabajador:
-        </label>
-        <div id="trabajadores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
-            <p style="text-align: center; color: #666; grid-column: 1/-1;">Cargando trabajadores...</p>
+    <!-- OPCIÓN 1: MANUAL -->
+    <div id="contenedor-manual" style="display: block;">
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
+                <i style="color: #667eea; margin-right: 8px;">👤</i> Selecciona un trabajador:
+            </label>
+            <div id="trabajadores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <p style="text-align: center; color: #666; grid-column: 1/-1;">Cargando trabajadores...</p>
+            </div>
+        </div>
+
+        <input type="hidden" id="trabajador_seleccionado" value="">
+
+        <button type="button" onclick="marcarLlegada()" class="btn" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px; font-weight: bold; background-color: #667eea;">
+            <i style="margin-right: 8px;">🕐</i> Registrar Llegada
+        </button>
+    </div>
+
+    <!-- OPCIÓN 2: ESCANEO DE CÓDIGO -->
+    <div id="contenedor-codigo" style="display: none;">
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
+                <i style="color: #e74c3c; margin-right: 8px;">📱</i> Escanea el código de barras:
+            </label>
+            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; border: 2px dashed #ccc;">
+                <input type="text" 
+                       id="input_reference_id" 
+                       placeholder="Apunta el lector de código de barras aquí..." 
+                       style="width: 100%; padding: 15px; font-size: 16px; border: 2px solid #ddd; border-radius: 5px; text-align: center;"
+                       autocomplete="off"
+                       autofocus>
+                <p style="text-align: center; color: #999; margin-top: 10px; font-size: 12px;">
+                    El código se procesará automáticamente cuando escanees
+                </p>
+            </div>
+            <div id="worker-info" style="display: none; margin-top: 20px; padding: 15px; background-color: #e8f5e9; border: 2px solid #28a745; border-radius: 8px;">
+                <p style="color: #28a745; font-weight: bold; margin: 0;">✓ Trabajador detectado:</p>
+                <p id="worker-name" style="color: #333; font-size: 18px; font-weight: bold; margin: 5px 0 0 0;"></p>
+            </div>
         </div>
     </div>
 
-    <input type="hidden" id="trabajador_seleccionado" value="">
-
-    <button type="button" onclick="marcarLlegada()" class="btn" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px; font-weight: bold;">
-        <i style="margin-right: 8px;">🕐</i> Registrar Llegada
-    </button>
-</div>
 
 <div style="max-width: 600px; margin: 40px auto;">
     <h2>📊 Asistencias Registradas Hoy</h2>
@@ -43,13 +80,48 @@
 </div>
 
 <script>
+    // Variables globales
+    let pestanaActual = 'manual';
+
     // Cargar trabajadores activos al abrir la página
     document.addEventListener('DOMContentLoaded', function() {
         cargarTrabajadores();
         cargarAsistencias();
+        
+        // Escuchar eventos en el input de código de barras
+        const inputReferenceId = document.getElementById('input_reference_id');
+        inputReferenceId.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                marcarLlegadaPorCodigo();
+            }
+        });
+        
         // Actualizar asistencias cada 10 segundos
         setInterval(cargarAsistencias, 10000);
     });
+
+    function cambiarPestana(pestana) {
+        pestanaActual = pestana;
+        
+        // Actualizar visibilidad de contenedores
+        document.getElementById('contenedor-manual').style.display = pestana === 'manual' ? 'block' : 'none';
+        document.getElementById('contenedor-codigo').style.display = pestana === 'codigo' ? 'block' : 'none';
+        
+        // Actualizar estilos de pestañas
+        document.getElementById('tab-manual').style.backgroundColor = pestana === 'manual' ? '#667eea' : '#ccc';
+        document.getElementById('tab-manual').style.color = pestana === 'manual' ? 'white' : '#333';
+        
+        document.getElementById('tab-codigo').style.backgroundColor = pestana === 'codigo' ? '#e74c3c' : '#ccc';
+        document.getElementById('tab-codigo').style.color = pestana === 'codigo' ? 'white' : '#333';
+        
+        // Si cambia a código, enfocar el input
+        if (pestana === 'codigo') {
+            setTimeout(() => {
+                document.getElementById('input_reference_id').focus();
+            }, 100);
+        }
+    }
 
     async function cargarTrabajadores() {
         try {
@@ -164,6 +236,59 @@
         }
     }
 
+    async function marcarLlegadaPorCodigo() {
+        const referenceId = document.getElementById('input_reference_id').value.trim();
+        
+        if (!referenceId) {
+            mostrarError('Por favor escanea un código de barras');
+            return;
+        }
+
+        try {
+            const response = await fetch('/assistence/api/marcar-llegada-codigo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reference_id: referenceId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                mostrarExito(data.message);
+                
+                // Mostrar información del trabajador
+                const workerInfo = document.getElementById('worker-info');
+                document.getElementById('worker-name').textContent = data.data.worker;
+                workerInfo.style.display = 'block';
+                
+                // Limpiar input y dar foco de nuevo
+                document.getElementById('input_reference_id').value = '';
+                document.getElementById('input_reference_id').focus();
+                
+                // Ocultar info después de 3 segundos
+                setTimeout(() => {
+                    workerInfo.style.display = 'none';
+                }, 3000);
+                
+                cargarAsistencias();
+                reproducirSonido();
+            } else {
+                mostrarError(data.error || 'No se encontró trabajador con ese código');
+                document.getElementById('input_reference_id').value = '';
+                document.getElementById('input_reference_id').focus();
+            }
+        } catch (error) {
+            console.error('Error al marcar llegada:', error);
+            mostrarError('Error al procesar el código de barras');
+            document.getElementById('input_reference_id').value = '';
+            document.getElementById('input_reference_id').focus();
+        }
+    }
+
     async function marcarSalida(asistenceId) {
         try {
             const response = await fetch('/assistence/api/marcar-salida', {
@@ -215,7 +340,7 @@
                     const arrival = new Date(asistencia.arrival_time);
                     const arrivalTime = arrival.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
                     const estado = asistencia.estado;
-                    const estadoColor = estado === 'Salida registrada' ? '#28a745' : '#ffc107';
+                    const estadoColor = estado === 'Salió' ? '#28a745' : '#ffc107';
                     const tienesSalida = asistencia.departure_time !== null;
                     
                     let botonAccion = '';

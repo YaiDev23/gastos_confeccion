@@ -1,83 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}Menú Principal - Calculadora de Costos{% endblock %}
+{% block title %}Menú Principal - Sistema de Gestión{% endblock %}
 
 {% block content %}
-<h1>📊 Sistema de Cálculo de Costos</h1>
+<h1>📋 Sistema de Gestión</h1>
 <p class="subtitle">
     Seleccione la opción que desea utilizar
 </p>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 40px;">
-    <!-- Costo de Operación -->
-    <div style="background: white; border: 2px solid #667eea; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(102,126,234,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">💰</div>
-        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Costo de Operación</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Calcule el costo diario de operación basado en la cantidad de trabajadores y practicantes
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; margin-top: 60px; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <!-- Asistencias -->
+    <div style="background: white; border: 3px solid #3498db; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(52,152,219,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+        <h2 style="color: #3498db; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Asistencias</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
+            Registra la llegada y salida de los trabajadores, mantén un control diario de asistencias
         </p>
-        <a href="/costo-operacion" class="btn" style="text-decoration: none; display: inline-block; width: 100%;">
-            Calcular Costo
+        <a href="/assistence/marcar-asistencia" class="btn" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); text-decoration: none; display: inline-block; padding: 15px 30px; font-size: 16px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
+            Ir a Asistencias
         </a>
     </div>
 
-    <!-- Punto de Equilibrio -->
-    <div style="background: white; border: 2px solid #3498db; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(52,152,219,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">⚖️</div>
-        <h3 style="color: #3498db; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Punto de Equilibrio</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Determine cuántas unidades necesita fabricar para cubrir todos los gastos
+    <!-- Menú de Cálculos -->
+    <div style="background: white; border: 3px solid #e74c3c; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(231,76,60,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 64px; margin-bottom: 20px;">🧮</div>
+        <h2 style="color: #e74c3c; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Menú de Cálculos</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
+            Accede a todas las herramientas de cálculo: costos, producción, equilibrio y más
         </p>
-        <a href="/punto-equilibrio" class="btn" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Calcular Punto
-        </a>
-    </div>
-
-    <!-- Producción -->
-    <div style="background: white; border: 2px solid #9b59b6; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(155,89,182,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">👕</div>
-        <h3 style="color: #9b59b6; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Cálculo de Producción</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Registre la producción por colores y tallas para obtener un resumen detallado
-        </p>
-        <a href="/produccion" class="btn" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Registrar Producción
-        </a>
-    </div>
-
-    <!-- Justicia de Pago -->
-    <div style="background: white; border: 2px solid #f39c12; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(243,156,18,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">🧮</div>
-        <h3 style="color: #f39c12; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Justicia de Pago</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Evalúe si un lote está bien pagado comparando el pago recibido con el costo real
-        </p>
-        <a href="/justicia-pago" class="btn" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Analizar Pago
-        </a>
-    </div>
-
-    <!-- Gestión de Trabajadores -->
-    <div style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
-        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Trabajadores</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Administre los trabajadores del sistema: agregar, editar y consultar información
-        </p>
-        <a href="/trabajadores" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Gestionar Trabajadores
-        </a>
-    </div>
-
-    <!-- Agregar Trabajador -->
-    <div style="background: white; border: 2px solid #e74c3c; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(231,76,60,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">➕</div>
-        <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Nuevo Trabajador</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Registre un nuevo trabajador en el sistema con toda la información requerida
-        </p>
-        <a href="/agregar-trabajador" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Agregar Trabajador
+        <a href="/calculos" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); text-decoration: none; display: inline-block; padding: 15px 30px; font-size: 16px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
+            Ir a Cálculos
         </a>
     </div>
 </div>

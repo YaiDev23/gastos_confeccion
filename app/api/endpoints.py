@@ -32,6 +32,10 @@ def obtener_fecha_hora_bogota():
 async def mostrar_menu(request: Request):
     return templates.TemplateResponse("menu.html", {"request": request})
 
+@router.get("/calculos", response_class=HTMLResponse)
+async def mostrar_calculos_menu(request: Request):
+    return templates.TemplateResponse("calculos_menu.html", {"request": request})
+
 @router.get("/agregar-trabajador", response_class=HTMLResponse)
 async def mostrar_agregar_trabajador(request: Request):
     return templates.TemplateResponse("agregar_trabajador.html", {"request": request})

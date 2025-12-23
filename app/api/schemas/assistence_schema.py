@@ -13,6 +13,10 @@ class AsistenciaCreate(BaseModel):
     worker_id: int
 
 
+class AsistenciaCodigoBarras(BaseModel):
+    reference_id: str
+
+
 class AsistenciaSalida(BaseModel):
     id_assistence: int
 

@@ -5,10 +5,11 @@ from datetime import datetime
 import pytz
 
 from app.api.schemas.gastos_schema import GastoSchema
-from app.api.schemas.assistence_schema import AsistenciaCreate, AsistenciaSalida
+from app.api.schemas.assistence_schema import AsistenciaCreate, AsistenciaSalida, AsistenciaCodigoBarras
 from app.db.connection import get_db
 from app.service.assistence_service import (
     marcar_llegada, 
+    marcar_llegada_por_reference_id,
     marcar_salida, 
     obtener_asistencias_hoy,
     obtener_trabajadores_activos
@@ -38,7 +39,7 @@ async def mostrar_menu(request: Request):
 @router.get("/marcar-asistencia", response_class=HTMLResponse)
 async def mostrar_marcar_asistencia(request: Request):
     """Muestra la página para marcar llegada"""
-    return templates.TemplateResponse("marcar_asistencia.html", {"request": request})
+    return templates.TemplateResponse("assistence/marcar_asistencia.html", {"request": request})
 
 
 @router.get("/marcar-salida", response_class=HTMLResponse)
@@ -120,6 +121,35 @@ async def api_marcar_llegada(asistencia: AsistenciaCreate):
     
     try:
         resultado = marcar_llegada(db, asistencia.worker_id)
+        if resultado["success"]:
+            return JSONResponse(status_code=200, content=resultado)
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"error": resultado["error"]}
+            )
+    finally:
+        from app.db.connection import close_connection
+        close_connection(db)
+
+
+@router.post("/api/marcar-llegada-codigo", response_class=JSONResponse)
+async def api_marcar_llegada_codigo(asistencia: AsistenciaCodigoBarras):
+    """
+    Marca la llegada de un trabajador usando el reference_id (código de barras).
+    
+    Parámetros:
+    - reference_id: Reference ID del trabajador (código de barras)
+    """
+    db = get_db()
+    if db is None:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "No se pudo conectar a la base de datos"}
+        )
+    
+    try:
+        resultado = marcar_llegada_por_reference_id(db, asistencia.reference_id)
         if resultado["success"]:
             return JSONResponse(status_code=200, content=resultado)
         else:
