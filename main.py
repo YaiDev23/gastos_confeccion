@@ -5,6 +5,7 @@ import os
 
 from app.api.endpoints import router
 from app.api.endpoints_assistence import router as assistence_router
+from app.api.worker_endpoints import router as worker_router
 
 app = FastAPI()
 
@@ -16,6 +17,8 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static_files")
 
 app.include_router(router)  
 app.include_router(assistence_router, prefix="/assistence", tags=["Assistence"])
+app.include_router(worker_router, prefix="/api", tags=["Workers"])
+
 
 if __name__ == "__main__":
     import uvicorn

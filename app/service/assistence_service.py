@@ -6,7 +6,7 @@ Proporciona funciones para gestionar asistencias y trabajadores
 from datetime import datetime, date
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
-from app.db.base import Worker
+from app.db.models import Worker
 from app.db.models.assistence_model import Assistence
 import pytz
 

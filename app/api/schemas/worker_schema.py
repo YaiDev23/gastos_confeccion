@@ -9,7 +9,7 @@ class WorkerCreate(BaseModel):
     apellido: Optional[str] = Field(None, max_length=100, description="Apellido del trabajador")
     cedula: str = Field(..., min_length=1, max_length=20, description="Cédula del trabajador (única)")
     cargo: str = Field(..., min_length=1, max_length=100, description="Cargo del trabajador")
-    salario: float = Field(..., gt=0, description="Salario del trabajador")
+    salario: str = Field(..., gt=0, description="Salario del trabajador")
     email: Optional[str] = Field(None, max_length=100, description="Email del trabajador")
     telefono: Optional[str] = Field(None, max_length=20, description="Teléfono del trabajador")
 
@@ -43,6 +43,7 @@ class WorkerUpdate(BaseModel):
     email: Optional[str] = Field(None, max_length=100)
     telefono: Optional[str] = Field(None, max_length=20)
     activo: Optional[bool] = None
+    reference_id: Optional[str] = Field(None, max_length=50)
 
     @validator('email')
     def validate_email(cls, v):
@@ -128,6 +129,7 @@ class WorkerCrudResponse(BaseModel):
                     "email": "juan@example.com",
                     "telefono": "3001234567",
                     "activo": True,
+                    "reference_id": 1232131231
                     
                 }
             }

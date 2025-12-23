@@ -46,9 +46,16 @@ def get_db(is_development=True):
     try:
         engine = create_db_engine(is_development)
         try:
-            from .base import Base
+            from models.base import Base
         except ImportError:
-            from app.db.base import Base
+            from app.db.models.base import Base
+        
+        # Import all models to register them with Base metadata
+        try:
+            from app.db.models import Worker, Assistence
+        except ImportError:
+            from .models import Worker, Assistence
+        
         # This ensures the metadata is bound to this engine
         Base.metadata.bind = engine
         

@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from datetime import datetime
-from app.db.base import Base
 import pytz
+from app.db.models.base import Base
+
 
 
 class Assistence(Base):
