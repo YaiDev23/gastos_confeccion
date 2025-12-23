@@ -14,7 +14,53 @@
 </div>
 
 <div class="result-section">
-    <h3 style="margin-top: 0; color: #333;">Análisis de Costos:</h3>
+    <h3 style="margin-top: 0; color: #2c3e50;">
+        <i style="margin-right: 8px;">👩‍🏭</i> Operarias:
+    </h3>
+    
+    {% if datos.operarias %}
+    <div style="background: #f8f9fa; border-left: 3px solid #3498db; padding: 12px; margin: 10px 0; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #2c3e50;">Nombre</strong>
+            <strong style="color: #2c3e50;">Salario Diario</strong>
+        </div>
+        {% for operaria in datos.operarias %}
+        <div style="padding: 8px 0; color: #555; font-size: 14px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <span>{{ operaria.nombre }} {{ operaria.apellido }}</span>
+            <span style="color: #27ae60; font-weight: 500;">${{ "{:,}".format(operaria.salario) }} COP</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: #fff3cd; border-left: 3px solid #ffc107; padding: 12px; margin: 10px 0; border-radius: 4px; color: #856404;">
+        No hay operarias registradas
+    </div>
+    {% endif %}
+
+    <h3 style="margin-top: 20px; color: #2c3e50;">
+        <i style="margin-right: 8px;">👨‍🎓</i> Aprendices:
+    </h3>
+    
+    {% if datos.aprendices %}
+    <div style="background: #f8f9fa; border-left: 3px solid #9b59b6; padding: 12px; margin: 10px 0; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #2c3e50;">Nombre</strong>
+            <strong style="color: #2c3e50;">Salario Diario</strong>
+        </div>
+        {% for aprendiz in datos.aprendices %}
+        <div style="padding: 8px 0; color: #555; font-size: 14px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <span>{{ aprendiz.nombre }} {{ aprendiz.apellido }}</span>
+            <span style="color: #27ae60; font-weight: 500;">${{ "{:,}".format(aprendiz.salario) }} COP</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="background: #fff3cd; border-left: 3px solid #ffc107; padding: 12px; margin: 10px 0; border-radius: 4px; color: #856404;">
+        No hay aprendices registrados
+    </div>
+    {% endif %}
+    
+    <h3 style="margin-top: 20px; color: #333;">Análisis de Costos:</h3>
     
     <div class="cost-item">
         <span class="cost-label">Costo Fijo Total Diario:</span>
@@ -43,11 +89,11 @@
             <h4 style="color: #0c5460; margin-bottom: 10px;">Personal:</h4>
             <div style="color: #0c5460;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                    <span>Trabajadoras ({{ datos.cantidad_trabajadoras }}): </span>
+                    <span>Operarias ({{ datos.cantidad_trabajadoras }}): </span>
                     <span>${{ "{:,}".format(datos.costo_trabajadoras) }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span>Practicantes ({{ datos.cantidad_practicantes }}): </span>
+                    <span>Aprendices ({{ datos.cantidad_practicantes }}): </span>
                     <span>${{ "{:,}".format(datos.costo_practicantes) }}</span>
                 </div>
             </div>

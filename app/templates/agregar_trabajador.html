@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Trabajador - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<a href="/" class="btn back-btn">
+    <i style="margin-right: 8px;">←</i> Volver al menú
+</a>
+
+<h1>➕ Agregar Nuevo Trabajador</h1>
+<p class="subtitle">
+    Complete el formulario para registrar un nuevo trabajador en el sistema
+</p>
+
+<div style="max-width: 600px; margin: 0 auto;">
+    <form id="formulario_trabajador" method="POST" onsubmit="enviarFormulario(event)">
+        <div class="form-group">
+            <label for="nombre">
+                <i style="color: #667eea; margin-right: 8px;">👤</i> Nombre:
+            </label>
+            <input 
+                type="text" 
+                id="nombre" 
+                name="nombre"  
+                required
+                placeholder="Ej: Juan"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="apellido">
+                <i style="color: #667eea; margin-right: 8px;">👤</i> Apellido:
+            </label>
+            <input 
+                type="text" 
+                id="apellido" 
+                name="apellido"  
+                required
+                placeholder="Ej: Pérez García"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="cedula">
+                <i style="color: #667eea; margin-right: 8px;">🆔</i> Cédula (Única):
+            </label>
+            <input 
+                type="text" 
+                id="cedula" 
+                name="cedula"  
+                required
+                placeholder="Ej: 1234567890"
+            >
+            <small>La cédula debe ser única en el sistema</small>
+        </div>
+
+        <div class="form-group">
+            <label for="email">
+                <i style="color: #667eea; margin-right: 8px;">📧</i> Email:
+            </label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email"  
+                placeholder="Ej: juan.perez@email.com"
+            >
+            <small>Campo opcional</small>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">
+                <i style="color: #667eea; margin-right: 8px;">☎️</i> Teléfono:
+            </label>
+            <input 
+                type="text" 
+                id="telefono" 
+                name="telefono"  
+                placeholder="Ej: 3012345678"
+            >
+            <small>Campo opcional</small>
+        </div>
+
+        <div class="form-group">
+            <label for="cargo">
+                <i style="color: #667eea; margin-right: 8px;">💼</i> Cargo:
+            </label>
+            <select id="cargo" name="cargo" required>
+                <option value="">-- Seleccione un cargo --</option>
+                <option value="operaria">Operaria</option>
+                <option value="aprendiz">Aprendiz</option>
+                <option value="supervisor">Supervisor</option>
+                <option value="gerente">Gerente</option>
+                <option value="administrador">Administrador</option>
+                <option value="otros">Otros</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="salario">
+                <i style="color: #667eea; margin-right: 8px;">💰</i> Salario Diario (COP):
+            </label>
+            <input 
+                type="number" 
+                id="salario" 
+                name="salario"  
+                required
+                placeholder="Ej: 50000"
+                step="0.01"
+            >
+            <small>Salario diario del trabajador</small>
+        </div>
+
+        <button type="submit" class="btn">
+            <i style="margin-right: 8px;">✓</i> Registrar Trabajador
+        </button>
+    </form>
+
+    <div id="mensaje_resultado" style="display: none; margin-top: 20px; padding: 20px; border-radius: 12px; text-align: center;">
+    </div>
+</div>
+
+<div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-radius: 12px; border-left: 5px solid #667eea;">
+    <h3 style="margin-top: 0; color: #2c3e50;">
+        <i style="margin-right: 8px;">ℹ️</i> Información importante:
+    </h3>
+    <div style="color: #555; font-size: 14px;">
+        <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+            <strong>📌 Campos obligatorios:</strong> Nombre, Apellido, Cédula, Cargo y Salario
+        </div>
+        <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+            <strong>📌 Cédula única:</strong> No se puede registrar dos trabajadores con la misma cédula
+        </div>
+        <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+            <strong>📌 Salario:</strong> Ingrese el salario diario del trabajador
+        </div>
+        <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+            <strong>📌 Estado:</strong> Una vez registrado, el trabajador quedará como <strong>activo</strong> en el sistema
+        </div>
+    </div>
+</div>
+
+<script>
+async function enviarFormulario(event) {
+    event.preventDefault();
+
+    const formData = new FormData(document.getElementById('formulario_trabajador'));
+    const mensajeDiv = document.getElementById('mensaje_resultado');
+
+    try {
+        const response = await fetch('/api/trabajadores/crear', {
+            method: 'POST',
+            body: formData
+        });
+
+        const resultado = await response.json();
+        mensajeDiv.style.display = 'block';
+
+        if (resultado.success) {
+            mensajeDiv.style.background = 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)';
+            mensajeDiv.style.color = '#155724';
+            mensajeDiv.style.borderLeft = '5px solid #28a745';
+            mensajeDiv.innerHTML = `
+                <h4 style="margin-top: 0;">✅ ¡Trabajador registrado exitosamente!</h4>
+                <div style="margin: 15px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+                    <p><strong>Nombre:</strong> ${resultado.data.nombre} ${resultado.data.apellido}</p>
+                </div>
+                <div style="margin: 15px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+                    <p><strong>Cédula:</strong> ${resultado.data.cedula}</p>
+                </div>
+                <div style="margin: 15px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+                    <p><strong>Cargo:</strong> ${resultado.data.cargo}</p>
+                </div>
+                <p style="margin-bottom: 0;"><a href="/trabajadores" style="color: #28a745; text-decoration: none; font-weight: bold;">Ver lista de trabajadores →</a></p>
+            `;
+            document.getElementById('formulario_trabajador').reset();
+        } else {
+            mensajeDiv.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+            mensajeDiv.style.color = '#721c24';
+            mensajeDiv.style.borderLeft = '5px solid #e74c3c';
+            mensajeDiv.innerHTML = `
+                <h4 style="margin-top: 0;">❌ Error al registrar</h4>
+                <p>${resultado.error}</p>
+            `;
+        }
+    } catch (error) {
+        mensajeDiv.style.display = 'block';
+        mensajeDiv.style.background = 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)';
+        mensajeDiv.style.color = '#721c24';
+        mensajeDiv.style.borderLeft = '5px solid #e74c3c';
+        mensajeDiv.innerHTML = `
+            <h4 style="margin-top: 0;">❌ Error de conexión</h4>
+            <p>${error.message}</p>
+        `;
+    }
+}
+</script>
+{% endblock %}

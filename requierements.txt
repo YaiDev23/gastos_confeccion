@@ -3,3 +3,9 @@ jinja2
 python-multipart
 uvicorn
 pytz
+sqlalchemy
+pymysql
+python-dotenv
+cryptography
+reportlab
+weasyprint

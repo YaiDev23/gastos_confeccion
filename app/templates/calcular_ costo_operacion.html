@@ -1,76 +1,41 @@
 {% extends "base.html" %}
 
-{% block title %}Calculadora Punto de Equilibrio{% endblock %}
-
 {% block content %}
 <a href="/" class="btn back-btn">
     <i style="margin-right: 8px;">←</i> Volver al menú
 </a>
 
-<h1>⚖️ Calculadora de Punto de Equilibrio</h1>
-<p class="subtitle">
-    Determine cuántas unidades necesita fabricar para cubrir todos los gastos
-</p>
+<h1>💰 Calculadora de Costos de Operación</h1>
+
 
 <div style="max-width: 600px; margin: 0 auto;">
     <div id="cargando" style="text-align: center; color: #7f8c8d; font-size: 16px;">
         <i style="margin-right: 8px;">⏳</i> Cargando trabajadores...
     </div>
 
-    <form id="formulario_equilibrio" action="/calcular-equilibrio" method="post" style="display: none;">
-    
-        <div class="form-group">
-            <label for="precio_unidad">
-                <i style="color: #667eea; margin-right: 8px;">💵</i> Precio por Unidad:
-            </label>
-            <input 
-                type="number" 
-                id="precio_unidad" 
-                name="precio_unidad" 
-                min="0" 
-                step="0.01"
-                placeholder="0.00" 
-                required
-            >
-            <small>Precio al que pagaran cada unidad (COP)</small>
-        </div>
-
-        <div class="form-group">
-            <label for="unidades_fabricadas">
-                <i style="color: #667eea; margin-right: 8px;">📦</i> Unidades Fabricadas Hoy (Opcional):
-            </label>
-            <input 
-                type="number" 
-                id="unidades_fabricadas" 
-                name="unidades_fabricadas" 
-                min="0" 
-                step="1"
-                placeholder="0" 
-            >
-            <small>Ingrese para calcular la ganancia real del día</small>
-        </div>
+    <form id="formulario_costo" action="/calcular-costo-operacion" method="post" style="display: none;">
 
         <button type="submit" class="btn">
-            <i style="margin-right: 8px;">🧮</i> Calcular Punto de Equilibrio
+            <i style="margin-right: 8px;">🧮</i> Calcular Costo de Operación
         </button>
     </form>
 
-    <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #fff3cd 0%, #ffe0a1 100%); border-radius: 12px; border-left: 5px solid #ffc107; display: none;" id="info_trabajadores">
-        <h3 style="margin-top: 0; color: #856404;">
-            <i style="margin-right: 8px;">💡</i> ¿Qué es el Punto de Equilibrio?
+    <div style="margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-radius: 12px; border-left: 5px solid #667eea;">
+        <h3 style="margin-top: 0; color: #2c3e50;">
+            <i style="margin-right: 8px;">📊</i> Gastos Fijos Incluidos:
         </h3>
-        <p style="color: #856404; margin-bottom: 15px; font-size: 14px;">
-            El punto de equilibrio es la cantidad mínima de unidades que debe fabricar para cubrir todos sus costos (fijos y variables).
-        </p>
-        <div style="color: #856404; font-size: 14px;">
+        <div style="color: #555; font-size: 15px;">
             <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
-                <strong>📌 Costos Fijos:</strong> Gastos que no cambian independiente de la producción (arriendo, salarios, servicios)
+                <strong>📍 Arriendo diario:</strong> $25,000 COP (basado en $750,000 mensual)
             </div>
             <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
-                <strong>📌 Costos Variables:</strong> Gastos que cambian según la cantidad producida
+                <strong>🧵 Hilos:</strong> $10,000 COP
             </div>
             <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
-                <strong>📌 Fórmula:</strong> Punto de Equilibrio = Costos Fijos ÷ Precio por Unidad
+                <strong>⚡ Luz:</strong> $5,000 COP
+            </div>
+            <div style="margin: 10px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+                <strong>⚙️ Máquinas:</strong> $10,000 COP
             </div>
         </div>
     </div>
@@ -101,8 +66,7 @@ async function cargarDatos() {
             
             // Actualizar UI
             document.getElementById('cargando').style.display = 'none';
-            document.getElementById('formulario_equilibrio').style.display = 'block';
-            document.getElementById('info_trabajadores').style.display = 'block';
+            document.getElementById('formulario_costo').style.display = 'block';
             
             document.getElementById('salario_operarias').textContent = 
                 `Salario diario: $${salario_op.toLocaleString('es-CO')} COP`;

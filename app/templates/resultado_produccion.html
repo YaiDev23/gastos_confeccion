@@ -4,74 +4,126 @@
 <link rel="stylesheet" href="/static/css/styles.css">
 
 <div class="container mt-5">
-    <h2 class="mb-4">Resultado de Producción</h2>
-    <p class="text-muted">Fecha y hora del cálculo: {{ fecha_hora_bogota }}</p>
+    <h2 class="mb-4" style="color: #667eea; font-weight: 700;">📊 Resultado de Producción</h2>
+    <p class="text-muted">📅 Fecha y hora del cálculo: <strong>{{ fecha_hora_bogota }}</strong></p>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h3>Resumen de Producción</h3>
+            <h3 style="margin: 0;">Resumen Financiero</h3>
         </div>
         <div class="card-body">
-            <h4>Total de Unidades: {{ datos.total_unidades }}</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <!-- Tarjeta Total Unidades -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Total de Unidades</div>
+                    <div style="font-size: 2.5rem; font-weight: 700;">{{ datos.total_unidades }}</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">📦 unidades producidas</div>
+                </div>
+                
+                <!-- Tarjeta Total Venta -->
+                <div style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Valor Total de Venta</div>
+                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ datos.get('total_venta')}}</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">💰 ingresos totales</div>
+                </div>
+                
+                <!-- Tarjeta Precio Promedio -->
+                {% if datos.total_unidades > 0 and datos.get('total_venta', 0) > 0 %}
+                <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e72 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Precio Promedio Unitario</div>
+                    <div style="font-size: 2.5rem; font-weight: 700;">$ {{ datos.get('total_venta') / datos.total_unidades }}</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">📊 precio por unidad</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        <div class="card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h4 style="margin: 0; color: #333;">
+                    <span style="font-size: 1.5rem;">📦</span>
+                    Total de Unidades: <span style="color: #667eea; font-weight: 700; font-size: 1.3rem;">{{ datos.total_unidades }}</span>
+                </h4>
+            </div>
+
+            <!-- Resumen por Tipo de Lote -->
+            <div class="summary-by-lote" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h4 style="margin-top: 0; margin-bottom: 1rem; color: #667eea; font-weight: 600;">📋 Total de Unidades por Tipo de Lote</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+                    {% set totales_lote = {} %}
+                    {% set valores_lote = {} %}
+                    {% for lote in datos.produccion_por_lote %}
+                        {% if lote.tipo_lote in totales_lote %}
+                            {% set _ = totales_lote.update({lote.tipo_lote: totales_lote[lote.tipo_lote] + lote.total}) %}
+                            {% set _ = valores_lote.update({lote.tipo_lote: valores_lote[lote.tipo_lote] + lote.get('valor_total', 0)}) %}
+                        {% else %}
+                            {% set _ = totales_lote.update({lote.tipo_lote: lote.total}) %}
+                            {% set _ = valores_lote.update({lote.tipo_lote: lote.get('valor_total', 0)}) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for tipo_lote in totales_lote | sort %}
+                        <div style="background: white; padding: 1.2rem; border-left: 4px solid #667eea; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 0.8rem;">{{ tipo_lote }}</div>
+                            <div style="font-size: 1.5rem; color: #667eea; font-weight: 700; margin-bottom: 0.3rem;">{{ totales_lote[tipo_lote] }}<span style="font-size: 0.8rem; color: #999;"> unidades</span></div>
+                            {% if valores_lote.get(tipo_lote, 0) > 0 %}
+                            <div style="font-size: 1.1rem; color: #28a745; font-weight: 600;">$ {{valores_lote.get(tipo_lote, 0) }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
             
             <div class="table-responsive mt-4">
-                                <div class="table-title" style="margin-bottom: 5px;">inferior</div>
-                <table class="production-table">
+                <table class="production-table" id="produccion-table">
                     <thead>
                         <tr>
-                            <th class="color-column" style="border-bottom: 2px solid #000;">colores</th>
-                
-                            <th>18-24</th>
-                            <th>24-36</th>
-                            <th>36-48</th>
-                            <th>2</th>
-                            <th>4</th>
-                            <th>6</th>
-                            <th>8</th>
-                            <th>10</th>
-                            <th>12</th>
-                            <th>14</th>
-                            <th>16</th>
-                            <th>18</th>
-                            <th class="total-column">total</th>
+                            <th style="text-align: left; width: 12%;">Tipo de Lote</th>
+                            <th style="text-align: left; width: 10%;">Color</th>
+                            <th style="text-align: center;">18-24</th>
+                            <th style="text-align: center;">24-36</th>
+                            <th style="text-align: center;">36-48</th>
+                            <th style="text-align: center;">2</th>
+                            <th style="text-align: center;">4</th>
+                            <th style="text-align: center;">6</th>
+                            <th style="text-align: center;">8</th>
+                            <th style="text-align: center;">10</th>
+                            <th style="text-align: center;">12</th>
+                            <th style="text-align: center;">14</th>
+                            <th style="text-align: center;">16</th>
+                            <th style="text-align: center;">18</th>
+                            <th style="text-align: center; width: 8%;">Cantidad</th>
+                            <th style="text-align: right; width: 10%;">Precio ($)</th>
+                            <th class="total-column" style="text-align: right; width: 10%;">Total ($)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for color in datos.produccion_por_color %}
+                        {% for lote in datos.produccion_por_lote %}
                         <tr>
-                            <td>{{ color.nombre }}</td>
-                        
-                            <td>{{ color.tallas["18-24"] }}</td>
-                            <td>{{ color.tallas["24-36"] }}</td>
-                            <td>{{ color.tallas["36-48"] }}</td>
-                            <td>{{ color.tallas["2"] }}</td>
-                            <td>{{ color.tallas["4"] }}</td>
-                            <td>{{ color.tallas["6"] }}</td>
-                            <td>{{ color.tallas["8"] }}</td>
-                            <td>{{ color.tallas["10"] }}</td>
-                            <td>{{ color.tallas["12"] }}</td>
-                            <td>{{ color.tallas["14"] }}</td>
-                            <td>{{ color.tallas["16"] }}</td>
-                            <td>{{ color.tallas["18"] }}</td>
-                            <td><strong>{{ color.total }}</strong></td>
+                            <td style="text-align: left; font-weight: 500;">{{ lote.tipo_lote }}</td>
+                            <td style="text-align: left; font-weight: 500;">{{ lote.color }}</td>
+                            <td>{{ lote.tallas["18-24"] }}</td>
+                            <td>{{ lote.tallas["24-36"] }}</td>
+                            <td>{{ lote.tallas["36-48"] }}</td>
+                            <td>{{ lote.tallas["2"] }}</td>
+                            <td>{{ lote.tallas["4"] }}</td>
+                            <td>{{ lote.tallas["6"] }}</td>
+                            <td>{{ lote.tallas["8"] }}</td>
+                            <td>{{ lote.tallas["10"] }}</td>
+                            <td>{{ lote.tallas["12"] }}</td>
+                            <td>{{ lote.tallas["14"] }}</td>
+                            <td>{{ lote.tallas["16"] }}</td>
+                            <td>{{ lote.tallas["18"] }}</td>
+                            <td style="text-align: center;"><strong style="color: #667eea;">{{ lote.total }}</strong></td>
+                            <td style="text-align: right;">$ {{ lote.get('precio', 0)}}</td>
+                            <td style="text-align: right;"><strong style="color: #28a745;">$ {{ lote.get('valor_total', 0)}}</strong></td>
                         </tr>
                         {% endfor %}
                         <tr class="total-row">
-                            <td class="color-column">Total por Talla</td>
-                           
-                            <td class="total-size">{{ datos.totales_por_talla["18-24"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["24-36"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["36-48"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["2"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["4"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["6"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["8"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["10"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["12"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["14"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["16"] }}</td>
-                            <td class="total-size">{{ datos.totales_por_talla["18"] }}</td>
-                            <td class="total-column">{{ datos.total_unidades }}</td>
+                            <td colspan="14" style="text-align: right; font-weight: 600;">📊 Totales:</td>
+                            <td style="text-align: center; font-weight: 600;">{{ datos.total_unidades }}</td>
+                            <td style="text-align: right;"></td>
+                            <td class="total-column" style="text-align: right; font-weight: 600;"><strong style="color: #28a745;">$ {{ datos.get('total_venta', 0) }}</strong></td>
                         </tr>
                     </tbody>
                 </table>
@@ -79,7 +131,144 @@
         </div>
     </div>
 
-    <a href="/produccion" class="btn btn-primary">Nuevo Cálculo</a>
-    <a href="/" class="btn btn-secondary">Volver al Menú</a>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+        <button class="btn btn-primary" onclick="descargarPDF()" style="flex: 1; min-width: 200px; text-align: center;">📥 Descargar PDF</button>
+        <a href="/produccion" class="btn btn-primary" style="flex: 1; min-width: 200px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">➕ Nuevo Cálculo</a>
+        <a href="/" class="btn btn-secondary" style="flex: 1; min-width: 200px; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">🏠 Volver al Menú</a>
+    </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+let ordenActual = 'ambos';
+
+function obtenerValorCelda(fila, indice) {
+    try {
+        return fila.cells[indice].textContent.trim().toLowerCase();
+    } catch(e) {
+        return '';
+    }
+}
+
+function actualizarEstadoBotones(opcion) {
+    // Remover clase activa de todos los botones
+    document.querySelectorAll('.orden-btn').forEach(btn => {
+        btn.style.backgroundColor = '';
+        btn.style.color = '#667eea';
+    });
+    
+    // Agregar clase activa al botón seleccionado
+    const btnActivo = document.getElementById('btn-' + opcion);
+    if (btnActivo) {
+        btnActivo.style.backgroundColor = '#667eea';
+        btnActivo.style.color = 'white';
+    }
+}
+
+function ordenarTabla(comparador) {
+    try {
+        const tabla = document.getElementById('produccion-table');
+        if (!tabla) {
+            console.error('Tabla no encontrada');
+            return;
+        }
+        
+        const tbody = tabla.querySelector('tbody');
+        if (!tbody) {
+            console.error('tbody no encontrada');
+            return;
+        }
+        
+        const totalRow = tbody.querySelector('.total-row');
+        
+        // Obtener todas las filas excepto la de totales
+        const filas = Array.from(tbody.querySelectorAll('tr')).filter(fila => !fila.classList.contains('total-row'));
+        
+        console.log('Filas encontradas:', filas.length);
+        
+        // Ordenar las filas
+        filas.sort(comparador);
+        
+        // Remover todas las filas de datos
+        filas.forEach(fila => fila.remove());
+        
+        // Reinsertarlas en orden
+        filas.forEach(fila => tbody.appendChild(fila));
+        
+        // Asegurar que la fila de totales queda al final
+        if (totalRow) {
+            tbody.appendChild(totalRow);
+        }
+        
+        console.log('Tabla ordenada correctamente');
+    } catch(e) {
+        console.error('Error al ordenar tabla:', e);
+    }
+}
+
+function ordenarPor(opcion) {
+    console.log('Ordenando por:', opcion);
+    ordenActual = opcion;
+    
+    // Actualizar estado de botones
+    actualizarEstadoBotones(opcion);
+    
+    switch(opcion) {
+        case 'lote':
+            ordenarTabla((a, b) => {
+                const loteA = obtenerValorCelda(a, 0);
+                const loteB = obtenerValorCelda(b, 0);
+                const resultado = loteA.localeCompare(loteB, 'es');
+                return resultado;
+            });
+            break;
+            
+        case 'color':
+            ordenarTabla((a, b) => {
+                const colorA = obtenerValorCelda(a, 1);
+                const colorB = obtenerValorCelda(b, 1);
+                const resultado = colorA.localeCompare(colorB, 'es');
+                return resultado;
+            });
+            break;
+            
+        case 'ambos':
+            ordenarTabla((a, b) => {
+                const loteA = obtenerValorCelda(a, 0);
+                const loteB = obtenerValorCelda(b, 0);
+                const comparaLote = loteA.localeCompare(loteB, 'es');
+                
+                if (comparaLote !== 0) return comparaLote;
+                
+                const colorA = obtenerValorCelda(a, 1);
+                const colorB = obtenerValorCelda(b, 1);
+                return colorA.localeCompare(colorB, 'es');
+            });
+            break;
+    }
+}
+
+function descargarPDF() {
+    const elemento = document.querySelector('.container');
+    const opcion = {
+        margin: 10,
+        filename: 'Reporte_Produccion.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, allowTaint: true },
+        jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+    };
+    
+    // Usar html2pdf para convertir y descargar
+    html2pdf().set(opcion).from(elemento).save();
+}
+
+// Aplicar ordenamiento por defecto cuando el documento está listo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Documento cargado');
+    setTimeout(() => {
+        ordenarPor('ambos');
+    }, 100);
+});
+</script>
 {% endblock %}
