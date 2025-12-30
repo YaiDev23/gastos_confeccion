@@ -3,70 +3,398 @@
 {% block title %}Menú Principal - Sistema de Gestión{% endblock %}
 
 {% block content %}
-<h1>📋 Sistema de Gestión</h1>
-<p class="subtitle">
-    Seleccione la opción que desea utilizar
-</p>
+<style>
+    .menu-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; margin-top: 60px; max-width: 1000px; margin-left: auto; margin-right: auto;">
-    <!-- Asistencias -->
-    <div id="moduloAsistencias" style="background: white; border: 3px solid #3498db; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(52,152,219,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
-        <h2 style="color: #3498db; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Asistencias</h2>
-        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
-            Registra la llegada y salida de los trabajadores, mantén un control diario de asistencias
-        </p>
-        <a href="/assistence/marcar-asistencia" class="btn" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); text-decoration: none; display: inline-block; padding: 15px 30px; font-size: 16px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
-            Ir a Asistencias
-        </a>
+    .menu-header {
+        text-align: center;
+        margin-bottom: 60px;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+    }
+
+    .menu-header h1 {
+        font-size: 2.5em;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .menu-header .subtitle {
+        font-size: 1.1em;
+        margin-top: 10px;
+        opacity: 0.95;
+        font-weight: 300;
+    }
+
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    .module-card {
+        background: white;
+        border-radius: 12px;
+        padding: 35px 25px;
+        text-align: center;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 3px solid;
+        display: flex;
+        flex-direction: column;
+        min-height: 380px;
+    }
+
+    .module-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .module-card.asistencias {
+        border-color: #3498db;
+    }
+
+    .module-card.asistencias:hover {
+        box-shadow: 0 20px 40px rgba(52, 152, 219, 0.25);
+    }
+
+    .module-card.calculos {
+        border-color: #e74c3c;
+    }
+
+    .module-card.calculos:hover {
+        box-shadow: 0 20px 40px rgba(231, 76, 60, 0.25);
+    }
+
+    .module-card.entregas {
+        border-color: #667eea;
+    }
+
+    .module-card.entregas:hover {
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.25);
+    }
+
+    .module-card.trabajadores {
+        border-color: #27ae60;
+    }
+
+    .module-card.trabajadores:hover {
+        box-shadow: 0 20px 40px rgba(39, 174, 96, 0.25);
+    }
+
+    .module-card.talleres {
+        border-color: #f39c12;
+    }
+
+    .module-card.talleres:hover {
+        box-shadow: 0 20px 40px rgba(243, 156, 18, 0.25);
+    }
+
+    .module-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+        display: block;
+        transition: transform 0.35s ease;
+    }
+
+    .module-card:hover .module-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .module-title {
+        font-size: 1.4em;
+        font-weight: 700;
+        margin: 0 0 15px 0;
+        transition: color 0.3s ease;
+    }
+
+    .module-card.asistencias .module-title {
+        color: #3498db;
+    }
+
+    .module-card.calculos .module-title {
+        color: #e74c3c;
+    }
+
+    .module-card.entregas .module-title {
+        color: #667eea;
+    }
+
+    .module-card.trabajadores .module-title {
+        color: #27ae60;
+    }
+
+    .module-card.talleres .module-title {
+        color: #f39c12;
+    }
+
+    .module-description {
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 0.95em;
+        line-height: 1.6;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .module-button {
+        text-decoration: none;
+        display: inline-block;
+        padding: 14px 28px;
+        font-size: 0.95em;
+        font-weight: 600;
+        color: white;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .module-card.asistencias .module-button {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    }
+
+    .module-card.asistencias .module-button:hover {
+        box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+    }
+
+    .module-card.calculos .module-button {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    }
+
+    .module-card.calculos .module-button:hover {
+        box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .module-card.entregas .module-button {
+        background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
+    }
+
+    .module-card.entregas .module-button:hover {
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .module-card.trabajadores .module-button {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    }
+
+    .module-card.trabajadores .module-button:hover {
+        box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+    }
+
+    .module-card.talleres .module-button {
+        background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+    }
+
+    .module-card.talleres .module-button:hover {
+        box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
+    }
+
+    .module-button:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .menu-header {
+            padding: 30px 15px;
+            margin-bottom: 40px;
+        }
+
+        .menu-header h1 {
+            font-size: 2em;
+        }
+
+        .menu-header .subtitle {
+            font-size: 1em;
+        }
+
+        .modules-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .module-card {
+            padding: 30px 20px;
+            min-height: auto;
+        }
+
+        .module-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-size: 1.2em;
+        }
+
+        .module-description {
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        .module-button {
+            padding: 12px 20px;
+            font-size: 0.9em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .menu-container {
+            padding: 10px;
+        }
+
+        .menu-header {
+            padding: 20px 10px;
+            margin-bottom: 30px;
+        }
+
+        .menu-header h1 {
+            font-size: 1.6em;
+        }
+
+        .menu-header .subtitle {
+            font-size: 0.9em;
+        }
+
+        .modules-grid {
+            gap: 15px;
+        }
+
+        .module-card {
+            padding: 25px 15px;
+            border-width: 2px;
+        }
+
+        .module-icon {
+            font-size: 45px;
+            margin-bottom: 12px;
+        }
+
+        .module-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .module-description {
+            font-size: 0.85em;
+            margin-bottom: 15px;
+        }
+
+        .module-button {
+            padding: 10px 15px;
+            font-size: 0.85em;
+        }
+    }
+
+    /* Animación de entrada */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .module-card {
+        animation: slideUp 0.6s ease-out forwards;
+    }
+
+    .module-card:nth-child(1) { animation-delay: 0.1s; }
+    .module-card:nth-child(2) { animation-delay: 0.2s; }
+    .module-card:nth-child(3) { animation-delay: 0.3s; }
+    .module-card:nth-child(4) { animation-delay: 0.4s; }
+    .module-card:nth-child(5) { animation-delay: 0.5s; }
+</style>
+
+<div class="menu-container">
+    <div class="menu-header">
+        <h1>📋 Sistema de Gestión</h1>
+        <p class="subtitle">Seleccione la opción que desea utilizar</p>
     </div>
 
-    <!-- Menú de Cálculos -->
-    <div id="moduloCalculos" style="background: white; border: 3px solid #e74c3c; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(231,76,60,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 64px; margin-bottom: 20px;">🧮</div>
-        <h2 style="color: #e74c3c; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Menú de Cálculos</h2>
-        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
-            Accede a todas las herramientas de cálculo: costos, producción, equilibrio y más
-        </p>
-        <a href="/calculos" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); text-decoration: none; display: inline-block; padding: 15px 30px; font-size: 16px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
-            Ir a Cálculos
-        </a>
-    </div>
+    <div class="modules-grid">
+        <!-- Asistencias -->
+        <div id="moduloAsistencias" class="module-card asistencias">
+            <span class="module-icon">✅</span>
+            <h2 class="module-title">Asistencias</h2>
+            <p class="module-description">
+                Registra la llegada y salida de los trabajadores, mantén un control diario de asistencias
+            </p>
+            <a href="/assistence/marcar-asistencia" class="module-button">
+                Ir a Asistencias
+            </a>
+        </div>
 
-    <!-- Gestión de Entregas -->
-    <div id="moduloEntregas" style="background: white; border: 3px solid #667eea; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
-        <h2 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Gestión de Entregas</h2>
-        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
-            Registra entregas de cortes, consulta datos y administra todas tus entregas en un solo lugar
-        </p>
-        <a href="/menu_entrega" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #5568d3 100%); text-decoration: none; display: inline-block; padding: 15px 30px; font-size: 16px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box;">
-            Ir a Entregas
-        </a>
-    </div>
-    <!-- Gestión de Trabajadores -->
-    <div id="moduloTrabajadores" style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
-        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Trabajadores</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Administre los trabajadores del sistema: agregar, editar y consultar información
-        </p>
-        <a href="/trabajadores" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Gestionar Trabajadores
-        </a>
-    </div>
-    <!-- Gestión de Taller -->
-    <div id="moduloTalleres"style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">🧶</div>
-        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Talleres</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Administre los talleres del sistema: agregar, editar y consultar información
-        </p>
-        <a href="/talleres" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Gestionar Talleres
-        </a>
+        <!-- Menú de Cálculos -->
+        <div id="moduloCalculos" class="module-card calculos">
+            <span class="module-icon">🧮</span>
+            <h2 class="module-title">Menú de Cálculos</h2>
+            <p class="module-description">
+                Accede a todas las herramientas de cálculo: costos, producción, equilibrio y más
+            </p>
+            <a href="/calculos" class="module-button">
+                Ir a Cálculos
+            </a>
+        </div>
+
+        <!-- Gestión de Entregas -->
+        <div id="moduloEntregas" class="module-card entregas">
+            <span class="module-icon">📦</span>
+            <h2 class="module-title">Gestión de Entregas</h2>
+            <p class="module-description">
+                Registra entregas de cortes, consulta datos y administra todas tus entregas en un solo lugar
+            </p>
+            <a href="/menu_entrega" class="module-button">
+                Ir a Entregas
+            </a>
+        </div>
+
+        <!-- Gestión de Trabajadores -->
+        <div id="moduloTrabajadores" class="module-card trabajadores">
+            <span class="module-icon">👥</span>
+            <h2 class="module-title">Gestión de Trabajadores</h2>
+            <p class="module-description">
+                Administre los trabajadores del sistema: agregar, editar y consultar información
+            </p>
+            <a href="/trabajadores" class="module-button">
+                Gestionar Trabajadores
+            </a>
+        </div>
+
+        <!-- Gestión de Talleres -->
+        <div id="moduloTalleres" class="module-card talleres">
+            <span class="module-icon">🧶</span>
+            <h2 class="module-title">Gestión de Talleres</h2>
+            <p class="module-description">
+                Administre los talleres del sistema: agregar, editar y consultar información
+            </p>
+            <a href="/talleres" class="module-button">
+                Gestionar Talleres
+            </a>
+        </div>
     </div>
 </div>
+
 
 <script>
     // Controlar visibilidad de módulos según el rol
@@ -109,4 +437,5 @@
     // Ejecutar cuando cargue la página
     window.addEventListener('load', mostrarModulosPorRol);
 </script>
+
 {% endblock %}
