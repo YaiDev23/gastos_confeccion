@@ -28,30 +28,6 @@ def obtener_fecha_hora_bogota():
     ahora = datetime.now(bogota_tz)
     return ahora.strftime("%d/%m/%Y - %I:%M:%S %p")
 
-@router.get("/", response_class=HTMLResponse)
-async def mostrar_menu(request: Request):
-    return templates.TemplateResponse("menu.html", {"request": request})
-
-@router.get("/calculos", response_class=HTMLResponse)
-async def mostrar_calculos_menu(request: Request):
-    return templates.TemplateResponse("calculos_menu.html", {"request": request})
-
-@router.get("/agregar-trabajador", response_class=HTMLResponse)
-async def mostrar_agregar_trabajador(request: Request):
-    return templates.TemplateResponse("agregar_trabajador.html", {"request": request})
-
-@router.get("/trabajadores", response_class=HTMLResponse)
-async def mostrar_lista_trabajadores(request: Request):
-    return templates.TemplateResponse("lista_trabajadores.html", {"request": request})
-
-@router.get("/editar-trabajador", response_class=HTMLResponse)
-async def mostrar_editar_trabajador(request: Request):
-    return templates.TemplateResponse("editar_trabajador.html", {"request": request})
-
-@router.get("/produccion", response_class=HTMLResponse)
-async def mostrar_produccion(request: Request):
-    return templates.TemplateResponse("produccion.html", {"request": request})
-
 @router.post("/calcular-produccion", response_class=HTMLResponse)
 async def calcular_produccion(request: Request):
     form = await request.form()
@@ -265,14 +241,6 @@ async def descargar_produccion_pdf(request: Request):
             status_code=500,
             detail=f"Error al generar PDF: {str(e)}"
         )
-
-@router.get("/costo-operacion", response_class=HTMLResponse)
-async def mostrar_formulario(request: Request):
-    return templates.TemplateResponse("calcular_ costo_operacion.html", {"request": request})
-
-@router.get("/punto-equilibrio", response_class=HTMLResponse)
-async def mostrar_punto_equilibrio(request: Request):
-    return templates.TemplateResponse("punto_equilibrio.html", {"request": request})
 
 @router.post("/calcular-costo-operacion", response_class=HTMLResponse)
 #calculo de costo de operacion

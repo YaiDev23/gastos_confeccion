@@ -1,0 +1,468 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/styles.css">
+
+<style>
+    .header-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #27ae60;
+    }
+    
+    .header-nav h2 {
+        margin: 0;
+        color: #27ae60;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    
+    .btn-nav {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-left: 10px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.3s;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .btn-menu {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    }
+    
+    .btn-menu:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-add {
+        background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table thead {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f0fdf4;
+    }
+    
+    .btn-action {
+        padding: 6px 12px;
+        margin: 0 3px;
+        font-size: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .btn-edit:hover {
+        background-color: #2980b9;
+    }
+    
+    .btn-delete {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .btn-delete:hover {
+        background-color: #c0392b;
+    }
+    
+    .btn-view {
+        background-color: #27ae60;
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background-color: #229954;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+        font-size: 18px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7f8c8d;
+    }
+    
+    .empty-state img {
+        width: 80px;
+        opacity: 0.5;
+        margin-bottom: 20px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: black;
+    }
+    
+    .modal-header {
+        border-bottom: 2px solid #27ae60;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #27ae60;
+    }
+    
+    .modal-body {
+        line-height: 1.6;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .detail-label {
+        font-weight: bold;
+        color: #27ae60;
+        min-width: 120px;
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        display: none;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+    }
+</style>
+
+<div class="header-nav">
+    <h2>📋 Consultar Entregas</h2>
+    <div>
+        <a href="/entrega_corte" class="btn-nav btn-add">➕ Nueva Entrega</a>
+        <a href="/menu_entrega" class="btn-nav btn-menu">← Menú de Entregas</a>
+    </div>
+</div>
+
+<div id="alertBox" class="alert"></div>
+
+<div class="table-container">
+    <div id="loadingMessage" class="loading">
+        ⏳ Cargando entregas...
+    </div>
+    
+    <table id="deliveriesTable" class="table table-striped" style="display: none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Responsable</th>
+                <th>Fecha</th>
+                <th>Lote</th>
+                <th>Tipo</th>
+                <th>Color</th>
+                <th>Total Piezas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="deliveriesBody">
+        </tbody>
+    </table>
+    
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+        <h3>No hay entregas registradas</h3>
+        <p>Comienza registrando una nueva entrega</p>
+        <a href="/entrega_corte" class="btn btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 30px; text-decoration: none;">
+            Crear Primera Entrega
+        </a>
+    </div>
+</div>
+
+<!-- Modal para ver detalles -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" onclick="closeModal('detailsModal')">&times;</span>
+            <h3>📦 Detalles de la Entrega</h3>
+        </div>
+        <div class="modal-body" id="detailsContent">
+        </div>
+    </div>
+</div>
+
+<script>
+async function loadDeliveries() {
+    try {
+        const response = await fetch('/api/deliveries');
+        const deliveries = await response.json();
+        
+        const loadingMessage = document.getElementById('loadingMessage');
+        const emptyState = document.getElementById('emptyState');
+        const table = document.getElementById('deliveriesTable');
+        const tbody = document.getElementById('deliveriesBody');
+        
+        loadingMessage.style.display = 'none';
+        
+        if (!deliveries || deliveries.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+        
+        table.style.display = 'table';
+        tbody.innerHTML = '';
+        
+        deliveries.forEach(delivery => {
+            const totalPiezas = 
+                (delivery.sz6_12 || 0) +
+                (delivery.sz12_18 || 0) +
+                (delivery.sz18_24 || 0) +
+                (delivery.sz24_36 || 0) +
+                (delivery.sz36_48 || 0) +
+                (delivery.sz2 || 0) +
+                (delivery.sz4 || 0) +
+                (delivery.sz6 || 0) +
+                (delivery.sz8 || 0) +
+                (delivery.sz10 || 0) +
+                (delivery.sz12 || 0) +
+                (delivery.sz14 || 0) +
+                (delivery.sz16 || 0) +
+                (delivery.sz18 || 0);
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><strong>#${delivery.id_delivery}</strong></td>
+                <td>${delivery.owner}</td>
+                <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
+                <td>${delivery.lot || '—'}</td>
+                <td>${delivery.type || '—'}</td>
+                <td>${delivery.color || '—'}</td>
+                <td><span style="background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
+                <td>
+                    <button class="btn-action btn-view" onclick="viewDetails(${delivery.id_delivery})">👁️ Ver</button>
+                    <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
+                    <button class="btn-action btn-delete" onclick="deleteDelivery(${delivery.id_delivery})">🗑️ Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loadingMessage').style.display = 'none';
+        showAlert('Error al cargar las entregas: ' + error.message, 'error');
+    }
+}
+
+function viewDetails(deliveryId) {
+    const deliveryRow = event.target.closest('tr');
+    const cells = deliveryRow.querySelectorAll('td');
+    
+    fetch(`/api/deliveries/${deliveryId}`)
+        .then(response => response.json())
+        .then(delivery => {
+            const totalPiezas = 
+                (delivery.sz6_12 || 0) +
+                (delivery.sz12_18 || 0) +
+                (delivery.sz18_24 || 0) +
+                (delivery.sz24_36 || 0) +
+                (delivery.sz36_48 || 0) +
+                (delivery.sz2 || 0) +
+                (delivery.sz4 || 0) +
+                (delivery.sz6 || 0) +
+                (delivery.sz8 || 0) +
+                (delivery.sz10 || 0) +
+                (delivery.sz12 || 0) +
+                (delivery.sz14 || 0) +
+                (delivery.sz16 || 0) +
+                (delivery.sz18 || 0);
+            
+            const detailsContent = document.getElementById('detailsContent');
+            detailsContent.innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">ID Entrega:</span>
+                    <span>#${delivery.id_delivery}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Responsable:</span>
+                    <span>${delivery.owner}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fecha:</span>
+                    <span>${new Date(delivery.date).toLocaleDateString('es-ES')}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Lote:</span>
+                    <span>${delivery.lot || '—'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Tipo:</span>
+                    <span>${delivery.type || '—'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Color:</span>
+                    <span>${delivery.color || '—'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Anotación:</span>
+                    <span>${delivery.annotation || '—'}</span>
+                </div>
+                <hr>
+                <h4 style="color: #27ae60; margin-top: 20px;">📏 Cantidades por Talla</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div class="detail-row"><span class="detail-label">6-12:</span> <span>${delivery.sz6_12 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">12-18:</span> <span>${delivery.sz12_18 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">18-24:</span> <span>${delivery.sz18_24 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">24-36:</span> <span>${delivery.sz24_36 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">36-48:</span> <span>${delivery.sz36_48 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 2:</span> <span>${delivery.sz2 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 4:</span> <span>${delivery.sz4 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 6:</span> <span>${delivery.sz6 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 8:</span> <span>${delivery.sz8 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 10:</span> <span>${delivery.sz10 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 12:</span> <span>${delivery.sz12 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 14:</span> <span>${delivery.sz14 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 16:</span> <span>${delivery.sz16 || 0}</span></div>
+                    <div class="detail-row"><span class="detail-label">Talla 18:</span> <span>${delivery.sz18 || 0}</span></div>
+                </div>
+                <hr>
+                <div class="detail-row" style="background: #ecf0f1; padding: 10px; border-radius: 5px; border-bottom: none;">
+                    <span class="detail-label" style="font-size: 16px;">Total Piezas:</span>
+                    <span style="font-size: 16px; font-weight: bold; color: #27ae60;">${totalPiezas}</span>
+                </div>
+            `;
+            
+            document.getElementById('detailsModal').style.display = 'block';
+        })
+        .catch(error => {
+            showAlert('Error al cargar los detalles: ' + error.message, 'error');
+        });
+}
+
+function editDelivery(deliveryId) {
+    alert('Función de edición en desarrollo');
+    // TODO: Implementar edición
+}
+
+function deleteDelivery(deliveryId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta entrega? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    
+    fetch(`/api/deliveries/${deliveryId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            showAlert('Entrega eliminada correctamente', 'success');
+            setTimeout(() => {
+                loadDeliveries();
+            }, 1500);
+        } else {
+            showAlert('Error al eliminar la entrega', 'error');
+        }
+    })
+    .catch(error => {
+        showAlert('Error: ' + error.message, 'error');
+    });
+}
+
+function showAlert(message, type) {
+    const alertBox = document.getElementById('alertBox');
+    alertBox.textContent = message;
+    alertBox.className = `alert alert-${type}`;
+    
+    setTimeout(() => {
+        alertBox.style.display = 'none';
+    }, 5000);
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('detailsModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Cargar entregas al iniciar
+document.addEventListener('DOMContentLoaded', loadDeliveries);
+</script>
+
+{% endblock %}

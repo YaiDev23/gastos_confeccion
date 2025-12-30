@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Menú de Entregas - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<style>
+    .header-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #667eea;
+    }
+    
+    .header-nav h1 {
+        margin: 0;
+        color: #667eea;
+        font-size: 32px;
+        font-weight: 700;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        text-decoration: none;
+        display: inline-block;
+        padding: 12px 25px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="header-nav">
+    <h1>📦 Gestión de Entregas</h1>
+    <a href="/" class="btn-back">← Volver al Menú Principal</a>
+</div>
+
+<p style="text-align: center; color: #7f8c8d; font-size: 18px; margin-bottom: 60px;">
+    Selecciona una opción para gestionar las entregas de producción
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+    
+    <!-- Registrar Entrega -->
+    <div style="background: white; border: 3px solid #667eea; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">➕</div>
+        <h2 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Registrar Entrega</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            Registra una nueva entrega de piezas cortadas indicando responsable, fecha, tipo de producto y cantidades por talla
+        </p>
+        <a href="/entrega_corte" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #5568d3 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Crear Entrega
+        </a>
+    </div>
+
+    <!-- Consultar Entregas -->
+    <div style="background: white; border: 3px solid #27ae60; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(39,174,96,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">📋</div>
+        <h2 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Ver Entregas</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            Visualiza todas las entregas registradas, consulta detalles específicos, edita información o elimina entregas
+        </p>
+        <a href="/consultar_entrega" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Ver Entregas
+        </a>
+    </div>
+
+    <!-- Reportes y Estadísticas -->
+    <div style="background: white; border: 3px solid #e67e22; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(230,126,34,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">📊</div>
+        <h2 style="color: #e67e22; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Reportes</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            Genera reportes y estadísticas sobre las entregas, análisis de producción por talla y responsable
+        </p>
+        <a href="#" class="btn" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Ver Reportes
+        </a>
+    </div>
+</div>
+
+{% endblock %}
