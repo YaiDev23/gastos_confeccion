@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gastos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-container p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .error-message {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Sistema de Gastos</h1>
+        <p>Inicia sesión para continuar</p>
+        
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="Ingresa tu usuario"
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="psw">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="psw" 
+                    name="psw" 
+                    required 
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="login-btn">Iniciar Sesión</button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <div class="footer-text">
+            © 2025 Sistema de Gastos de Confección
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            loading.style.display = 'block';
+
+            const username = document.getElementById('username').value;
+            const psw = document.getElementById('psw').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        psw: psw
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Guardar datos del usuario en sessionStorage
+                    sessionStorage.setItem('user', JSON.stringify(data.data));
+                    sessionStorage.setItem('userRole', data.data.rol);
+                    // Redirigir al menú principal
+                    window.location.href = '/menu';
+                } else {
+                    errorMessage.textContent = data.error || 'Error en el inicio de sesión';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Error de conexión. Intenta nuevamente.';
+                errorMessage.classList.add('show');
+                console.error('Error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Limpiar error cuando el usuario comience a escribir
+        document.getElementById('username').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+        document.getElementById('psw').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

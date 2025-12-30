@@ -3,62 +3,310 @@
 {% block title %}Menú de Cálculos - Sistema de Gestión{% endblock %}
 
 {% block content %}
-<a href="/" class="btn back-btn">
-    <i style="margin-right: 8px;">←</i> Volver al menú principal
-</a>
+<style>
+    .calculos-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 0;
+    }
 
-<h1>🧮 Menú de Cálculos</h1>
-<p class="subtitle">
-    Seleccione la opción de cálculo que desea utilizar
-</p>
+    .calculos-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px 20px;
+        color: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 40px;">
-    <!-- Costo de Operación -->
-    <div style="background: white; border: 2px solid #667eea; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(102,126,234,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">💰</div>
-        <h3 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Costo de Operación</h3>
+    .calculos-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 32px;
+    }
+
+    .calculos-header .subtitle {
+        margin: 0;
+        font-size: 14px;
+        opacity: 0.95;
+    }
+
+    .calculos-toolbar {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e0e0e0;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .toolbar-left {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .toolbar-right {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .back-btn {
+        background: white !important;
+        border: 1px solid #ddd !important;
+        padding: 8px 16px !important;
+        font-size: 14px !important;
+        border-radius: 6px !important;
+        color: #333 !important;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: #f0f0f0 !important;
+        border-color: #999 !important;
+    }
+
+    .profile-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+    }
+
+    .profile-section span {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .calculos-content {
+        flex: 1;
+        padding: 40px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .calculos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .card {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        border-color: #667eea;
+    }
+
+    .card-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+
+    .card h3 {
+        margin: 0 0 15px 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    .card p {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin: 0 0 20px 0;
+        flex: 1;
+        line-height: 1.5;
+    }
+
+    .card .btn {
+        margin-top: auto;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        padding: 12px 24px !important;
+        border-radius: 6px !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .card .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+    }
+
+    @media (max-width: 768px) {
+        .calculos-header {
+            padding: 20px 15px;
+        }
+
+        .calculos-header h1 {
+            font-size: 24px;
+        }
+
+        .calculos-toolbar {
+            flex-direction: column;
+            padding: 12px 15px;
+        }
+
+        .toolbar-left, .toolbar-right {
+            width: 100%;
+        }
+
+        .back-btn {
+            width: 100% !important;
+        }
+
+        .profile-section {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .calculos-content {
+            padding: 20px 15px;
+        }
+
+        .calculos-grid {
+            gap: 20px;
+        }
+
+        .card {
+            padding: 20px;
+        }
+
+        .card h3 {
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .calculos-header h1 {
+            font-size: 20px;
+        }
+
+        .calculos-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-icon {
+            font-size: 40px;
+        }
+    }
+</style>
+
+<div class="calculos-container">
+    <!-- Header -->
+    <div class="calculos-header">
+        <h1>🧮 Menú de Cálculos</h1>
+        <p class="subtitle">Seleccione la opción de cálculo que desea utilizar</p>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="calculos-toolbar">
+        <div class="toolbar-left">
+            <a href="/menu" class="back-btn">
+                <i style="margin-right: 8px;">←</i> Volver al menú
+            </a>
+        </div>
+        <div class="toolbar-right">
+            <div class="profile-section">
+                <span>👤</span>
+                <span id="userName">Usuario</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="calculos-content">
+        <div class="calculos-grid">
+            <!-- Costo de Operación -->
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <h3>Costo de Operación</h3>
+                <p>Calcule el costo diario de operación basado en la cantidad de trabajadores y practicantes</p>
+                <a href="/costo-operacion" class="btn">Calcular Costo</a>
+            </div>
+
+            <!-- Punto de Equilibrio -->
+            <div class="card">
+                <div class="card-icon">⚖️</div>
+                <h3>Punto de Equilibrio</h3>
+                <p>Determine cuántas unidades necesita fabricar para cubrir todos los gastos</p>
+                <a href="/punto-equilibrio" class="btn">Calcular Punto</a>
+            </div>
+
+            <!-- Producción -->
+            <div class="card">
+                <div class="card-icon">👕</div>
+                <h3>Entrega de Producción</h3>
+                <p>Registre la producción por colores y tallas para obtener un resumen detallado</p>
+                <a href="/produccion" class="btn">Registrar Producción</a>
+            </div>
+
+            <!-- Justicia de Pago -->
+            <div class="card">
+                <div class="card-icon">💳</div>
+                <h3>Justicia de Pago</h3>
+                <p>Evalúe si un lote está bien pagado comparando el pago recibido con el costo real</p>
+                <a href="/justicia-pago" class="btn">Analizar Pago</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Gestión de Trabajadores -->
+    <div style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Trabajadores</h3>
         <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Calcule el costo diario de operación basado en la cantidad de trabajadores y practicantes
+            Administre los trabajadores del sistema: agregar, editar y consultar información
         </p>
-        <a href="/costo-operacion" class="btn" style="text-decoration: none; display: inline-block; width: 100%;">
-            Calcular Costo
+        <a href="/trabajadores" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
+            Gestionar Trabajadores
         </a>
     </div>
 
-    <!-- Punto de Equilibrio -->
-    <div style="background: white; border: 2px solid #3498db; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(52,152,219,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">⚖️</div>
-        <h3 style="color: #3498db; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Punto de Equilibrio</h3>
+    <!-- Agregar Trabajador -->
+    <div style="background: white; border: 2px solid #e74c3c; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(231,76,60,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 48px; margin-bottom: 15px;">➕</div>
+        <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Nuevo Trabajador</h3>
         <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Determine cuántas unidades necesita fabricar para cubrir todos los gastos
+            Registre un nuevo trabajador en el sistema con toda la información requerida
         </p>
-        <a href="/punto-equilibrio" class="btn" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Calcular Punto
+        <a href="/agregar-trabajador" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); text-decoration: none; display: inline-block; width: 100%;">
+            Agregar Trabajador
         </a>
     </div>
+</div>
 
-    <!-- Producción -->
-    <div style="background: white; border: 2px solid #9b59b6; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(155,89,182,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">👕</div>
-        <h3 style="color: #9b59b6; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Entrega de Producción</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Registre la producción por colores y tallas para obtener un resumen detallado
-        </p>
-        <a href="/produccion" class="btn" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Registrar Producción
-        </a>
-    </div>
-
-    <!-- Justicia de Pago -->
-    <div style="background: white; border: 2px solid #f39c12; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(243,156,18,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-        <div style="font-size: 48px; margin-bottom: 15px;">🧮</div>
-        <h3 style="color: #f39c12; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Justicia de Pago</h3>
-        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
-            Evalúe si un lote está bien pagado comparando el pago recibido con el costo real
-        </p>
-        <a href="/justicia-pago" class="btn" style="background: linear-gradient(135deg, #f39c12 0%, #d68910 100%); text-decoration: none; display: inline-block; width: 100%;">
-            Analizar Pago
-        </a>
-    </div>
+<script>
+    // Cargar nombre del usuario en la barra de herramientas
+    window.addEventListener('load', () => {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user && user.usuario) {
+            document.getElementById('userName').textContent = user.usuario;
+        }
+    });
+</script>
 
 {% endblock %}

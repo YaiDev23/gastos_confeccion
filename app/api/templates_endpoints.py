@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Request, Form, HTTPException, status
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse
 from datetime import datetime
 import io
 import json
 
 from app.api.schemas.gastos_schema import GastoSchema
+from app.api.schemas.user_schema import UserLogin
+from app.utils.permissions import RolePermissions
 
 from app.db.connection import get_db
 from app.service.assistence_service import (
@@ -14,6 +16,7 @@ from app.service.assistence_service import (
     obtener_asistencias_hoy,
     obtener_trabajadores_activos
 )
+from app.service.user_service import UserService
 import pytz
 
 templates = Jinja2Templates(directory="app/templates")
@@ -22,7 +25,18 @@ router = APIRouter()
 gastos_fijos = GastoSchema.gastos_fijos
 arriendo = GastoSchema.arriendo
 
+def verificar_rol(request: Request, roles_permitidos: list) -> bool:
+    """Verifica si el usuario tiene uno de los roles permitidos"""
+    # Obtener rol de cookies o headers
+    user_data = request.headers.get('X-User-Rol')
+    return user_data in roles_permitidos if user_data else False
+
 @router.get("/", response_class=HTMLResponse)
+async def mostrar_login(request: Request):
+    """Ruta principal - Muestra el formulario de login"""
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@router.get("/menu", response_class=HTMLResponse)
 async def mostrar_menu(request: Request):
     return templates.TemplateResponse("menu.html", {"request": request})
 

@@ -10,7 +10,7 @@
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; margin-top: 60px; max-width: 1000px; margin-left: auto; margin-right: auto;">
     <!-- Asistencias -->
-    <div style="background: white; border: 3px solid #3498db; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(52,152,219,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+    <div id="moduloAsistencias" style="background: white; border: 3px solid #3498db; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(52,152,219,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
         <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
         <h2 style="color: #3498db; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Asistencias</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Menú de Cálculos -->
-    <div style="background: white; border: 3px solid #e74c3c; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(231,76,60,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+    <div id="moduloCalculos" style="background: white; border: 3px solid #e74c3c; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(231,76,60,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
         <div style="font-size: 64px; margin-bottom: 20px;">🧮</div>
         <h2 style="color: #e74c3c; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Menú de Cálculos</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
@@ -34,7 +34,7 @@
     </div>
 
     <!-- Gestión de Entregas -->
-    <div style="background: white; border: 3px solid #667eea; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+    <div id="moduloEntregas" style="background: white; border: 3px solid #667eea; border-radius: 15px; padding: 40px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
         <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
         <h2 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 28px; font-weight: bold;">Gestión de Entregas</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
@@ -45,4 +45,38 @@
         </a>
     </div>
 </div>
+
+<script>
+    // Controlar visibilidad de módulos según el rol
+    function mostrarModulosPorRol() {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const rol = user?.rol;
+
+        // Obtener referencias a los módulos
+        const moduloAsistencias = document.getElementById('moduloAsistencias');
+        const moduloCalculos = document.getElementById('moduloCalculos');
+        const moduloEntregas = document.getElementById('moduloEntregas');
+
+        // Mostrar/ocultar según el rol
+        if (rol === 'supera') {
+            // Super tiene acceso a todo
+            moduloAsistencias.style.display = 'block';
+            moduloCalculos.style.display = 'block';
+            moduloEntregas.style.display = 'block';
+        } else if (rol === 'admin') {
+            // Admin solo a entregas
+            moduloAsistencias.style.display = 'none';
+            moduloCalculos.style.display = 'none';
+            moduloEntregas.style.display = 'block';
+        } else {
+            // Otros roles sin acceso
+            moduloAsistencias.style.display = 'block';
+            moduloCalculos.style.display = 'block';
+            moduloEntregas.style.display = 'none';
+        }
+    }
+
+    // Ejecutar cuando cargue la página
+    window.addEventListener('load', mostrarModulosPorRol);
+</script>
 {% endblock %}
