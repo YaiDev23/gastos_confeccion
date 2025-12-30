@@ -44,6 +44,28 @@
             Ir a Entregas
         </a>
     </div>
+    <!-- Gestión de Trabajadores -->
+    <div id="moduloTrabajadores" style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 48px; margin-bottom: 15px;">👥</div>
+        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Trabajadores</h3>
+        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
+            Administre los trabajadores del sistema: agregar, editar y consultar información
+        </p>
+        <a href="/trabajadores" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
+            Gestionar Trabajadores
+        </a>
+    </div>
+    <!-- Gestión de Taller -->
+    <div id="moduloTalleres"style="background: white; border: 2px solid #27ae60; border-radius: 12px; padding: 30px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(39,174,96,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 48px; margin-bottom: 15px;">🧶</div>
+        <h3 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 22px;">Gestión de Talleres</h3>
+        <p style="color: #7f8c8d; margin-bottom: 20px; font-size: 14px;">
+            Administre los talleres del sistema: agregar, editar y consultar información
+        </p>
+        <a href="/talleres" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: 100%;">
+            Gestionar Talleres
+        </a>
+    </div>
 </div>
 
 <script>
@@ -56,23 +78,31 @@
         const moduloAsistencias = document.getElementById('moduloAsistencias');
         const moduloCalculos = document.getElementById('moduloCalculos');
         const moduloEntregas = document.getElementById('moduloEntregas');
+        const moduloTalleres = document.getElementById('moduloTalleres');
+        const moduloTrabajadores = document.getElementById('moduloTrabajadores');
 
         // Mostrar/ocultar según el rol
         if (rol === 'supera') {
             // Super tiene acceso a todo
             moduloAsistencias.style.display = 'block';
             moduloCalculos.style.display = 'block';
+            moduloTalleres.style.display = 'block';
             moduloEntregas.style.display = 'block';
+            moduloTrabajadores.style.display = 'block';
         } else if (rol === 'admin') {
             // Admin solo a entregas
             moduloAsistencias.style.display = 'none';
             moduloCalculos.style.display = 'none';
             moduloEntregas.style.display = 'block';
+            moduloTalleres.style.display = 'block';
+            moduloTrabajadores.style.display = 'none';
         } else {
             // Otros roles sin acceso
             moduloAsistencias.style.display = 'block';
             moduloCalculos.style.display = 'block';
             moduloEntregas.style.display = 'none';
+            moduloTalleres.style.display = 'none';
+            moduloTrabajadores.style.display = 'block';
         }
     }
 

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Talleres - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<a href="/menu" class="btn back-btn">
+    <i style="margin-right: 8px;">←</i> Volver al menú
+</a>
+
+<h1>🏭 Lista de Talleres</h1>
+<p class="subtitle">
+    Gestión de talleres registrados en el sistema
+</p>
+
+<div style="margin-bottom: 20px;">
+    <a href="/agregar-taller" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block;">
+        <i style="margin-right: 8px;">➕</i> Agregar Nuevo Taller
+    </a>
+</div>
+
+<div id="contenedor_trabajadores">
+    <p style="text-align: center; color: #7f8c8d; font-size: 16px;">
+        <i style="margin-right: 8px;">⏳</i> Cargando trabajadores...
+    </p>
+</div>
+
+<script>
+async function cargarTrabajadores() {
+    try {
+        const response = await fetch('/api/factories');
+        const resultado = await response.json();
+        const contenedor = document.getElementById('contenedor_trabajadores');
+
+        if (resultado && resultado.length > 0) {
+            let html = `
+                <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">🆔 ID</th>
+                            <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">🏭 Propietario</th>
+                            <th style="padding: 15px; text-align: center; border: none; font-weight: 600;">⚙️ Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            resultado.forEach((taller, index) => {
+                const esParImpar = index % 2 === 0 ? '#f8f9fa' : 'white';
+                html += `
+                    <tr style="background-color: ${esParImpar}; border-bottom: 1px solid #ecf0f1; transition: background-color 0.2s;">
+                        <td style="padding: 15px; border: none; color: #667eea; font-weight: 600;">${taller.id_factory}</td>
+                        <td style="padding: 15px; border: none; font-weight: 500;">${taller.owner}</td>
+                        <td style="padding: 15px; border: none; text-align: center;">
+                            <button onclick="editarTaller(${taller.id_factory})" class="btn" style="padding: 8px 14px; font-size: 13px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); margin-right: 5px; width: auto;">✏️ Editar</button>
+                            <button onclick="eliminarTaller(${taller.id_factory})" class="btn" style="padding: 8px 14px; font-size: 13px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); width: auto;">🗑️ Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                </div>
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 12px; text-align: center; border-left: 5px solid #667eea; margin-top: 20px;">
+                    <strong style="color: #2c3e50; font-size: 16px;">🏭 Total de talleres:</strong>
+                    <span style="color: #667eea; font-size: 20px; font-weight: bold; margin-left: 10px;">${resultado.length}</span>
+                </div>
+            `;
+
+            contenedor.innerHTML = html;
+        } else {
+            contenedor.innerHTML = `
+                <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 40px; border-radius: 12px; text-align: center; border-left: 5px solid #e74c3c;">
+                    <p style="color: #721c24; font-size: 18px; margin-bottom: 15px;">
+                        <i style="font-size: 32px; margin-right: 10px;">📭</i>
+                        <strong>No hay talleres registrados</strong>
+                    </p>
+                    <p style="color: #721c24; margin-bottom: 15px;">Registre el primer taller para comenzar</p>
+                    <a href="/agregar-taller" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; width: auto;">
+                        <i style="margin-right: 8px;">➕</i> Agregar Taller
+                    </a>
+                </div>
+            `;
+        }
+    } catch (error) {
+        document.getElementById('contenedor_trabajadores').innerHTML = `
+            <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 40px; border-radius: 12px; text-align: center; border-left: 5px solid #e74c3c;">
+                <p style="color: #721c24; font-size: 16px; margin-bottom: 10px;">
+                    <i style="font-size: 32px; margin-right: 10px;">⚠️</i>
+                    <strong>Error al cargar talleres</strong>
+                </p>
+                <p style="color: #721c24;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function editarTaller(id) {
+    window.location.href = `/editar-taller?id=${id}`;
+}
+
+function eliminarTaller(id) {
+    if (confirm('¿Está seguro de que desea eliminar este taller?')) {
+        fetch(`/api/factories/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(resultado => {
+            alert('Taller eliminado correctamente');
+            cargarTrabajadores();
+        })
+        .catch(error => {
+            alert('Error al eliminar taller: ' + error.message);
+        });
+    }
+}
+
+// Cargar talleres al abrir la página
+document.addEventListener('DOMContentLoaded', cargarTrabajadores);
+</script>
+{% endblock %}

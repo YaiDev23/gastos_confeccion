@@ -71,8 +71,22 @@
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="owner">Responsable:</label>
-                            <input type="text" id="owner" name="owner" class="form-control" placeholder="Nombre del responsable" required>
+                            <label for="factorySelect" style="color: #667eea; font-weight: 600;">👤 Responsable (Taller):</label>
+                            <div class="position-relative">
+                                <input 
+                                    type="text" 
+                                    id="factorySelect" 
+                                    class="form-control" 
+                                    placeholder="🔍 Buscar taller..." 
+                                    autocomplete="off"
+                                    required
+                                    style="padding-right: 40px;">
+                                <div id="factoriesDropdown" class="position-absolute w-100" style="display: none; top: 100%; left: 0; border: 1px solid #ddd; background: white; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 300px; overflow-y: auto; z-index: 1000;">
+                                    <!-- Se llenará dinámicamente con JavaScript -->
+                                </div>
+                            </div>
+                            <input type="hidden" id="owner" name="owner" required>
+                            <small id="ownerHelper" style="display: none; color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem;">❌ Por favor selecciona un taller válido</small>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -178,12 +192,119 @@
 </div>
 
 <script>
+// Variable global para almacenar los talleres
+let factories = [];
+
+// Cargar talleres desde la API
+async function loadFactories() {
+    try {
+        const response = await fetch('/api/factories');
+        if (response.ok) {
+            factories = await response.json();
+        } else {
+            console.error('Error al cargar talleres:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al conectar con la API:', error);
+    }
+}
+
+// Mostrar dropdown con talleres
+function showFactoriesDropdown(searchTerm = '') {
+    const dropdown = document.getElementById('factoriesDropdown');
+    const filtered = factories.filter(f => 
+        f.owner.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    if (filtered.length === 0) {
+        dropdown.innerHTML = '<div style="padding: 15px; text-align: center; color: #999;">No se encontraron talleres</div>';
+    } else {
+        dropdown.innerHTML = filtered.map(factory => `
+            <div class="factory-option" data-factory-id="${factory.id_factory}" data-factory-name="${factory.owner}" 
+                 style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0;">
+                    ${factory.owner.charAt(0).toUpperCase()}
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #333;">${factory.owner}</div>
+                    <div style="font-size: 0.85rem; color: #999;">ID: ${factory.id_factory}</div>
+                </div>
+                <div style="color: #667eea; font-size: 1.2rem;">✓</div>
+            </div>
+        `).join('');
+    }
+    
+    dropdown.style.display = 'block';
+    
+    // Agregar listeners a las opciones
+    document.querySelectorAll('.factory-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const factoryName = this.dataset.factoryName;
+            const factoryId = this.dataset.factoryId;
+            
+            document.getElementById('factorySelect').value = factoryName;
+            document.getElementById('owner').value = factoryName;
+            dropdown.style.display = 'none';
+            document.getElementById('ownerHelper').style.display = 'none';
+            document.getElementById('factorySelect').classList.remove('is-invalid');
+        });
+        
+        option.addEventListener('mouseover', function() {
+            this.style.backgroundColor = '#f8f9ff';
+        });
+        
+        option.addEventListener('mouseout', function() {
+            this.style.backgroundColor = 'transparent';
+        });
+    });
+}
+
+// Event listeners para el campo de búsqueda
+document.getElementById('factorySelect').addEventListener('input', function(e) {
+    const searchTerm = this.value;
+    if (searchTerm.length > 0) {
+        showFactoriesDropdown(searchTerm);
+    } else {
+        document.getElementById('factoriesDropdown').style.display = 'none';
+    }
+});
+
+document.getElementById('factorySelect').addEventListener('focus', function() {
+    if (this.value.length > 0 || factories.length > 0) {
+        showFactoriesDropdown(this.value);
+    }
+});
+
+// Cerrar dropdown al hacer click fuera
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('factoriesDropdown');
+    const factorySelect = document.getElementById('factorySelect');
+    
+    if (!e.target.closest('.form-group')) {
+        dropdown.style.display = 'none';
+    }
+});
+
 document.getElementById('deliveryForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Validar que el owner sea un taller válido
+    const ownerValue = document.getElementById('owner').value;
+    const isValidFactory = factories.some(f => f.owner === ownerValue);
+    
+    if (!isValidFactory) {
+        const alertBox = document.getElementById('alertBox');
+        alertBox.className = 'alert alert-danger';
+        alertBox.innerHTML = '<strong>❌ Error!</strong> Por favor selecciona un taller válido de la lista';
+        document.getElementById('statusMessage').style.display = 'block';
+        document.getElementById('factorySelect').classList.add('is-invalid');
+        document.getElementById('ownerHelper').style.display = 'block';
+        return;
+    }
+
     // Obtener datos del formulario
     const formData = {
-        owner: document.getElementById('owner').value,
+        owner: ownerValue,
         date: document.getElementById('date').value,
         lot: document.getElementById('lot').value || null,
         type: document.getElementById('type').value || null,
@@ -222,6 +343,8 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
             alertBox.className = 'alert alert-success';
             alertBox.innerHTML = `<strong>✅ Éxito!</strong> Entrega registrada correctamente. ID: ${result.id_delivery}`;
             document.getElementById('deliveryForm').reset();
+            document.getElementById('owner').value = '';
+            document.getElementById('factorySelect').value = '';
             
             // Establecer la fecha de hoy por defecto
             const today = new Date().toISOString().split('T')[0];
@@ -242,10 +365,11 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
     }
 });
 
-// Establecer la fecha de hoy por defecto al cargar
+// Establecer la fecha de hoy por defecto y cargar talleres al cargar
 document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('date').value = today;
+    loadFactories();
 });
 </script>
 {% endblock %}

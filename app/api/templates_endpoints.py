@@ -79,6 +79,14 @@ async def mostrar_justicia_pago(request: Request):
 async def mostrar_menu_entrega(request: Request):
     return templates.TemplateResponse("delivery/menu_entrega.html", {"request": request})
 
+@router.get("/agregar-taller", response_class=HTMLResponse)
+async def mostrar_menu_entrega(request: Request):
+    return templates.TemplateResponse("delivery/agregar_taller.html", {"request": request})
+
+@router.get("/talleres", response_class=HTMLResponse)
+async def mostrar_menu_entrega(request: Request):
+    return templates.TemplateResponse("delivery/lista_talleres.html", {"request": request})
+
 
 @router.get("/entrega_corte", response_class=HTMLResponse)
 async def mostrar_entrega_corte(request: Request):

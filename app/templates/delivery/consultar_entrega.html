@@ -219,6 +219,46 @@
 
 <div id="alertBox" class="alert"></div>
 
+<!-- Sección de Búsqueda y Filtros -->
+<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="searchInput" style="color: #27ae60; font-weight: 600;">🔍 Buscar Entrega:</label>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="form-control" 
+                    placeholder="Buscar por responsable, lote, tipo o color..."
+                    style="padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px;">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="sortSelect" style="color: #27ae60; font-weight: 600;">📊 Ordenar por:</label>
+                <select id="sortSelect" class="form-control" style="padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px;">
+                    <option value="fecha-desc">Fecha (Más Reciente)</option>
+                    <option value="fecha-asc">Fecha (Más Antigua)</option>
+                    <option value="responsable-asc">Responsable (A-Z)</option>
+                    <option value="responsable-desc">Responsable (Z-A)</option>
+                    <option value="lote-asc">Lote (A-Z)</option>
+                    <option value="total-desc">Total Piezas (Mayor)</option>
+                    <option value="total-asc">Total Piezas (Menor)</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label style="color: #27ae60; font-weight: 600;">&nbsp;</label>
+                <button id="clearFilters" class="btn btn-secondary w-100" style="padding: 10px 15px; border-radius: 8px;">🔄 Limpiar Filtros</button>
+            </div>
+        </div>
+    </div>
+    <div id="filterStatus" style="font-size: 0.9rem; color: #666; display: none;">
+        Mostrando <strong id="resultCount">0</strong> de <strong id="totalCount">0</strong> entregas
+    </div>
+</div>
+
 <div class="table-container">
     <div id="loadingMessage" class="loading">
         ⏳ Cargando entregas...
@@ -264,60 +304,22 @@
 </div>
 
 <script>
+let allDeliveries = []; // Almacenar todas las entregas
+
 async function loadDeliveries() {
     try {
         const response = await fetch('/api/deliveries');
-        const deliveries = await response.json();
+        allDeliveries = await response.json();
         
         const loadingMessage = document.getElementById('loadingMessage');
-        const emptyState = document.getElementById('emptyState');
-        const table = document.getElementById('deliveriesTable');
-        const tbody = document.getElementById('deliveriesBody');
-        
         loadingMessage.style.display = 'none';
         
-        if (!deliveries || deliveries.length === 0) {
-            emptyState.style.display = 'block';
+        if (!allDeliveries || allDeliveries.length === 0) {
+            document.getElementById('emptyState').style.display = 'block';
             return;
         }
         
-        table.style.display = 'table';
-        tbody.innerHTML = '';
-        
-        deliveries.forEach(delivery => {
-            const totalPiezas = 
-                (delivery.sz6_12 || 0) +
-                (delivery.sz12_18 || 0) +
-                (delivery.sz18_24 || 0) +
-                (delivery.sz24_36 || 0) +
-                (delivery.sz36_48 || 0) +
-                (delivery.sz2 || 0) +
-                (delivery.sz4 || 0) +
-                (delivery.sz6 || 0) +
-                (delivery.sz8 || 0) +
-                (delivery.sz10 || 0) +
-                (delivery.sz12 || 0) +
-                (delivery.sz14 || 0) +
-                (delivery.sz16 || 0) +
-                (delivery.sz18 || 0);
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><strong>#${delivery.id_delivery}</strong></td>
-                <td>${delivery.owner}</td>
-                <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
-                <td>${delivery.lot || '—'}</td>
-                <td>${delivery.type || '—'}</td>
-                <td>${delivery.color || '—'}</td>
-                <td><span style="background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
-                <td>
-                    <button class="btn-action btn-view" onclick="viewDetails(${delivery.id_delivery})">👁️ Ver</button>
-                    <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
-                    <button class="btn-action btn-delete" onclick="deleteDelivery(${delivery.id_delivery})">🗑️ Eliminar</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
+        renderDeliveries(allDeliveries);
         
     } catch (error) {
         console.error('Error:', error);
@@ -326,89 +328,186 @@ async function loadDeliveries() {
     }
 }
 
-function viewDetails(deliveryId) {
-    const deliveryRow = event.target.closest('tr');
-    const cells = deliveryRow.querySelectorAll('td');
+function calculateTotalPiezas(delivery) {
+    return (delivery.sz6_12 || 0) +
+           (delivery.sz12_18 || 0) +
+           (delivery.sz18_24 || 0) +
+           (delivery.sz24_36 || 0) +
+           (delivery.sz36_48 || 0) +
+           (delivery.sz2 || 0) +
+           (delivery.sz4 || 0) +
+           (delivery.sz6 || 0) +
+           (delivery.sz8 || 0) +
+           (delivery.sz10 || 0) +
+           (delivery.sz12 || 0) +
+           (delivery.sz14 || 0) +
+           (delivery.sz16 || 0) +
+           (delivery.sz18 || 0);
+}
+
+function filterAndSortDeliveries() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortOption = document.getElementById('sortSelect').value;
     
-    fetch(`/api/deliveries/${deliveryId}`)
-        .then(response => response.json())
-        .then(delivery => {
-            const totalPiezas = 
-                (delivery.sz6_12 || 0) +
-                (delivery.sz12_18 || 0) +
-                (delivery.sz18_24 || 0) +
-                (delivery.sz24_36 || 0) +
-                (delivery.sz36_48 || 0) +
-                (delivery.sz2 || 0) +
-                (delivery.sz4 || 0) +
-                (delivery.sz6 || 0) +
-                (delivery.sz8 || 0) +
-                (delivery.sz10 || 0) +
-                (delivery.sz12 || 0) +
-                (delivery.sz14 || 0) +
-                (delivery.sz16 || 0) +
-                (delivery.sz18 || 0);
-            
-            const detailsContent = document.getElementById('detailsContent');
-            detailsContent.innerHTML = `
-                <div class="detail-row">
-                    <span class="detail-label">ID Entrega:</span>
-                    <span>#${delivery.id_delivery}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Responsable:</span>
-                    <span>${delivery.owner}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Fecha:</span>
-                    <span>${new Date(delivery.date).toLocaleDateString('es-ES')}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Lote:</span>
-                    <span>${delivery.lot || '—'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Tipo:</span>
-                    <span>${delivery.type || '—'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Color:</span>
-                    <span>${delivery.color || '—'}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Anotación:</span>
-                    <span>${delivery.annotation || '—'}</span>
-                </div>
-                <hr>
-                <h4 style="color: #27ae60; margin-top: 20px;">📏 Cantidades por Talla</h4>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div class="detail-row"><span class="detail-label">6-12:</span> <span>${delivery.sz6_12 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">12-18:</span> <span>${delivery.sz12_18 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">18-24:</span> <span>${delivery.sz18_24 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">24-36:</span> <span>${delivery.sz24_36 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">36-48:</span> <span>${delivery.sz36_48 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 2:</span> <span>${delivery.sz2 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 4:</span> <span>${delivery.sz4 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 6:</span> <span>${delivery.sz6 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 8:</span> <span>${delivery.sz8 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 10:</span> <span>${delivery.sz10 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 12:</span> <span>${delivery.sz12 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 14:</span> <span>${delivery.sz14 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 16:</span> <span>${delivery.sz16 || 0}</span></div>
-                    <div class="detail-row"><span class="detail-label">Talla 18:</span> <span>${delivery.sz18 || 0}</span></div>
-                </div>
-                <hr>
-                <div class="detail-row" style="background: #ecf0f1; padding: 10px; border-radius: 5px; border-bottom: none;">
-                    <span class="detail-label" style="font-size: 16px;">Total Piezas:</span>
-                    <span style="font-size: 16px; font-weight: bold; color: #27ae60;">${totalPiezas}</span>
-                </div>
-            `;
-            
-            document.getElementById('detailsModal').style.display = 'block';
-        })
-        .catch(error => {
-            showAlert('Error al cargar los detalles: ' + error.message, 'error');
-        });
+    // Filtrar
+    let filtered = allDeliveries.filter(delivery => {
+        const searchString = `${delivery.owner || ''} ${delivery.lot || ''} ${delivery.type || ''} ${delivery.color || ''}`.toLowerCase();
+        return searchString.includes(searchTerm);
+    });
+    
+    // Ordenar
+    filtered.sort((a, b) => {
+        switch(sortOption) {
+            case 'fecha-desc':
+                return new Date(b.date) - new Date(a.date);
+            case 'fecha-asc':
+                return new Date(a.date) - new Date(b.date);
+            case 'responsable-asc':
+                return (a.owner || '').localeCompare(b.owner || '');
+            case 'responsable-desc':
+                return (b.owner || '').localeCompare(a.owner || '');
+            case 'lote-asc':
+                return (a.lot || '').localeCompare(b.lot || '');
+            case 'total-desc':
+                return calculateTotalPiezas(b) - calculateTotalPiezas(a);
+            case 'total-asc':
+                return calculateTotalPiezas(a) - calculateTotalPiezas(b);
+            default:
+                return 0;
+        }
+    });
+    
+    // Actualizar estado de filtros
+    const filterStatus = document.getElementById('filterStatus');
+    if (searchTerm || sortOption !== 'fecha-desc') {
+        filterStatus.style.display = 'block';
+        document.getElementById('resultCount').textContent = filtered.length;
+        document.getElementById('totalCount').textContent = allDeliveries.length;
+    } else {
+        filterStatus.style.display = 'none';
+    }
+    
+    renderDeliveries(filtered);
+}
+
+function renderDeliveries(deliveries) {
+    const emptyState = document.getElementById('emptyState');
+    const table = document.getElementById('deliveriesTable');
+    const tbody = document.getElementById('deliveriesBody');
+    
+    if (!deliveries || deliveries.length === 0) {
+        table.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = `
+            <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+            <h3>No se encontraron entregas</h3>
+            <p>Intenta con otros términos de búsqueda</p>
+        `;
+        return;
+    }
+    
+    table.style.display = 'table';
+    emptyState.style.display = 'none';
+    tbody.innerHTML = '';
+    
+    deliveries.forEach(delivery => {
+        const totalPiezas = calculateTotalPiezas(delivery);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><strong>#${delivery.id_delivery}</strong></td>
+            <td>${delivery.owner}</td>
+            <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
+            <td>${delivery.lot || '—'}</td>
+            <td>${delivery.type || '—'}</td>
+            <td>${delivery.color || '—'}</td>
+            <td><span style="background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
+            <td>
+                <button class="btn-action btn-view" onclick="viewDetails(${delivery.id_delivery})">👁️ Ver</button>
+                <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
+                <button class="btn-action btn-delete" onclick="deleteDelivery(${delivery.id_delivery})">🗑️ Eliminar</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Event listeners para búsqueda y ordenamiento
+document.getElementById('searchInput').addEventListener('input', filterAndSortDeliveries);
+document.getElementById('sortSelect').addEventListener('change', filterAndSortDeliveries);
+
+document.getElementById('clearFilters').addEventListener('click', function() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('sortSelect').value = 'fecha-desc';
+    filterAndSortDeliveries();
+});
+
+function viewDetails(deliveryId) {
+    const delivery = allDeliveries.find(d => d.id_delivery === deliveryId);
+    
+    if (!delivery) {
+        showAlert('Entrega no encontrada', 'error');
+        return;
+    }
+    
+    const totalPiezas = calculateTotalPiezas(delivery);
+    
+    const detailsContent = document.getElementById('detailsContent');
+    detailsContent.innerHTML = `
+        <div class="detail-row">
+            <span class="detail-label">ID Entrega:</span>
+            <span>#${delivery.id_delivery}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Responsable:</span>
+            <span>${delivery.owner}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Fecha:</span>
+            <span>${new Date(delivery.date).toLocaleDateString('es-ES')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Lote:</span>
+            <span>${delivery.lot || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Tipo:</span>
+            <span>${delivery.type || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Color:</span>
+            <span>${delivery.color || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Anotación:</span>
+            <span>${delivery.annotation || '—'}</span>
+        </div>
+        <hr>
+        <h4 style="color: #27ae60; margin-top: 20px;">📏 Cantidades por Talla</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="detail-row"><span class="detail-label">6-12:</span> <span>${delivery.sz6_12 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">12-18:</span> <span>${delivery.sz12_18 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">18-24:</span> <span>${delivery.sz18_24 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">24-36:</span> <span>${delivery.sz24_36 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">36-48:</span> <span>${delivery.sz36_48 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 2:</span> <span>${delivery.sz2 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 4:</span> <span>${delivery.sz4 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 6:</span> <span>${delivery.sz6 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 8:</span> <span>${delivery.sz8 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 10:</span> <span>${delivery.sz10 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 12:</span> <span>${delivery.sz12 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 14:</span> <span>${delivery.sz14 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 16:</span> <span>${delivery.sz16 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 18:</span> <span>${delivery.sz18 || 0}</span></div>
+        </div>
+        <hr>
+        <div class="detail-row" style="background: #ecf0f1; padding: 10px; border-radius: 5px; border-bottom: none;">
+            <span class="detail-label" style="font-size: 16px;">Total Piezas:</span>
+            <span style="font-size: 16px; font-weight: bold; color: #27ae60;">${totalPiezas}</span>
+        </div>
+    `;
+    
+    document.getElementById('detailsModal').style.display = 'block';
 }
 
 function editDelivery(deliveryId) {

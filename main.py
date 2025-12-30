@@ -7,6 +7,7 @@ from app.api.delivery_endpoints import router as delivery_router
 from app.api.endpoints_assistence import router as assistence_router
 from app.api.worker_endpoints import router as worker_router
 from app.api.templates_endpoints import router as templates_router
+from app.api.factory_endpoints import router as factory_router
 from app.api.auth_endpoints import router as auth_router
 from app.api.endpoints import router
 
@@ -24,6 +25,7 @@ app.include_router(router, prefix="", tags=["General"])
 app.include_router(delivery_router, prefix="/api", tags=["Delivery"])  
 app.include_router(assistence_router, prefix="/assistence", tags=["Assistence"])
 app.include_router(worker_router, prefix="/api", tags=["Workers"])
+app.include_router(factory_router, prefix="/api", tags=["Factories"])
 
 
 if __name__ == "__main__":
