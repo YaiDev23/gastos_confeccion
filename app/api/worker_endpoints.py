@@ -15,7 +15,15 @@ router = APIRouter()
 # =====================
 
 @router.post("/trabajadores/crear", response_model=WorkerCrudResponse, status_code=status.HTTP_201_CREATED)
-async def crear_nuevo_trabajador(worker: WorkerCreate):
+async def crear_nuevo_trabajador(
+    nombre: str = Form(...),
+    apellido: str = Form(None),
+    cedula: str = Form(...),
+    cargo: str = Form(...),
+    salario: float = Form(...),
+    email: str = Form(None),
+    telefono: str = Form(None)
+):
     """
     Crea un nuevo trabajador en la base de datos.
     
@@ -36,6 +44,15 @@ async def crear_nuevo_trabajador(worker: WorkerCreate):
         )
     
     try:
+        worker = WorkerCreate(
+            nombre=nombre,
+            apellido=apellido,
+            cedula=cedula,
+            cargo=cargo,
+            salario=salario,
+            email=email,
+            telefono=telefono
+        )
         resultado = WorkerService.crear_trabajador(db, worker)
         
         if resultado["success"]:

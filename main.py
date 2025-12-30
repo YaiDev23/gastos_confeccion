@@ -3,7 +3,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 import os
 
-from app.api.endpoints import router
+from app.api.endpoints.delivery_endpoints import router as delivery_router
 from app.api.endpoints_assistence import router as assistence_router
 from app.api.worker_endpoints import router as worker_router
 
@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="app/templates")
 # Configurar archivos estáticos
 app.mount("/static", StaticFiles(directory="app/static"), name="static_files")
 
-app.include_router(router)  
+app.include_router(delivery_router, prefix="/api", tags=["Delivery"])  
 app.include_router(assistence_router, prefix="/assistence", tags=["Assistence"])
 app.include_router(worker_router, prefix="/api", tags=["Workers"])
 
