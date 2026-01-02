@@ -36,7 +36,7 @@ async function cargarTrabajadores() {
                 <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <tr style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); color: white;">
                             <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">👤 Nombre Completo</th>
                             <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">🆔 Cédula</th>
                             <th style="padding: 15px; text-align: left; border: none; font-weight: 600;">📧 Email</th>
@@ -53,10 +53,10 @@ async function cargarTrabajadores() {
                 html += `
                     <tr style="background-color: ${esParImpar}; border-bottom: 1px solid #ecf0f1; transition: background-color 0.2s;">
                         <td style="padding: 15px; border: none; font-weight: 500;">${trabajador.nombre} ${trabajador.apellido}</td>
-                        <td style="padding: 15px; border: none; color: #667eea;">${trabajador.cedula}</td>
+                        <td style="padding: 15px; border: none; color: #0B1023;">${trabajador.cedula}</td>
                         <td style="padding: 15px; border: none; color: #7f8c8d;">${trabajador.email || '—'}</td>
                         <td style="padding: 15px; border: none;">
-                            <span style="background-color: #e3f2fd; color: #667eea; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                            <span style="background-color: #e3f2fd; color: #0B1023; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">
                                 ${trabajador.cargo}
                             </span>
                         </td>
@@ -75,9 +75,9 @@ async function cargarTrabajadores() {
                     </tbody>
                 </table>
                 </div>
-                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 12px; text-align: center; border-left: 5px solid #667eea; margin-top: 20px;">
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 20px; border-radius: 12px; text-align: center; border-left: 5px solid #0B1023; margin-top: 20px;">
                     <strong style="color: #2c3e50; font-size: 16px;">👥 Total de trabajadores:</strong>
-                    <span style="color: #667eea; font-size: 20px; font-weight: bold; margin-left: 10px;">${resultado.cantidad}</span>
+                    <span style="color: #0B1023; font-size: 20px; font-weight: bold; margin-left: 10px;">${resultado.cantidad}</span>
                 </div>
             `;
 

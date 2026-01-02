@@ -14,7 +14,7 @@
 
 <!-- Pestañas de opciones -->
 <div style="max-width: 600px; margin: 30px auto; display: flex; gap: 10px; border-bottom: 2px solid #ddd;">
-    <button onclick="cambiarPestana('manual')" id="tab-manual" class="btn" style="flex: 1; background-color: #667eea; border: none; border-radius: 5px 5px 0 0; padding: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 14px;">
+    <button onclick="cambiarPestana('manual')" id="tab-manual" class="btn" style="flex: 1; background-color: #0B1023; border: none; border-radius: 5px 5px 0 0; padding: 12px; font-weight: bold; color: white; cursor: pointer; font-size: 14px;">
         👤 Selección Manual
     </button>
     <button onclick="cambiarPestana('codigo')" id="tab-codigo" class="btn" style="flex: 1; background-color: #ccc; border: none; border-radius: 5px 5px 0 0; padding: 12px; font-weight: bold; color: #333; cursor: pointer; font-size: 14px;">
@@ -33,7 +33,7 @@
     <div id="contenedor-manual" style="display: block;">
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
-                <i style="color: #667eea; margin-right: 8px;">👤</i> Selecciona un trabajador:
+                <i style="color: #0B1023; margin-right: 8px;">👤</i> Selecciona un trabajador:
             </label>
             <div id="trabajadores-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px;">
                 <p style="text-align: center; color: #666; grid-column: 1/-1;">Cargando trabajadores...</p>
@@ -42,7 +42,7 @@
 
         <input type="hidden" id="trabajador_seleccionado" value="">
 
-        <button type="button" onclick="marcarLlegada()" class="btn" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px; font-weight: bold; background-color: #667eea;">
+        <button type="button" onclick="marcarLlegada()" class="btn" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 16px; font-weight: bold; background-color: #0B1023;">
             <i style="margin-right: 8px;">🕐</i> Registrar Llegada
         </button>
     </div>
@@ -109,7 +109,7 @@
         document.getElementById('contenedor-codigo').style.display = pestana === 'codigo' ? 'block' : 'none';
         
         // Actualizar estilos de pestañas
-        document.getElementById('tab-manual').style.backgroundColor = pestana === 'manual' ? '#667eea' : '#ccc';
+        document.getElementById('tab-manual').style.backgroundColor = pestana === 'manual' ? '#0B1023' : '#ccc';
         document.getElementById('tab-manual').style.color = pestana === 'manual' ? 'white' : '#333';
         
         document.getElementById('tab-codigo').style.backgroundColor = pestana === 'codigo' ? '#e74c3c' : '#ccc';
@@ -158,14 +158,14 @@
                     `;
                     
                     card.addEventListener('mouseenter', function() {
-                        this.style.borderColor = '#667eea';
+                        this.style.borderColor = '#0B1023';
                         this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
                         this.style.backgroundColor = '#f0f4ff';
                     });
                     
                     card.addEventListener('mouseleave', function() {
                         const isSelected = document.getElementById('trabajador_seleccionado').value === trabajador.id.toString();
-                        this.style.borderColor = isSelected ? '#667eea' : '#ddd';
+                        this.style.borderColor = isSelected ? '#0B1023' : '#ddd';
                         this.style.boxShadow = isSelected ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none';
                         this.style.backgroundColor = isSelected ? '#e8ecff' : 'white';
                     });
@@ -183,7 +183,7 @@
                         // Seleccionar nueva tarjeta
                         document.getElementById('trabajador_seleccionado').value = trabajador.id;
                         this.classList.add('trabajador-card-selected');
-                        this.style.borderColor = '#667eea';
+                        this.style.borderColor = '#0B1023';
                         this.style.backgroundColor = '#e8ecff';
                         this.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
                         this.style.borderWidth = '3px';
@@ -326,7 +326,7 @@
             if (data.success && data.data.length > 0) {
                 let html = '<div style="overflow-x: auto;">';
                 html += '<table style="width: 100%; border-collapse: collapse;">';
-                html += '<thead style="background-color: #667eea; color: white;">';
+                html += '<thead style="background-color: #0B1023; color: white;">';
                 html += '<tr>';
                 html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Trabajador</th>';
                 html += '<th style="padding: 12px; border: 1px solid #ddd; text-align: center;">Llegada</th>';

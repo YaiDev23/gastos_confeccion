@@ -54,7 +54,7 @@
 .card-header {
     padding: 1rem 1.5rem;
     margin-bottom: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
     color: white;
     border-bottom: 1px solid rgba(0,0,0,.125);
     border-radius: 0.5rem 0.5rem 0 0;
@@ -101,7 +101,7 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #0B1023;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -131,12 +131,12 @@
 
 .btn-primary {
     color: #fff;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg,  0%, #0B1023 100%);
     border-color: transparent;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #6a3f91 100%);
+    background: linear-gradient(135deg,  0%, #0B1023 100%);
 }
 
 .btn-secondary {
@@ -151,15 +151,15 @@
 }
 
 .btn-outline-primary {
-    color: #667eea;
+    color: #0B1023;
     background-color: transparent;
-    border: 2px solid #667eea;
+    border: 2px solid #0B1023;
 }
 
 .btn-outline-primary:hover {
     color: #fff;
-    background-color: #667eea;
-    border-color: #667eea;
+    background-color: #0B1023;
+    border-color: #0B1023;
 }
 
 .btn-group {
@@ -216,12 +216,12 @@
         padding: 1.5rem;
         background-color: #f8f9fa;
         border-radius: 0.5rem;
-        border-left: 4px solid #667eea;
+        border-left: 4px solid #0B1023;
     }
 
     .color-group h4 {
         margin-top: 0;
-        color: #667eea;
+        color: #0B1023;
     }
 }
 
@@ -259,7 +259,7 @@
 /* Add smooth scrolling for table containers */
 .table-responsive {
     scrollbar-width: thin;
-    scrollbar-color: #667eea #f0f0f0;
+    scrollbar-color: #0B1023 #f0f0f0;
 }
 
 .table-responsive::-webkit-scrollbar {
@@ -272,7 +272,7 @@
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-    background-color: #667eea;
+    background-color: #0B1023;
     border-radius: 10px;
 }
 
@@ -292,7 +292,7 @@
 
 .table thead th {
     vertical-align: bottom;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid #0B1023;
     background-color: #f8f9fa;
     font-weight: 600;
     color: #333;
@@ -312,7 +312,7 @@
 }
 
 .production-table th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
     color: white;
     font-weight: 600;
     text-align: center;
@@ -335,7 +335,7 @@
 
 .total-column {
     font-weight: bold;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
     color: white;
 }
 
@@ -345,8 +345,8 @@
 }
 
 .total-row td {
-    border-top: 2px solid #667eea;
-    border-bottom: 2px solid #667eea;
+    border-top: 2px solid #0B1023;
+    border-bottom: 2px solid #0B1023;
 }
 
 .total-size {
@@ -356,7 +356,7 @@
 .table-title {
     font-weight: bold;
     font-size: 1.1em;
-    color: #667eea;
+    color: #0B1023;
 }
 
 /* Color group styling for form */
@@ -364,14 +364,14 @@
     padding: 1.5rem;
     background-color: #f8f9fa;
     border-radius: 0.5rem;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #0B1023;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .color-group h4 {
     margin-top: 0;
-    color: #667eea;
+    color: #0B1023;
     font-size: 1.1rem;
     margin-bottom: 1rem;
 }

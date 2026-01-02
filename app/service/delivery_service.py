@@ -28,7 +28,7 @@ class DeliveryService:
         """Actualizar una entrega"""
         db_delivery = DeliveryService.get_delivery_by_id(db, delivery_id)
         if db_delivery:
-            update_data = delivery_data.model_dump(exclude_unset=True)
+            update_data = delivery_data.model_dump(exclude_none=True)
             for field, value in update_data.items():
                 setattr(db_delivery, field, value)
             db.commit()

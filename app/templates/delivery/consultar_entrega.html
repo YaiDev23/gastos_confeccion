@@ -2,211 +2,11 @@
 
 {% block content %}
 <link rel="stylesheet" href="/static/css/styles.css">
+<link rel="stylesheet" href="/static/css/delivery.css">
+
 
 <style>
-    .header-nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 3px solid #27ae60;
-    }
-    
-    .header-nav h2 {
-        margin: 0;
-        color: #27ae60;
-        font-size: 28px;
-        font-weight: 700;
-    }
-    
-    .btn-nav {
-        display: inline-block;
-        padding: 10px 20px;
-        margin-left: 10px;
-        text-decoration: none;
-        border-radius: 8px;
-        font-weight: bold;
-        transition: all 0.3s;
-        color: white;
-        font-size: 14px;
-    }
-    
-    .btn-menu {
-        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-    }
-    
-    .btn-menu:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-add {
-        background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
-    }
-    
-    .btn-add:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-    }
-    
-    .table-container {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .table thead {
-        background-color: #27ae60;
-        color: white;
-    }
-    
-    .table tbody tr:hover {
-        background-color: #f0fdf4;
-    }
-    
-    .btn-action {
-        padding: 6px 12px;
-        margin: 0 3px;
-        font-size: 12px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.3s;
-        text-decoration: none;
-        display: inline-block;
-    }
-    
-    .btn-edit {
-        background-color: #3498db;
-        color: white;
-    }
-    
-    .btn-edit:hover {
-        background-color: #2980b9;
-    }
-    
-    .btn-delete {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    .btn-delete:hover {
-        background-color: #c0392b;
-    }
-    
-    .btn-view {
-        background-color: #27ae60;
-        color: white;
-    }
-    
-    .btn-view:hover {
-        background-color: #229954;
-    }
-    
-    .loading {
-        text-align: center;
-        padding: 40px;
-        color: #7f8c8d;
-        font-size: 18px;
-    }
-    
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #7f8c8d;
-    }
-    
-    .empty-state img {
-        width: 80px;
-        opacity: 0.5;
-        margin-bottom: 20px;
-    }
-    
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.4);
-    }
-    
-    .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 600px;
-        max-height: 80vh;
-        overflow-y: auto;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-    
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    
-    .close:hover {
-        color: black;
-    }
-    
-    .modal-header {
-        border-bottom: 2px solid #27ae60;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-    }
-    
-    .modal-header h3 {
-        margin: 0;
-        color: #27ae60;
-    }
-    
-    .modal-body {
-        line-height: 1.6;
-    }
-    
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #ecf0f1;
-    }
-    
-    .detail-label {
-        font-weight: bold;
-        color: #27ae60;
-        min-width: 120px;
-    }
-    
-    .alert {
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        display: none;
-    }
-    
-    .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-        display: block;
-    }
-    
-    .alert-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        display: block;
-    }
+
 </style>
 
 <div class="header-nav">
@@ -224,7 +24,7 @@
     <div class="row mb-3">
         <div class="col-md-6">
             <div class="form-group">
-                <label for="searchInput" style="color: #27ae60; font-weight: 600;">🔍 Buscar Entrega:</label>
+                <label for="searchInput" style="color: #0B1023; font-weight: 600;">🔍 Buscar Entrega:</label>
                 <input 
                     type="text" 
                     id="searchInput" 
@@ -235,7 +35,7 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label for="sortSelect" style="color: #27ae60; font-weight: 600;">📊 Ordenar por:</label>
+                <label for="sortSelect" style="color: #0B1023; font-weight: 600;">📊 Ordenar por:</label>
                 <select id="sortSelect" class="form-control" style="padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px;">
                     <option value="fecha-desc">Fecha (Más Reciente)</option>
                     <option value="fecha-asc">Fecha (Más Antigua)</option>
@@ -249,7 +49,7 @@
         </div>
         <div class="col-md-3">
             <div class="form-group">
-                <label style="color: #27ae60; font-weight: 600;">&nbsp;</label>
+                <label style="color: #0B1023; font-weight: 600;">&nbsp;</label>
                 <button id="clearFilters" class="btn btn-secondary w-100" style="padding: 10px 15px; border-radius: 8px;">🔄 Limpiar Filtros</button>
             </div>
         </div>
@@ -303,8 +103,68 @@
     </div>
 </div>
 
+<!-- Modal para editar entrega -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close" onclick="closeModal('editModal')">&times;</span>
+            <h3>✏️ Editar Entrega</h3>
+        </div>
+        <div class="modal-body">
+            <form id="editForm">
+                <div class="mb-3">
+                    <label for="editOwner" class="form-label">Responsable (Taller):</label>
+                    <input type="text" id="editOwner" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editDate" class="form-label">Fecha:</label>
+                    <input type="date" id="editDate" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="editLot" class="form-label">Lote (Opcional):</label>
+                    <input type="text" id="editLot" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="editType" class="form-label">Tipo:</label>
+                    <input type="text" id="editType" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="editColor" class="form-label">Color:</label>
+                    <input type="text" id="editColor" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="editAnnotation" class="form-label">Observación:</label>
+                    <textarea id="editAnnotation" class="form-control" rows="3"></textarea>
+                </div>
+                <h5 style="color: #0B1023; margin-top: 20px;">📏 Cantidades por Talla</h5>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div class="mb-3"><label class="form-label">6-12:</label><input type="number" id="editSz6_12" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">12-18:</label><input type="number" id="editSz12_18" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">18-24:</label><input type="number" id="editSz18_24" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">24-36:</label><input type="number" id="editSz24_36" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">36-48:</label><input type="number" id="editSz36_48" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 2:</label><input type="number" id="editSz2" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 4:</label><input type="number" id="editSz4" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 6:</label><input type="number" id="editSz6" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 8:</label><input type="number" id="editSz8" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 10:</label><input type="number" id="editSz10" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 12:</label><input type="number" id="editSz12" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 14:</label><input type="number" id="editSz14" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 16:</label><input type="number" id="editSz16" class="form-control" min="0" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Talla 18:</label><input type="number" id="editSz18" class="form-control" min="0" value="0"></div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary flex-grow-1">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 let allDeliveries = []; // Almacenar todas las entregas
+let currentEditingDeliveryId = null;
 
 async function loadDeliveries() {
     try {
@@ -421,7 +281,7 @@ function renderDeliveries(deliveries) {
             <td>${delivery.lot || '—'}</td>
             <td>${delivery.type || '—'}</td>
             <td>${delivery.color || '—'}</td>
-            <td><span style="background: #27ae60; color: white; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
+            <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
             <td>
                 <button class="btn-action btn-view" onclick="viewDetails(${delivery.id_delivery})">👁️ Ver</button>
                 <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
@@ -483,7 +343,7 @@ function viewDetails(deliveryId) {
             <span>${delivery.annotation || '—'}</span>
         </div>
         <hr>
-        <h4 style="color: #27ae60; margin-top: 20px;">📏 Cantidades por Talla</h4>
+        <h4 style="color: #0B1023; margin-top: 20px;">📏 Cantidades por Talla</h4>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
             <div class="detail-row"><span class="detail-label">6-12:</span> <span>${delivery.sz6_12 || 0}</span></div>
             <div class="detail-row"><span class="detail-label">12-18:</span> <span>${delivery.sz12_18 || 0}</span></div>
@@ -503,7 +363,7 @@ function viewDetails(deliveryId) {
         <hr>
         <div class="detail-row" style="background: #ecf0f1; padding: 10px; border-radius: 5px; border-bottom: none;">
             <span class="detail-label" style="font-size: 16px;">Total Piezas:</span>
-            <span style="font-size: 16px; font-weight: bold; color: #27ae60;">${totalPiezas}</span>
+            <span style="font-size: 16px; font-weight: bold; color: #0B1023;">${totalPiezas}</span>
         </div>
     `;
     
@@ -511,8 +371,15 @@ function viewDetails(deliveryId) {
 }
 
 function editDelivery(deliveryId) {
-    alert('Función de edición en desarrollo');
-    // TODO: Implementar edición
+    const delivery = allDeliveries.find(d => d.id_delivery === deliveryId);
+    
+    if (!delivery) {
+        showAlert('Entrega no encontrada', 'error');
+        return;
+    }
+    
+    // Abrir modal de edición
+    openEditModal(delivery);
 }
 
 function deleteDelivery(deliveryId) {
@@ -538,6 +405,35 @@ function deleteDelivery(deliveryId) {
     });
 }
 
+function openEditModal(delivery) {
+    currentEditingDeliveryId = delivery.id_delivery;
+    
+    // Llenar el formulario con los datos actuales
+    document.getElementById('editOwner').value = delivery.owner;
+    document.getElementById('editDate').value = delivery.date;
+    document.getElementById('editLot').value = delivery.lot || '';
+    document.getElementById('editType').value = delivery.type || '';
+    document.getElementById('editColor').value = delivery.color || '';
+    document.getElementById('editAnnotation').value = delivery.annotation || '';
+    
+    document.getElementById('editSz6_12').value = delivery.sz6_12 || 0;
+    document.getElementById('editSz12_18').value = delivery.sz12_18 || 0;
+    document.getElementById('editSz18_24').value = delivery.sz18_24 || 0;
+    document.getElementById('editSz24_36').value = delivery.sz24_36 || 0;
+    document.getElementById('editSz36_48').value = delivery.sz36_48 || 0;
+    document.getElementById('editSz2').value = delivery.sz2 || 0;
+    document.getElementById('editSz4').value = delivery.sz4 || 0;
+    document.getElementById('editSz6').value = delivery.sz6 || 0;
+    document.getElementById('editSz8').value = delivery.sz8 || 0;
+    document.getElementById('editSz10').value = delivery.sz10 || 0;
+    document.getElementById('editSz12').value = delivery.sz12 || 0;
+    document.getElementById('editSz14').value = delivery.sz14 || 0;
+    document.getElementById('editSz16').value = delivery.sz16 || 0;
+    document.getElementById('editSz18').value = delivery.sz18 || 0;
+    
+    document.getElementById('editModal').style.display = 'block';
+}
+
 function showAlert(message, type) {
     const alertBox = document.getElementById('alertBox');
     alertBox.textContent = message;
@@ -558,7 +454,66 @@ window.onclick = function(event) {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
+    const editModal = document.getElementById('editModal');
+    if (event.target === editModal) {
+        editModal.style.display = 'none';
+    }
 }
+
+// Manejador del formulario de edición
+document.getElementById('editForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!currentEditingDeliveryId) {
+        showAlert('Error: ID de entrega no encontrado', 'error');
+        return;
+    }
+    
+    const updatedData = {
+        owner: document.getElementById('editOwner').value,
+        date: document.getElementById('editDate').value,
+        lot: document.getElementById('editLot').value || null,
+        type: document.getElementById('editType').value || null,
+        color: document.getElementById('editColor').value || null,
+        annotation: document.getElementById('editAnnotation').value || null,
+        sz6_12: parseInt(document.getElementById('editSz6_12').value) || 0,
+        sz12_18: parseInt(document.getElementById('editSz12_18').value) || 0,
+        sz18_24: parseInt(document.getElementById('editSz18_24').value) || 0,
+        sz24_36: parseInt(document.getElementById('editSz24_36').value) || 0,
+        sz36_48: parseInt(document.getElementById('editSz36_48').value) || 0,
+        sz2: parseInt(document.getElementById('editSz2').value) || 0,
+        sz4: parseInt(document.getElementById('editSz4').value) || 0,
+        sz6: parseInt(document.getElementById('editSz6').value) || 0,
+        sz8: parseInt(document.getElementById('editSz8').value) || 0,
+        sz10: parseInt(document.getElementById('editSz10').value) || 0,
+        sz12: parseInt(document.getElementById('editSz12').value) || 0,
+        sz14: parseInt(document.getElementById('editSz14').value) || 0,
+        sz16: parseInt(document.getElementById('editSz16').value) || 0,
+        sz18: parseInt(document.getElementById('editSz18').value) || 0
+    };
+    
+    try {
+        const response = await fetch(`/api/deliveries/${currentEditingDeliveryId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+        });
+        
+        if (response.ok) {
+            showAlert('✅ Entrega actualizada correctamente', 'success');
+            closeModal('editModal');
+            loadDeliveries();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            const error = await response.json();
+            showAlert(`❌ Error: ${error.detail || 'Error al actualizar'}`, 'error');
+        }
+    } catch (error) {
+        showAlert(`❌ Error: ${error.message}`, 'error');
+    }
+});
 
 // Cargar entregas al iniciar
 document.addEventListener('DOMContentLoaded', loadDeliveries);

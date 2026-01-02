@@ -141,7 +141,7 @@ async def descargar_produccion_pdf(request: Request):
             'CustomTitle',
             parent=styles['Heading1'],
             fontSize=18,
-            textColor=colors.HexColor('#667eea'),
+            textColor=colors.HexColor('#0B1023'),
             spaceAfter=10,
             alignment=1  # Centro
         )
@@ -205,7 +205,7 @@ async def descargar_produccion_pdf(request: Request):
         # Crear tabla
         table = Table(table_data, colWidths=[1*inch]*15)
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#667eea')),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0B1023')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),

@@ -1,0 +1,206 @@
+    .header-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #0B1023;
+    }
+    
+    .header-nav h2 {
+        margin: 0;
+        color: #0B1023;
+        font-size: 28px;
+        font-weight: 700;
+    }
+    
+    .btn-nav {
+        display: inline-block;
+        padding: 10px 20px;
+        margin-left: 10px;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: all 0.3s;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .btn-menu {
+        background: linear-gradient(135deg, #0B1023 0%, #0B1023 100%);
+    }
+    
+    .btn-menu:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(11, 16, 35, 0.2);
+    }
+    
+    .btn-add {
+        background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(11, 16, 35, 0.3);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .table thead {
+        background-color: #0B1023;
+        color: #0B1023;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #c6c6c7;
+    }
+    
+    .btn-action {
+        padding: 6px 12px;
+        margin: 0 3px;
+        font-size: 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-edit {
+        background-color: #0B1023;
+        color: #f0f0f0;
+    }
+    
+    .btn-edit:hover {
+        background-color: #0B1023;
+        color: #919090;
+    }
+    
+    .btn-delete {
+        background-color: #700000;
+        color: #f0f0f0;
+    }
+    
+    .btn-delete:hover {
+        background-color: #0B1023;
+        color: #919090;
+    }
+    
+    .btn-view {
+        background-color: #0b230e;
+        color: #f0f0f0;
+    }
+    
+    .btn-view:hover {
+        background-color: #000000;
+        color: #919090;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+        font-size: 18px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7f8c8d;
+    }
+    
+    .empty-state img {
+        width: 80px;
+        opacity: 0.5;
+        margin-bottom: 20px;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .close:hover {
+        color: black;
+    }
+    
+    .modal-header {
+        border-bottom: 2px solid #0B1023;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .modal-header h3 {
+        margin: 0;
+        color: #0B1023;
+    }
+    
+    .modal-body {
+        line-height: 1.6;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ecf0f1;
+    }
+    
+    .detail-label {
+        font-weight: bold;
+        color: #0B1023;
+        min-width: 120px;
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        display: none;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+    }

@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="/static/css/styles.css">
 
 <div class="container mt-5">
-    <h2 class="mb-4" style="color: #667eea; font-weight: 700;">📊 Resultado de Producción</h2>
+    <h2 class="mb-4" style="color: #0B1023; font-weight: 700;">📊 Resultado de Producción</h2>
     <p class="text-muted">📅 Fecha y hora del cálculo: <strong>{{ fecha_hora_bogota }}</strong></p>
 
     <div class="card mb-4">
@@ -14,7 +14,7 @@
         <div class="card-body">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                 <!-- Tarjeta Total Unidades -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); padding: 2rem; border-radius: 8px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Total de Unidades</div>
                     <div style="font-size: 2.5rem; font-weight: 700;">{{ datos.total_unidades }}</div>
                     <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">📦 unidades producidas</div>
@@ -42,13 +42,13 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                 <h4 style="margin: 0; color: #333;">
                     <span style="font-size: 1.5rem;">📦</span>
-                    Total de Unidades: <span style="color: #667eea; font-weight: 700; font-size: 1.3rem;">{{ datos.total_unidades }}</span>
+                    Total de Unidades: <span style="color: #0B1023; font-weight: 700; font-size: 1.3rem;">{{ datos.total_unidades }}</span>
                 </h4>
             </div>
 
             <!-- Resumen por Tipo de Lote -->
             <div class="summary-by-lote" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                <h4 style="margin-top: 0; margin-bottom: 1rem; color: #667eea; font-weight: 600;">📋 Total de Unidades por Tipo de Lote</h4>
+                <h4 style="margin-top: 0; margin-bottom: 1rem; color: #0B1023; font-weight: 600;">📋 Total de Unidades por Tipo de Lote</h4>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
                     {% set totales_lote = {} %}
                     {% set valores_lote = {} %}
@@ -63,9 +63,9 @@
                     {% endfor %}
                     
                     {% for tipo_lote in totales_lote | sort %}
-                        <div style="background: white; padding: 1.2rem; border-left: 4px solid #667eea; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="background: white; padding: 1.2rem; border-left: 4px solid #0B1023; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                             <div style="font-weight: 600; color: #333; margin-bottom: 0.8rem;">{{ tipo_lote }}</div>
-                            <div style="font-size: 1.5rem; color: #667eea; font-weight: 700; margin-bottom: 0.3rem;">{{ totales_lote[tipo_lote] }}<span style="font-size: 0.8rem; color: #999;"> unidades</span></div>
+                            <div style="font-size: 1.5rem; color: #0B1023; font-weight: 700; margin-bottom: 0.3rem;">{{ totales_lote[tipo_lote] }}<span style="font-size: 0.8rem; color: #999;"> unidades</span></div>
                             {% if valores_lote.get(tipo_lote, 0) > 0 %}
                             <div style="font-size: 1.1rem; color: #28a745; font-weight: 600;">$ {{valores_lote.get(tipo_lote, 0) }}</div>
                             {% endif %}
@@ -114,7 +114,7 @@
                             <td>{{ lote.tallas["14"] }}</td>
                             <td>{{ lote.tallas["16"] }}</td>
                             <td>{{ lote.tallas["18"] }}</td>
-                            <td style="text-align: center;"><strong style="color: #667eea;">{{ lote.total }}</strong></td>
+                            <td style="text-align: center;"><strong style="color: #0B1023;">{{ lote.total }}</strong></td>
                             <td style="text-align: right;">$ {{ lote.get('precio', 0)}}</td>
                             <td style="text-align: right;"><strong style="color: #28a745;">$ {{ lote.get('valor_total', 0)}}</strong></td>
                         </tr>
@@ -155,13 +155,13 @@ function actualizarEstadoBotones(opcion) {
     // Remover clase activa de todos los botones
     document.querySelectorAll('.orden-btn').forEach(btn => {
         btn.style.backgroundColor = '';
-        btn.style.color = '#667eea';
+        btn.style.color = '#0B1023';
     });
     
     // Agregar clase activa al botón seleccionado
     const btnActivo = document.getElementById('btn-' + opcion);
     if (btnActivo) {
-        btnActivo.style.backgroundColor = '#667eea';
+        btnActivo.style.backgroundColor = '#0B1023';
         btnActivo.style.color = 'white';
     }
 }

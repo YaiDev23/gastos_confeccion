@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.connection import get_db
-from app.api.schemas.delivery_schemas import DeliveredPiecesCreate, DeliveredPiecesResponse
+from app.api.schemas.delivery_schemas import DeliveredPiecesCreate, DeliveredPiecesResponse, DeliveredPiecesUpdate
 from app.service.delivery_service import DeliveryService
 
 router = APIRouter()
@@ -31,6 +31,15 @@ async def get_delivery(delivery_id: int, db: Session = Depends(get_db)):
     if not delivery:
         raise HTTPException(status_code=404, detail="Entrega no encontrada")
     return delivery
+
+
+@router.put("/deliveries/{delivery_id}", response_model=DeliveredPiecesResponse)
+async def update_delivery(delivery_id: int, delivery: DeliveredPiecesUpdate, db: Session = Depends(get_db)):
+    """Actualizar una entrega"""
+    updated_delivery = DeliveryService.update_delivery(db, delivery_id, delivery)
+    if not updated_delivery:
+        raise HTTPException(status_code=404, detail="Entrega no encontrada")
+    return updated_delivery
 
 
 @router.delete("/deliveries/{delivery_id}")

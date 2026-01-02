@@ -10,12 +10,12 @@
         align-items: center;
         margin-bottom: 40px;
         padding-bottom: 20px;
-        border-bottom: 3px solid #667eea;
+        border-bottom: 3px solid #0B1023;
     }
     
     .header-nav h1 {
         margin: 0;
-        color: #667eea;
+        color: #0B1023;
         font-size: 32px;
         font-weight: 700;
     }
@@ -67,28 +67,28 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; max-width: 1200px; margin-left: auto; margin-right: auto;">
     
     <!-- Registrar Entrega -->
-    <div style="background: white; border: 3px solid #667eea; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+    <div style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
         <div style="font-size: 60px; margin-bottom: 20px;">➕</div>
-        <h2 style="color: #667eea; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Registrar Entrega</h2>
+        <h2 style="color: #0B1023; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Registrar Entrega</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
             Registra una nueva entrega de corte indicando responsable, fecha, tipo de producto y cantidades por talla
         </p>
-        <a href="/entrega_corte" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #5568d3 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+        <a href="/entrega_corte" class="btn" style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: #f0f0f0; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
             Crear Entrega
         </a>
     </div>
 
     <!-- Consultar Entregas (Solo Admins) -->
-    <div id="consultarEntregasCard" style="background: white; border: 3px solid #27ae60; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="!isRestricted() && (this.style.transform='translateY(-8px)', this.style.boxShadow='0 20px 40px rgba(39,174,96,0.3)')" onmouseout="!isRestricted() && (this.style.transform='translateY(0)', this.style.boxShadow='none')">
+    <div id="consultarEntregasCard" style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="!isRestricted() && (this.style.transform='translateY(-8px)', this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)')" onmouseout="!isRestricted() && (this.style.transform='translateY(0)', this.style.boxShadow='none')">
         <div id="restrictedBadge" style="display: none; margin-bottom: 15px;">
             <span class="restricted-badge">Solo Administrador</span>
         </div>
         <div style="font-size: 60px; margin-bottom: 20px;">📋</div>
-        <h2 style="color: #27ae60; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Ver Entregas</h2>
+        <h2 style="color: #0B1023; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Ver Entregas</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
             Visualiza todas las entregas registradas, consulta detalles específicos, edita información o elimina entregas
         </p>
-        <a id="consultarEntregasBtn" href="/consultar_entrega" class="btn" style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+        <a id="consultarEntregasBtn" href="/consultar_entrega" class="btn" style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: #f0f0f0; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
             Ver Entregas
         </a>
     </div>
