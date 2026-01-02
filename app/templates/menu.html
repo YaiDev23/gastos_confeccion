@@ -424,7 +424,14 @@
             moduloEntregas.style.display = 'block';
             moduloTalleres.style.display = 'block';
             moduloTrabajadores.style.display = 'none';
-        } else {
+        } else if (rol === 'taller') {
+            // Admin solo a entregas
+            moduloAsistencias.style.display = 'none';
+            moduloCalculos.style.display = 'none';
+            moduloEntregas.style.display = 'block';
+            moduloTalleres.style.display = 'none';
+            moduloTrabajadores.style.display = 'none';
+        }else {
             // Otros roles sin acceso
             moduloAsistencias.style.display = 'block';
             moduloCalculos.style.display = 'block';
