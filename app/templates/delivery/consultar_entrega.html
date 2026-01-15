@@ -67,12 +67,9 @@
     <table id="deliveriesTable" class="table table-striped" style="display: none;">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Responsable</th>
                 <th>Fecha</th>
                 <th>Lote</th>
-                <th>Tipo</th>
-                <th>Color</th>
                 <th>Total Piezas</th>
                 <th>Acciones</th>
             </tr>
@@ -205,6 +202,18 @@ function calculateTotalPiezas(delivery) {
            (delivery.sz18 || 0);
 }
 
+function groupByIdGroup(deliveries) {
+    const grouped = {};
+    
+    deliveries.forEach(delivery => {
+        if (!grouped[delivery.id_group]) {
+            grouped[delivery.id_group] = delivery; // Guardar la primera del grupo
+        }
+    });
+    
+    return Object.values(grouped);
+}
+
 function filterAndSortDeliveries() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const sortOption = document.getElementById('sortSelect').value;
@@ -214,6 +223,9 @@ function filterAndSortDeliveries() {
         const searchString = `${delivery.owner || ''} ${delivery.lot || ''} ${delivery.type || ''} ${delivery.color || ''}`.toLowerCase();
         return searchString.includes(searchTerm);
     });
+    
+    // Agrupar por id_group (mostrar solo una por grupo)
+    filtered = groupByIdGroup(filtered);
     
     // Ordenar
     filtered.sort((a, b) => {
@@ -239,10 +251,11 @@ function filterAndSortDeliveries() {
     
     // Actualizar estado de filtros
     const filterStatus = document.getElementById('filterStatus');
+    const uniqueGroupCount = groupByIdGroup(allDeliveries).length;
     if (searchTerm || sortOption !== 'fecha-desc') {
         filterStatus.style.display = 'block';
         document.getElementById('resultCount').textContent = filtered.length;
-        document.getElementById('totalCount').textContent = allDeliveries.length;
+        document.getElementById('totalCount').textContent = uniqueGroupCount;
     } else {
         filterStatus.style.display = 'none';
     }
@@ -275,17 +288,13 @@ function renderDeliveries(deliveries) {
         
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td><strong>#${delivery.id_delivery}</strong></td>
             <td>${delivery.owner}</td>
             <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
             <td>${delivery.lot || '—'}</td>
-            <td>${delivery.type || '—'}</td>
-            <td>${delivery.color || '—'}</td>
             <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
             <td>
-                <button class="btn-action btn-view" onclick="viewDetails(${delivery.id_delivery})">👁️ Ver</button>
-                <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
-                <button class="btn-action btn-delete" onclick="deleteDelivery(${delivery.id_delivery})">🗑️ Eliminar</button>
+                <button class="btn-action btn-view" onclick="viewDetailsGroup('${delivery.id_group}')">👁️ Ver</button>
+                <button class="btn-action btn-delete" onclick="deleteDeliveryGroup('${delivery.id_group}')">🗑️ Eliminar</button>
             </td>
         `;
         tbody.appendChild(row);
@@ -301,6 +310,161 @@ document.getElementById('clearFilters').addEventListener('click', function() {
     document.getElementById('sortSelect').value = 'fecha-desc';
     filterAndSortDeliveries();
 });
+
+function viewDetailsGroup(idGroup) {
+    const deliveriesInGroup = allDeliveries.filter(d => d.id_group === idGroup);
+    
+    if (!deliveriesInGroup || deliveriesInGroup.length === 0) {
+        showAlert('Grupo de entregas no encontrado', 'error');
+        return;
+    }
+    
+    const detailsContent = document.getElementById('detailsContent');
+    const firstDelivery = deliveriesInGroup[0];
+    
+    // Encabezado con información general
+    let detailsHTML = `
+        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #0B1023;">
+            <h3 style="color: #0B1023; margin: 0 0 10px 0;">📋 GUÍA DE CORTE</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div>
+                    <strong style="color: #0B1023;">LOTE:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${firstDelivery.lot || '—'}</span>
+                </div>
+                <div>
+                    <strong style="color: #0B1023;">FECHA:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${new Date(firstDelivery.date).toLocaleDateString('es-ES')}</span>
+                </div>
+                <div>
+                    <strong style="color: #0B1023;">RESPONSABLE:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${firstDelivery.owner}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agrupar entregas por tipo de prenda
+    const groupedByType = {};
+    deliveriesInGroup.forEach(delivery => {
+        const type = delivery.type || 'SIN ESPECIFICAR';
+        if (!groupedByType[type]) {
+            groupedByType[type] = [];
+        }
+        groupedByType[type].push(delivery);
+    });
+    
+    // Crear tabla para cada tipo de prenda
+    Object.entries(groupedByType).forEach(([type, deliveries]) => {
+        detailsHTML += `
+            <div style="margin-bottom: 30px;">
+                <h4 style="background: #0B1023; color: white; padding: 10px; margin: 0; text-transform: uppercase;">PRENDA: ${type}</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+                    <thead>
+                        <tr style="background: #e8e8e8;">
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">RIB</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">COLORES</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">TIPO TELA</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">2</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">4</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">6</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">8</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">10</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">12</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">14</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">16</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">18</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Agregar filas para cada entrega del tipo
+        deliveries.forEach(delivery => {
+            const total = calculateTotalPiezas(delivery);
+            detailsHTML += `
+                        <tr>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.rib || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px;">${delivery.color || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px;">${delivery.type_fabric || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz2 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz4 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz6 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz8 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz10 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz12 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz14 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz16 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz18 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center; background: #f0f0f0; font-weight: bold;">${total}</td>
+                        </tr>
+                        ${delivery.annotation ? `
+                        <tr style="background: #fff9e6; border: 1px solid #999;">
+                            <td colspan="13" style="border: 1px solid #999; padding: 8px; padding-left: 12px;">
+                                <strong style="color: #0B1023;">Observación:</strong> <span style="color: #555;">${delivery.annotation}</span>
+                            </td>
+                        </tr>
+                        ` : ''}
+            `;
+        });
+        
+        // Fila de total por tipo
+        const typeTotal = deliveries.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+        detailsHTML += `
+                        <tr style="background: #f0f0f0; font-weight: bold;">
+                            <td colspan="12" style="border: 1px solid #999; padding: 8px; text-align: right;">TOTAL ${type.toUpperCase()}:</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center; background: #d0d0d0;">${typeTotal}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    });
+    
+  
+    
+    // Total general del grupo
+    const groupTotal = deliveriesInGroup.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+    detailsHTML += `
+        <div style="background: #0B1023; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
+            <h4 style="margin: 0;">📊 TOTAL GENERAL: ${groupTotal} piezas</h4>
+        </div>
+    `;
+    
+    detailsContent.innerHTML = detailsHTML;
+    document.getElementById('detailsModal').style.display = 'block';
+}
+
+function deleteDeliveryGroup(idGroup) {
+    const deliveriesInGroup = allDeliveries.filter(d => d.id_group === idGroup);
+    
+    if (!confirm(`¿Estás seguro de que deseas eliminar todas las ${deliveriesInGroup.length} entregas de este grupo? Esta acción no se puede deshacer.`)) {
+        return;
+    }
+    
+    // Eliminar todas las entregas del grupo
+    let deleteCount = 0;
+    
+    deliveriesInGroup.forEach(delivery => {
+        fetch(`/api/deliveries/${delivery.id_delivery}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                deleteCount++;
+                if (deleteCount === deliveriesInGroup.length) {
+                    showAlert('✅ Grupo de entregas eliminado correctamente', 'success');
+                    setTimeout(() => {
+                        loadDeliveries();
+                    }, 1500);
+                }
+            }
+        })
+        .catch(error => {
+            showAlert('Error: ' + error.message, 'error');
+        });
+    });
+}
 
 function viewDetails(deliveryId) {
     const delivery = allDeliveries.find(d => d.id_delivery === deliveryId);

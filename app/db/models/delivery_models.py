@@ -33,7 +33,7 @@ class DeliveredPieces(Base):
     sz14 = Column(Integer, default=0)
     sz16 = Column(Integer, default=0)
     sz18 = Column(Integer, default=0)
-    id_group = Column(Integer, nullable=True)
+    id_group = Column(String(50), nullable=True)
 
     def __repr__(self):
         return f"<DeliveredPieces(id_delivery={self.id_delivery}, owner={self.owner}, date={self.date})>"

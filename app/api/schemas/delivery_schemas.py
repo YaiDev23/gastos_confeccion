@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
+from typing import Optional, Union
 
 
 class DeliveredPiecesBase(BaseModel):
@@ -30,7 +30,7 @@ class DeliveredPiecesBase(BaseModel):
     sz14: int = 0
     sz16: int = 0
     sz18: int = 0
-    id_group: Optional[int] = None
+    id_group: Optional[Union[int, str]] = None
 
 
 class DeliveredPiecesCreate(DeliveredPiecesBase):

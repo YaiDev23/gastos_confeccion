@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from app.db.connection import get_db
 from app.api.schemas.delivery_schemas import DeliveredPiecesCreate, DeliveredPiecesResponse, DeliveredPiecesUpdate
 from app.service.delivery_service import DeliveryService
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -18,9 +21,11 @@ async def get_deliveries(db: Session = Depends(get_db)):
 async def create_delivery(delivery: DeliveredPiecesCreate, db: Session = Depends(get_db)):
     """Crear una nueva entrega"""
     try:
+        logger.info(f"Recibiendo entrega: {delivery}")
         new_delivery = DeliveryService.create_delivery(db, delivery)
         return new_delivery
     except Exception as e:
+        logger.error(f"Error al crear entrega: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
 
 
