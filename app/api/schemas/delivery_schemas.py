@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime
 from typing import Optional, Union
 
 
@@ -31,10 +31,11 @@ class DeliveredPiecesBase(BaseModel):
     sz16: int = 0
     sz18: int = 0
     id_group: Optional[Union[int, str]] = None
+    status: str = "active"
 
 
 class DeliveredPiecesCreate(DeliveredPiecesBase):
-    pass
+    modified_by: Optional[str] = None
 
 
 class DeliveredPiecesUpdate(BaseModel):
@@ -62,10 +63,13 @@ class DeliveredPiecesUpdate(BaseModel):
     sz14: int = 0
     sz16: int = 0
     sz18: int = 0
+    modified_by: Optional[str] = None
 
 
 class DeliveredPiecesResponse(DeliveredPiecesBase):
     id_delivery: int
+    modification_date: Optional[datetime] = None
+    modified_by: Optional[str] = None
     
     class Config:
         from_attributes = True

@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, DateTime
 from app.db.models.base import Base
-from datetime import date
+from datetime import date, datetime
 
 
 class DeliveredPieces(Base):
@@ -34,6 +34,11 @@ class DeliveredPieces(Base):
     sz16 = Column(Integer, default=0)
     sz18 = Column(Integer, default=0)
     id_group = Column(String(50), nullable=True)
+    
+    # Audit fields
+    modification_date = Column(DateTime, nullable=True)
+    modified_by = Column(String(100), nullable=True)
+    status = Column(String(20), default="active", nullable=False)
 
     def __repr__(self):
-        return f"<DeliveredPieces(id_delivery={self.id_delivery}, owner={self.owner}, date={self.date})>"
+        return f"<DeliveredPieces(id_delivery={self.id_delivery}, owner={self.owner}, date={self.date}, status={self.status})>"

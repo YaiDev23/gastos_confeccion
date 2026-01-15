@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.get("/deliveries")
 async def get_deliveries(db: Session = Depends(get_db)):
-    """Obtener todas las entregas"""
+    """Obtener todas las entregas activas"""
     deliveries = DeliveryService.get_all_deliveries(db)
     return deliveries
 
@@ -40,7 +40,7 @@ async def get_delivery(delivery_id: int, db: Session = Depends(get_db)):
 
 @router.put("/deliveries/{delivery_id}", response_model=DeliveredPiecesResponse)
 async def update_delivery(delivery_id: int, delivery: DeliveredPiecesUpdate, db: Session = Depends(get_db)):
-    """Actualizar una entrega"""
+    """Actualizar una entrega con registro de auditoría"""
     updated_delivery = DeliveryService.update_delivery(db, delivery_id, delivery)
     if not updated_delivery:
         raise HTTPException(status_code=404, detail="Entrega no encontrada")
@@ -48,9 +48,9 @@ async def update_delivery(delivery_id: int, delivery: DeliveredPiecesUpdate, db:
 
 
 @router.delete("/deliveries/{delivery_id}")
-async def delete_delivery(delivery_id: int, db: Session = Depends(get_db)):
-    """Eliminar una entrega"""
-    success = DeliveryService.delete_delivery(db, delivery_id)
+async def delete_delivery(delivery_id: int, modified_by: str = None, db: Session = Depends(get_db)):
+    """Marcar una entrega como inactiva en lugar de eliminarla"""
+    success = DeliveryService.delete_delivery(db, delivery_id, modified_by)
     if not success:
         raise HTTPException(status_code=404, detail="Entrega no encontrada")
-    return {"message": "Entrega eliminada correctamente", "id_delivery": delivery_id}
+    return {"message": "Entrega marcada como inactiva correctamente", "id_delivery": delivery_id}

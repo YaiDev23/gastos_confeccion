@@ -100,44 +100,73 @@
         overflow-x: auto;
         border-radius: 8px;
         border: 1px solid #dee2e6;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1rem;
     }
 
     .table-sizes-responsive table {
         margin-bottom: 0;
+        min-width: 100%;
+        width: 100%;
     }
 
     .table-sizes-responsive thead {
         background-color: #f8f9fa;
+        position: sticky;
+        top: 0;
     }
 
     .table-sizes-responsive th {
         color: #0B1023;
         font-weight: 600;
-        padding: 0.75rem !important;
+        padding: 0.6rem 0.4rem !important;
         text-align: center;
         border-color: #dee2e6;
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         white-space: nowrap;
+        vertical-align: middle;
     }
 
     .table-sizes-responsive td {
-        padding: 0.5rem !important;
+        padding: 0.4rem !important;
         border-color: #dee2e6;
+        vertical-align: middle;
     }
 
     .table-sizes-responsive td input {
         text-align: center;
         font-weight: 500;
+        width: 115%;
+        padding: 1%;
+        font-size: 0.9rem;
     }
 
     .table-sizes-responsive td textarea {
         font-size: 0.85rem;
+        width: 100%;
+        min-width: 80px;
     }
 
     .size-group-header {
         background-color: #e9ecef !important;
         font-weight: 700 !important;
         color: #0B1023 !important;
+    }
+
+    @media (max-width: 768px) {
+        .table-sizes-responsive th {
+            padding: 0.4rem 0.2rem !important;
+            font-size: 0.7rem;
+        }
+        
+        .table-sizes-responsive td {
+            padding: 0.3rem !important;
+        }
+
+        .table-sizes-responsive td input {
+            padding: 0.3rem 0.2rem !important;
+            font-size: 0.85rem;
+        }
     }
 </style>
 
@@ -148,19 +177,19 @@
     </div>
 </div>
 
-<div class="container mt-5">
+<div class="container mt-4">
     
     <div class="card mb-4">
         <div class="card-header">
             <h3 style="margin: 0;">Ingresa los datos de la entrega</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body" style="padding: 1.5rem;">
             <form id="deliveryForm">
                 <!-- Información General -->
                 <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="factorySelect" style="color: #0B1023; font-weight: 600;">👤 Responsable (Taller):</label>
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="factorySelect" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">👤 Responsable (Taller):</label>
                             <div class="position-relative">
                                 <input 
                                     type="text" 
@@ -175,18 +204,18 @@
                                 </div>
                             </div>
                             <input type="hidden" id="owner" name="owner" required>
-                            <small id="ownerHelper" style="display: none; color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem;">❌ Por favor selecciona un taller válido</small>
+                            <small id="ownerHelper" style="display: none; color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem; display: block;">❌ Por favor selecciona un taller válido</small>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="date">Fecha:</label>
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="date" style="margin-bottom: 0.5rem; display: block;">📅 Fecha:</label>
                             <input type="date" id="date" name="date" class="form-control" required>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="lot">Lote (Opcional):</label>
+                    <div class="col-md-4 col-sm-6 mb-3">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="lot" style="margin-bottom: 0.5rem; display: block;">📦 Lote (Opcional):</label>
                             <input type="text" id="lot" name="lot" class="form-control" placeholder="Ej: LOTE-001">
                         </div>
                     </div>
@@ -195,30 +224,30 @@
               
 
                 <!-- Tabla de Tallas -->
-                <div class="mt-4 mb-4">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div>
-                            <h4 style="color: #0B1023; font-weight: 600; margin: 0;">📏 Cantidades por Talla</h4>
-                            <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0 0 0;"><strong>Ingresa la cantidad de piezas para cada talla:</strong></p>
+                <div class="mt-5 mb-4">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1; min-width: 250px;">
+                            <h4 style="color: #0B1023; font-weight: 600; margin: 0 0 0.5rem 0;">📏 Cantidades por Talla</h4>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0;"><strong>Ingresa la cantidad de piezas para cada talla:</strong></p>
                         </div>
                     </div>
                     
-                    <div id="deliveriesContainer" class="deliveries-container">
+                    <div id="deliveriesContainer" class="deliveries-container" style="margin-bottom: 2rem;">
                         <!-- Las entregas se agregarán aquí dinámicamente -->
                     </div>
                     
                     <!-- Botón para añadir más entregas -->
-                    <div style="margin-top: 1.5rem; text-align: center;">
-                        <button type="button" id="addDeliveryBtn" class="btn btn-outline-primary" style="padding: 10px 30px; font-size: 1.1rem; border-width: 2px;">
+                    <div style="margin-top: 2rem; text-align: center; margin-bottom: 2rem;">
+                        <button type="button" id="addDeliveryBtn" class="btn btn-outline-primary" style="padding: 12px 40px; font-size: 1rem; border-width: 2px;">
                             <strong>+ Añadir otra entrega</strong>
                         </button>
                     </div>
                 </div>
 
                 <!-- Botones -->
-                <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button type="reset" class="btn btn-secondary" style="flex: 1; min-width: 200px;">🔄 Limpiar Formulario</button>
-                    <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 200px;">💾 Guardar Entrega</button>
+                <div style="margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <button type="reset" class="btn btn-secondary" style="flex: 1; min-width: 180px; padding: 0.75rem;">🔄 Limpiar Formulario</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 180px; padding: 0.75rem;">💾 Guardar Entrega</button>
                 </div>
             </form>
 
@@ -342,9 +371,9 @@ function createDeliveryCardHTML(index) {
             ${index > 0 ? `<button type="button" class="btn-remove-delivery" onclick="removeDelivery(${index})">❌ Eliminar</button>` : ''}
         </div>
         
-        <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #dee2e6;">
-            <div class="form-group">
-                <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600;">Tipo de Producto:</label>
+        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #dee2e6;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Producto:</label>
                 <input type="text" id="delivery_${index}_type" name="delivery_${index}_type" class="form-control" placeholder="Ej: Jogger, Pantalón, Blusa" value="">
             </div>
         </div>
@@ -353,54 +382,54 @@ function createDeliveryCardHTML(index) {
             <table class="table table-bordered table-sm" style="margin-bottom: 0;">
                 <thead>
                     <tr style="background-color: #f8f9fa;">
-                        <th>Color</th>
-                        <th>RIB</th>
-                        <th>Tipo de Tela</th>
-                        <th colspan="5" style="text-align: center; background-color: #e9ecef;">👶 Bebé (meses)</th>
-                        <th colspan="9" style="text-align: center; background-color: #e9ecef;">👧 Niñ@s (tallas)</th>
-                        <th>Observaciones</th>
+                        <th style="width: 12%;">Color</th>
+                        <th style="width: 8%;">RIB</th>
+                        <th style="width: 12%;">Tipo de Tela</th>
+                        <th colspan="5" style="text-align: center; background-color: #e9ecef; width: 20%;">👶 Bebé (meses)</th>
+                        <th colspan="9" style="text-align: center; background-color: #e9ecef; width: 36%;">👧 Niñ@s (tallas)</th>
+                        <th style="width: 12%;">Observaciones</th>
                     </tr>
                     <tr style="background-color: #f8f9fa;">
                         <th>-</th>
                         <th>-</th>
                         <th>-</th>
-                        <th style="font-size: 0.85rem;">6-12</th>
-                        <th style="font-size: 0.85rem;">12-18</th>
-                        <th style="font-size: 0.85rem;">18-24</th>
-                        <th style="font-size: 0.85rem;">24-36</th>
-                        <th style="font-size: 0.85rem;">36-48</th>
-                        <th style="font-size: 0.85rem;">2</th>
-                        <th style="font-size: 0.85rem;">4</th>
-                        <th style="font-size: 0.85rem;">6</th>
-                        <th style="font-size: 0.85rem;">8</th>
-                        <th style="font-size: 0.85rem;">10</th>
-                        <th style="font-size: 0.85rem;">12</th>
-                        <th style="font-size: 0.85rem;">14</th>
-                        <th style="font-size: 0.85rem;">16</th>
-                        <th style="font-size: 0.85rem;">18</th>
+                        <th style="font-size: 0.75rem;">6-12</th>
+                        <th style="font-size: 0.75rem;">12-18</th>
+                        <th style="font-size: 0.75rem;">18-24</th>
+                        <th style="font-size: 0.75rem;">24-36</th>
+                        <th style="font-size: 0.75rem;">36-48</th>
+                        <th style="font-size: 0.75rem;">2</th>
+                        <th style="font-size: 0.75rem;">4</th>
+                        <th style="font-size: 0.75rem;">6</th>
+                        <th style="font-size: 0.75rem;">8</th>
+                        <th style="font-size: 0.75rem;">10</th>
+                        <th style="font-size: 0.75rem;">12</th>
+                        <th style="font-size: 0.75rem;">14</th>
+                        <th style="font-size: 0.75rem;">16</th>
+                        <th style="font-size: 0.75rem;">18</th>
                         <th>-</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="text" name="delivery_${index}_color" class="form-control form-control-sm" placeholder="Rojo, Azul..."></td>
-                        <td><input type="text" name="delivery_${index}_rib" class="form-control form-control-sm" placeholder="RIB"></td>
-                        <td><input type="text" name="delivery_${index}_type_fabric" class="form-control form-control-sm" placeholder="Algodón..."></td>
-                        <td><input type="number" name="delivery_${index}_sz6_12" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz12_18" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz18_24" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz24_36" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz36_48" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz2" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz4" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz6" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz8" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz10" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz12" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz14" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz16" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><input type="number" name="delivery_${index}_sz18" class="form-control form-control-sm" min="0" value="0" style="text-align: center;"></td>
-                        <td><textarea name="delivery_${index}_annotation" class="form-control form-control-sm" placeholder="Notas..." rows="2" style="resize: vertical;"></textarea></td>
+                        <td><input type="text" name="delivery_${index}_color" class="form-control" placeholder="Rojo, Azul..."></td>
+                        <td><input type="text" name="delivery_${index}_rib" class="form-control" placeholder="RIB"></td>
+                        <td><input type="text" name="delivery_${index}_type_fabric" class="form-control" placeholder="Algodón..."></td>
+                        <td><input type="number" name="delivery_${index}_sz6_12" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz12_18" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz18_24" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz24_36" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz36_48" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz2" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz4" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz6" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz8" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz10" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz12" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz14" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz16" class="form-control" min="0" value="0"></td>
+                        <td><input type="number" name="delivery_${index}_sz18" class="form-control" min="0" value="0"></td>
+                        <td><textarea name="delivery_${index}_annotation" class="form-control" placeholder="Notas..." rows="2" style="resize: vertical;"></textarea></td>
                     </tr>
                 </tbody>
             </table>
@@ -422,6 +451,19 @@ function removeDelivery(index) {
     if (card) {
         card.remove();
     }
+}
+
+// Obtener usuario actual
+function getCurrentUser() {
+    const userElement = document.getElementById('currentUser');
+    if (userElement) {
+        return userElement.value;
+    }
+    const userMeta = document.querySelector('meta[name="current-user"]');
+    if (userMeta) {
+        return userMeta.getAttribute('content');
+    }
+    return localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'unknown';
 }
 
 // Event listener para el botón de añadir entrega
@@ -462,6 +504,7 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
 
     let successCount = 0;
     let errorMessages = [];
+    const currentUser = getCurrentUser();
 
     // Procesar cada entrega
     for (let card of deliveryCards) {
@@ -476,6 +519,7 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
             type_fabric: document.querySelector(`input[name="delivery_${index}_type_fabric"]`).value || null,
             rib: document.querySelector(`input[name="delivery_${index}_rib"]`).value || null,
             annotation: document.querySelector(`textarea[name="delivery_${index}_annotation"]`).value || null,
+            modified_by: currentUser,
             sz6_12: parseInt(document.querySelector(`input[name="delivery_${index}_sz6_12"]`).value) || 0,
             sz12_18: parseInt(document.querySelector(`input[name="delivery_${index}_sz12_18"]`).value) || 0,
             sz18_24: parseInt(document.querySelector(`input[name="delivery_${index}_sz18_24"]`).value) || 0,

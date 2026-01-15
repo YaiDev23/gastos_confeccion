@@ -90,7 +90,7 @@
 
 <!-- Modal para ver detalles -->
 <div id="detailsModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
             <span class="close" onclick="closeModal('detailsModal')">&times;</span>
             <h3>📦 Detalles de la Entrega</h3>
@@ -162,6 +162,21 @@
 <script>
 let allDeliveries = []; // Almacenar todas las entregas
 let currentEditingDeliveryId = null;
+
+function getCurrentUser() {
+    // Obtener el usuario del elemento HTML o de localStorage/sessionStorage
+    const userElement = document.getElementById('currentUser');
+    if (userElement) {
+        return userElement.value;
+    }
+    // Alternativa: obtener del meta tag si está disponible
+    const userMeta = document.querySelector('meta[name="current-user"]');
+    if (userMeta) {
+        return userMeta.getAttribute('content');
+    }
+    // Si no hay usuario disponible, usar 'unknown'
+    return localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'unknown';
+}
 
 async function loadDeliveries() {
     try {
@@ -442,18 +457,21 @@ function deleteDeliveryGroup(idGroup) {
         return;
     }
     
+    // Obtener usuario actual
+    const currentUser = getCurrentUser();
+    
     // Eliminar todas las entregas del grupo
     let deleteCount = 0;
     
     deliveriesInGroup.forEach(delivery => {
-        fetch(`/api/deliveries/${delivery.id_delivery}`, {
+        fetch(`/api/deliveries/${delivery.id_delivery}?modified_by=${encodeURIComponent(currentUser)}`, {
             method: 'DELETE'
         })
         .then(response => {
             if (response.ok) {
                 deleteCount++;
                 if (deleteCount === deliveriesInGroup.length) {
-                    showAlert('✅ Grupo de entregas eliminado correctamente', 'success');
+                    showAlert('✅ Grupo de entregas marcado como inactivo correctamente', 'success');
                     setTimeout(() => {
                         loadDeliveries();
                     }, 1500);
@@ -551,12 +569,15 @@ function deleteDelivery(deliveryId) {
         return;
     }
     
-    fetch(`/api/deliveries/${deliveryId}`, {
+    // Obtener usuario actual
+    const currentUser = getCurrentUser();
+    
+    fetch(`/api/deliveries/${deliveryId}?modified_by=${encodeURIComponent(currentUser)}`, {
         method: 'DELETE'
     })
     .then(response => {
         if (response.ok) {
-            showAlert('Entrega eliminada correctamente', 'success');
+            showAlert('Entrega marcada como inactiva correctamente', 'success');
             setTimeout(() => {
                 loadDeliveries();
             }, 1500);
@@ -633,6 +654,9 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         return;
     }
     
+    // Obtener usuario actual
+    const currentUser = getCurrentUser();
+    
     const updatedData = {
         owner: document.getElementById('editOwner').value,
         date: document.getElementById('editDate').value,
@@ -640,6 +664,7 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         type: document.getElementById('editType').value || null,
         color: document.getElementById('editColor').value || null,
         annotation: document.getElementById('editAnnotation').value || null,
+        modified_by: currentUser,
         sz6_12: parseInt(document.getElementById('editSz6_12').value) || 0,
         sz12_18: parseInt(document.getElementById('editSz12_18').value) || 0,
         sz18_24: parseInt(document.getElementById('editSz18_24').value) || 0,
