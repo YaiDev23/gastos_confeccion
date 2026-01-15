@@ -13,6 +13,8 @@ class DeliveredPieces(Base):
     type = Column(String(50), nullable=True)
     color = Column(String(50), nullable=True)
     annotation = Column(String(500), nullable=True)
+    type_fabric = Column(String(100), nullable=True)
+    rib = Column(String(100), nullable=True)
     
     # Size range 6-12 to 36-48
     sz6_12 = Column(Integer, default=0)
@@ -31,6 +33,7 @@ class DeliveredPieces(Base):
     sz14 = Column(Integer, default=0)
     sz16 = Column(Integer, default=0)
     sz18 = Column(Integer, default=0)
+    id_group = Column(Integer, nullable=True)
 
     def __repr__(self):
         return f"<DeliveredPieces(id_delivery={self.id_delivery}, owner={self.owner}, date={self.date})>"

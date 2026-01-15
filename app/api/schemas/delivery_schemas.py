@@ -10,6 +10,8 @@ class DeliveredPiecesBase(BaseModel):
     type: Optional[str] = None
     color: Optional[str] = None
     annotation: Optional[str] = None
+    type_fabric: Optional[str] = None
+    rib: Optional[str] = None
     
     # Size range 6-12 to 36-48
     sz6_12: int = 0
@@ -28,6 +30,7 @@ class DeliveredPiecesBase(BaseModel):
     sz14: int = 0
     sz16: int = 0
     sz18: int = 0
+    id_group: Optional[int] = None
 
 
 class DeliveredPiecesCreate(DeliveredPiecesBase):
