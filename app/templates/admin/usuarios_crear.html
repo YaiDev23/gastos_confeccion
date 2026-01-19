@@ -1,0 +1,418 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Usuario - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .header-form {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .header-form h1 {
+        margin: 0;
+        flex: 1;
+    }
+
+    .btn-volver {
+        background-color: #95a5a6;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-volver:hover {
+        background-color: #7f8c8d;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #0B1023;
+        font-size: 15px;
+    }
+
+    input[type="text"],
+    input[type="psw"],
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ecf0f1;
+        border-radius: 8px;
+        font-size: 15px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="psw"]:focus,
+    select:focus {
+        border-color: #0B1023;
+        outline: none;
+        background-color: #f8f9fa;
+        box-shadow: 0 0 0 3px rgba(11, 16, 35, 0.1);
+    }
+
+    .psw-group {
+        position: relative;
+    }
+
+    .toggle-psw {
+        position: absolute;
+        right: 12px;
+        top: 42px;
+        cursor: pointer;
+        color: #0B1023;
+        background: none;
+        border: none;
+        font-size: 14px;
+    }
+
+    .requirement {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-top: 8px;
+    }
+
+    .requirement.met {
+        color: #27ae60;
+    }
+
+    .requirement i {
+        font-size: 11px;
+    }
+
+    .help-text {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+
+    .formulario-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 14px 30px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        grid-column: span 2;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+    }
+
+    .btn-submit:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-cancelar {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .btn-cancelar:hover {
+        background-color: #7f8c8d;
+    }
+
+    .card-info {
+        background: #e8f4f8;
+        border-left: 4px solid #3498db;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+    }
+
+    .card-info p {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .mensaje {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mensaje-exito {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .mensaje-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @media (max-width: 768px) {
+        .formulario-buttons {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-submit {
+            grid-column: span 1;
+        }
+
+        .header-form {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-volver {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="form-container">
+    <div class="header-form">
+        <a href="/admin/usuarios" class="btn-volver">
+            <i class="fas fa-arrow-left"></i>
+            Volver
+        </a>
+        <h1>
+            <i class="fas fa-user-plus"></i>
+            Crear Nuevo Usuario
+        </h1>
+    </div>
+
+    <div id="mensaje"></div>
+
+    <div class="card-info">
+        <p>
+            <i class="fas fa-info-circle"></i>
+            Complete el formulario para crear un nuevo usuario. La contraseña debe tener al menos 8 caracteres.
+        </p>
+    </div>
+
+    <form id="formularioUsuario" onsubmit="guardarUsuario(event)">
+        <div class="form-group">
+            <label for="username">
+                <i class="fas fa-user"></i>
+                Nombre de Usuario *
+            </label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                placeholder="ej: usuario123"
+                minlength="3"
+            >
+            <div class="help-text">Debe tener al menos 3 caracteres</div>
+        </div>
+
+        <div class="form-group">
+            <label for="psw">
+                <i class="fas fa-lock"></i>
+                Contraseña *
+            </label>
+            <div class="psw-group">
+                <input 
+                    type="psw" 
+                    id="psw" 
+                    name="psw" 
+                    required 
+                    placeholder="Ingrese una contraseña segura"
+                    minlength="8"
+                    onchange="validarContraseña()"
+                >
+                <button type="button" class="toggle-psw" onclick="togglepsw()">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            <div class="help-text">Mínimo 8 caracteres</div>
+            <div id="requerimientos">
+                <div class="requirement" id="req-min">
+                    <i class="fas fa-times"></i> Al menos 8 caracteres
+                </div>
+                <div class="requirement" id="req-may">
+                    <i class="fas fa-times"></i> Al menos una mayúscula
+                </div>
+                <div class="requirement" id="req-min-let">
+                    <i class="fas fa-times"></i> Al menos una minúscula
+                </div>
+                <div class="requirement" id="req-num">
+                    <i class="fas fa-times"></i> Al menos un número
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="rol">
+                <i class="fas fa-tag"></i>
+                Rol *
+            </label>
+            <select id="rol" name="rol" required>
+                <option value="">Seleccione un rol</option>
+                <option value="admin">Administrador</option>
+                <option value="taller">Taller</option>
+                <option value="usuario">Usuario</option>
+            </select>
+        </div>
+
+        <div class="formulario-buttons">
+            <button type="button" class="btn btn-cancelar" onclick="cancelar()">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </button>
+            <button type="submit" class="btn btn-submit" id="btnSubmit">
+                <i class="fas fa-save"></i>
+                Crear Usuario
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function togglepsw() {
+        const input = document.getElementById('psw');
+        const btn = document.querySelector('.toggle-psw');
+        
+        if (input.type === 'psw') {
+            input.type = 'text';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            input.type = 'psw';
+            btn.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    }
+
+    function validarContraseña() {
+        const psw = document.getElementById('psw').value;
+        
+        const req = {
+            'req-min': psw.length >= 8,
+            'req-may': /[A-Z]/.test(psw),
+            'req-min-let': /[a-z]/.test(psw),
+            'req-num': /[0-9]/.test(psw)
+        };
+
+        Object.entries(req).forEach(([id, cumple]) => {
+            const elemento = document.getElementById(id);
+            if (cumple) {
+                elemento.classList.add('met');
+                elemento.innerHTML = '<i class="fas fa-check"></i> ' + elemento.textContent.replace('✗ ', '');
+            } else {
+                elemento.classList.remove('met');
+                elemento.innerHTML = '<i class="fas fa-times"></i> ' + elemento.textContent.replace('✓ ', '');
+            }
+        });
+
+        // Habilitar botón solo si todos los requisitos se cumplen
+        const btnSubmit = document.getElementById('btnSubmit');
+        btnSubmit.disabled = !Object.values(req).every(v => v);
+    }
+
+    async function guardarUsuario(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const psw = document.getElementById('psw').value;
+        const rol = document.getElementById('rol').value;
+
+        if (!username || !psw || !rol) {
+            mostrarMensaje('Por favor complete todos los campos requeridos', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username,
+                    psw,
+                    rol
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Error al crear el usuario');
+            }
+
+            mostrarMensaje('Usuario creado correctamente', 'exito');
+            setTimeout(() => {
+                window.location.href = '/admin/usuarios';
+            }, 1500);
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje(error.message || 'Error al crear el usuario', 'error');
+        }
+    }
+
+    function mostrarMensaje(texto, tipo) {
+        const mensajeDiv = document.getElementById('mensaje');
+        mensajeDiv.innerHTML = `
+            <div class="mensaje mensaje-${tipo}">
+                <i class="fas fa-${tipo === 'exito' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${texto}
+            </div>
+        `;
+    }
+
+    function cancelar() {
+        if (confirm('¿Descartar cambios?')) {
+            window.location.href = '/admin/usuarios';
+        }
+    }
+
+    // Validar contraseña al escribir
+    document.getElementById('psw').addEventListener('input', validarContraseña);
+
+    // Inicializar
+    validarContraseña();
+</script>
+
+{% endblock %}

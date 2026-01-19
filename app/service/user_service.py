@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.db.models.user_model import User
+from app.db.models.factory_model import Factory
 from app.api.schemas.user_schema import UserCreate, UserUpdate, UserLogin
 from typing import Optional, List, Dict, Any
 
@@ -18,8 +19,12 @@ class UserService:
                 username=user_data.username,
                 psw=user_data.psw,
                 rol=user_data.rol,
-                estado=user_data.estado
+                estado=user_data.estado,
             )
+            
+            # Solo establece email si está disponible en el objeto
+            if hasattr(user_data, 'email') and user_data.email:
+                nuevo_usuario.email = user_data.email
             
             db.add(nuevo_usuario)
             db.commit()
@@ -68,7 +73,7 @@ class UserService:
         """
         Obtiene todos los usuarios activos
         """
-        return db.query(User).filter(User.estado == 'activo').all()
+        return db.query(User).filter(User.estado == 1).all()
     
     @staticmethod
     def actualizar_usuario(db: Session, usuario_id: int, user_data: UserUpdate) -> Dict[str, Any]:
@@ -93,6 +98,7 @@ class UserService:
                 usuario.rol = user_data.rol
             if user_data.estado is not None:
                 usuario.estado = user_data.estado
+
             
             db.commit()
             db.refresh(usuario)
@@ -150,7 +156,7 @@ class UserService:
         """
         usuario = db.query(User).filter(
             User.username == user_data.username,
-            User.estado == 'activo'
+            User.estado == 1
         ).first()
         
         if not usuario:
@@ -169,4 +175,30 @@ class UserService:
         return {
             "success": True,
             "data": usuario
+        }
+
+    @staticmethod
+    def verificar_taller_por_documento(db: Session, document: str) -> Dict[str, Any]:
+        """
+        Verifica si existe un taller con el documento proporcionado (login para talleres)
+        """
+        factory = db.query(Factory).filter(
+            Factory.document == document
+        ).first()
+        
+        if not factory:
+            return {
+                "success": False,
+                "error": "Taller no encontrado con ese número de documento"
+            }
+        
+        # Retornar datos del taller en formato similar al usuario
+        return {
+            "success": True,
+            "data": {
+                "id_factory": factory.id_factory,
+                "owner": factory.owner,
+                "document": factory.document,
+                "rol": "taller"  # Rol especial para talleres
+            }
         }

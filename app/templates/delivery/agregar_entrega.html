@@ -604,6 +604,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Agregar la primera entrega por defecto
     addDelivery();
+
+    // Si es taller, bloquear el campo de responsable y autocompletarlo
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (user && user.rol === 'taller') {
+        const factorySelect = document.getElementById('factorySelect');
+        const owner = document.getElementById('owner');
+        
+        // Obtener el nombre del taller del owner
+        const tallerName = user.owner || 'Taller';
+        
+        // Autocompletar los campos
+        factorySelect.value = tallerName;
+        owner.value = tallerName;
+        
+        // Bloquear el campo
+        factorySelect.disabled = true;
+        factorySelect.style.backgroundColor = '#e9ecef';
+        factorySelect.style.cursor = 'not-allowed';
+        factorySelect.style.opacity = '0.7';
+    }
 });
 </script>
 {% endblock %}

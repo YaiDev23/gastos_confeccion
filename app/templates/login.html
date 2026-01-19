@@ -132,6 +132,44 @@
             color: #666;
             font-size: 12px;
         }
+
+        .login-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .type-btn:hover {
+            border-color: #0B1023;
+            color: #0B1023;
+        }
+
+        .type-btn.active {
+            background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
+            color: white;
+            border-color: #0B1023;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -139,9 +177,20 @@
         <h1>Sistema de Gastos</h1>
         <p>Inicia sesión para continuar</p>
         
+        <!-- Selector de tipo de login -->
+        <div class="login-type-selector">
+            <button type="button" class="type-btn active" data-type="user">
+                Usuario
+            </button>
+            <button type="button" class="type-btn" data-type="factory">
+                Taller
+            </button>
+        </div>
+        
         <div class="error-message" id="errorMessage"></div>
 
-        <form id="loginForm">
+        <!-- Formulario de login de usuario -->
+        <form id="userLoginForm" class="login-form active">
             <div class="form-group">
                 <label for="username">Usuario</label>
                 <input 
@@ -168,7 +217,28 @@
 
             <button type="submit" class="login-btn">Iniciar Sesión</button>
 
-            <div class="loading" id="loading">
+            <div class="loading" id="userLoading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <!-- Formulario de login de taller -->
+        <form id="factoryLoginForm" class="login-form">
+            <div class="form-group">
+                <label for="document">Número de Documento del Taller</label>
+                <input 
+                    type="text" 
+                    id="document" 
+                    name="document" 
+                    required 
+                    placeholder="Ingresa el número de documento"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button type="submit" class="login-btn">Acceder como Taller</button>
+
+            <div class="loading" id="factoryLoading">
                 <div class="spinner"></div>
             </div>
         </form>
@@ -179,22 +249,48 @@
     </div>
 
     <script>
-        const form = document.getElementById('loginForm');
+        // Selectores de tipo de login
+        const typeButtons = document.querySelectorAll('.type-btn');
+        const userLoginForm = document.getElementById('userLoginForm');
+        const factoryLoginForm = document.getElementById('factoryLoginForm');
         const errorMessage = document.getElementById('errorMessage');
-        const loading = document.getElementById('loading');
 
-        form.addEventListener('submit', async (e) => {
+        // Manejar cambio entre tipos de login
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const type = btn.dataset.type;
+                
+                // Mostrar/ocultar formularios
+                if (type === 'user') {
+                    userLoginForm.classList.add('active');
+                    factoryLoginForm.classList.remove('active');
+                } else {
+                    userLoginForm.classList.remove('active');
+                    factoryLoginForm.classList.add('active');
+                }
+                
+                errorMessage.classList.remove('show');
+                errorMessage.textContent = '';
+            });
+        });
+
+        // Manejador de login de usuario
+        userLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             errorMessage.classList.remove('show');
             errorMessage.textContent = '';
+            const loading = document.getElementById('userLoading');
             loading.style.display = 'block';
 
             const username = document.getElementById('username').value;
             const psw = document.getElementById('psw').value;
 
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/users/login', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -208,13 +304,52 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Guardar datos del usuario en sessionStorage
                     sessionStorage.setItem('user', JSON.stringify(data.data));
                     sessionStorage.setItem('userRole', data.data.rol);
-                    // Redirigir al menú principal
                     window.location.href = '/menu';
                 } else {
-                    errorMessage.textContent = data.error || 'Error en el inicio de sesión';
+                    errorMessage.textContent = data.error || 'Usuario o contraseña incorrectos.';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Error de conexión. Intenta nuevamente.';
+                errorMessage.classList.add('show');
+                console.error('Error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Manejador de login de taller
+        factoryLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            const loading = document.getElementById('factoryLoading');
+            loading.style.display = 'block';
+
+            const factoryDocument = document.getElementById('document').value;
+
+            try {
+                const response = await fetch('/factory/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        document: factoryDocument
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('user', JSON.stringify(data.data));
+                    sessionStorage.setItem('userRole', data.data.rol);
+                    window.location.href = '/menu';
+                } else {
+                    errorMessage.textContent = data.error || 'Número de documento no encontrado.';
                     errorMessage.classList.add('show');
                 }
             } catch (error) {
@@ -231,6 +366,9 @@
             errorMessage.classList.remove('show');
         });
         document.getElementById('psw').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+        document.getElementById('document').addEventListener('focus', () => {
             errorMessage.classList.remove('show');
         });
     </script>

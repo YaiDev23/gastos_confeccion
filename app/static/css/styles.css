@@ -151,13 +151,13 @@
 }
 
 .btn-outline-primary {
-    color: #0B1023;
+    color: #fff;
     background-color: transparent;
     border: 2px solid #0B1023;
 }
 
 .btn-outline-primary:hover {
-    color: #fff;
+    color: #a5a1a1;
     background-color: #0B1023;
     border-color: #0B1023;
 }

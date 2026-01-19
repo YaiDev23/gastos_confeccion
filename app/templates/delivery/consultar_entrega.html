@@ -102,57 +102,111 @@
 
 <!-- Modal para editar entrega -->
 <div id="editModal" class="modal">
-    <div class="modal-content">
+    <div class="modal-content" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
             <span class="close" onclick="closeModal('editModal')">&times;</span>
             <h3>✏️ Editar Entrega</h3>
         </div>
         <div class="modal-body">
             <form id="editForm">
-                <div class="mb-3">
-                    <label for="editOwner" class="form-label">Responsable (Taller):</label>
-                    <input type="text" id="editOwner" class="form-control" required>
+                <!-- Encabezado con información general -->
+                <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #0B1023;">
+                    <h3 style="color: #0B1023; margin: 0 0 10px 0;">📋 EDITAR GUÍA DE CORTE</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div>
+                            <strong style="color: #0B1023;">LOTE:</strong>
+                            <input type="text" id="editLot" class="form-control" placeholder="Lote (Opcional)" style="margin-top: 5px;">
+                        </div>
+                        <div>
+                            <strong style="color: #0B1023;">FECHA:</strong>
+                            <input type="date" id="editDate" class="form-control" required style="margin-top: 5px;">
+                        </div>
+                        <div>
+                            <strong style="color: #0B1023;">RESPONSABLE:</strong>
+                            <input type="text" id="editOwner" class="form-control" required style="margin-top: 5px;">
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="editDate" class="form-label">Fecha:</label>
-                    <input type="date" id="editDate" class="form-control" required>
+
+                <!-- Información de la prenda -->
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #0B1023; margin: 0 0 15px 0;">📦 Información de la Prenda</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Tipo de Producto:</label>
+                            <input type="text" id="editType" class="form-control" placeholder="Ej: Jogger, Pantalón">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Color:</label>
+                            <input type="text" id="editColor" class="form-control" placeholder="Ej: Rojo, Azul">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">RIB:</label>
+                            <input type="text" id="editRib" class="form-control" placeholder="RIB">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">Tipo de Tela:</label>
+                            <input type="text" id="editTypeFabric" class="form-control" placeholder="Algodón, Poliéster...">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
+                        <label class="form-label">Observación:</label>
+                        <textarea id="editAnnotation" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="editLot" class="form-label">Lote (Opcional):</label>
-                    <input type="text" id="editLot" class="form-control">
+
+                <!-- Tabla de Tallas -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="background: #0B1023; color: white; padding: 10px; margin: 0 0 10px 0; text-transform: uppercase;">📏 Cantidades por Talla</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: #e8e8e8;">
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 6-12</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 12-18</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 18-24</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 24-36</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 36-48</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-2</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-4</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-6</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-8</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-10</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-12</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-14</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-16</th>
+                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-18</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz6_12" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz12_18" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz18_24" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz24_36" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz36_48" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz2" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz4" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz6" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz8" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz10" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz12" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz14" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz16" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz18" class="form-control" min="0" value="0" style="text-align: center;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="mb-3">
-                    <label for="editType" class="form-label">Tipo:</label>
-                    <input type="text" id="editType" class="form-control">
+
+                <!-- Total -->
+                <div style="background: #0B1023; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                    <h4 style="margin: 0;">📊 Total Piezas: <span id="editTotalDisplay">0</span></h4>
                 </div>
-                <div class="mb-3">
-                    <label for="editColor" class="form-label">Color:</label>
-                    <input type="text" id="editColor" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label for="editAnnotation" class="form-label">Observación:</label>
-                    <textarea id="editAnnotation" class="form-control" rows="3"></textarea>
-                </div>
-                <h5 style="color: #0B1023; margin-top: 20px;">📏 Cantidades por Talla</h5>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    <div class="mb-3"><label class="form-label">6-12:</label><input type="number" id="editSz6_12" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">12-18:</label><input type="number" id="editSz12_18" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">18-24:</label><input type="number" id="editSz18_24" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">24-36:</label><input type="number" id="editSz24_36" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">36-48:</label><input type="number" id="editSz36_48" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 2:</label><input type="number" id="editSz2" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 4:</label><input type="number" id="editSz4" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 6:</label><input type="number" id="editSz6" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 8:</label><input type="number" id="editSz8" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 10:</label><input type="number" id="editSz10" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 12:</label><input type="number" id="editSz12" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 14:</label><input type="number" id="editSz14" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 16:</label><input type="number" id="editSz16" class="form-control" min="0" value="0"></div>
-                    <div class="mb-3"><label class="form-label">Talla 18:</label><input type="number" id="editSz18" class="form-control" min="0" value="0"></div>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary flex-grow-1">💾 Guardar Cambios</button>
-                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')">❌ Cancelar</button>
+
+                <!-- Botones -->
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary flex-grow-1" style="flex: 1;">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')" style="flex: 1;">❌ Cancelar</button>
                 </div>
             </form>
         </div>
@@ -164,16 +218,28 @@ let allDeliveries = []; // Almacenar todas las entregas
 let currentEditingDeliveryId = null;
 
 function getCurrentUser() {
-    // Obtener el usuario del elemento HTML o de localStorage/sessionStorage
+    // Obtener el usuario del sessionStorage (como en base.html)
+    try {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user && user.username) {
+            return user.username;
+        }
+    } catch (e) {
+        console.log('Error al obtener usuario del sessionStorage:', e);
+    }
+    
+    // Alternativa: obtener del elemento HTML
     const userElement = document.getElementById('currentUser');
     if (userElement) {
         return userElement.value;
     }
-    // Alternativa: obtener del meta tag si está disponible
+    
+    // Alternativa: obtener del meta tag
     const userMeta = document.querySelector('meta[name="current-user"]');
     if (userMeta) {
         return userMeta.getAttribute('content');
     }
+    
     // Si no hay usuario disponible, usar 'unknown'
     return localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'unknown';
 }
@@ -309,6 +375,7 @@ function renderDeliveries(deliveries) {
             <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
             <td>
                 <button class="btn-action btn-view" onclick="viewDetailsGroup('${delivery.id_group}')">👁️ Ver</button>
+                <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
                 <button class="btn-action btn-delete" onclick="deleteDeliveryGroup('${delivery.id_group}')">🗑️ Eliminar</button>
             </td>
         `;
@@ -615,8 +682,44 @@ function openEditModal(delivery) {
     document.getElementById('editSz14').value = delivery.sz14 || 0;
     document.getElementById('editSz16').value = delivery.sz16 || 0;
     document.getElementById('editSz18').value = delivery.sz18 || 0;
+    document.getElementById('editRib').value = delivery.rib || '';
+    document.getElementById('editTypeFabric').value = delivery.type_fabric || '';
+    
+    // Calcular y mostrar total inicial
+    updateEditTotalDisplay();
+    
+    // Agregar listeners para actualizar total en tiempo real
+    const sizeInputs = [
+        'editSz6_12', 'editSz12_18', 'editSz18_24', 'editSz24_36', 'editSz36_48',
+        'editSz2', 'editSz4', 'editSz6', 'editSz8', 'editSz10', 'editSz12', 'editSz14', 'editSz16', 'editSz18'
+    ];
+    
+    sizeInputs.forEach(id => {
+        const element = document.getElementById(id);
+        element.removeEventListener('input', updateEditTotalDisplay);
+        element.addEventListener('input', updateEditTotalDisplay);
+    });
     
     document.getElementById('editModal').style.display = 'block';
+}
+
+function updateEditTotalDisplay() {
+    const total = (parseInt(document.getElementById('editSz6_12').value) || 0) +
+                  (parseInt(document.getElementById('editSz12_18').value) || 0) +
+                  (parseInt(document.getElementById('editSz18_24').value) || 0) +
+                  (parseInt(document.getElementById('editSz24_36').value) || 0) +
+                  (parseInt(document.getElementById('editSz36_48').value) || 0) +
+                  (parseInt(document.getElementById('editSz2').value) || 0) +
+                  (parseInt(document.getElementById('editSz4').value) || 0) +
+                  (parseInt(document.getElementById('editSz6').value) || 0) +
+                  (parseInt(document.getElementById('editSz8').value) || 0) +
+                  (parseInt(document.getElementById('editSz10').value) || 0) +
+                  (parseInt(document.getElementById('editSz12').value) || 0) +
+                  (parseInt(document.getElementById('editSz14').value) || 0) +
+                  (parseInt(document.getElementById('editSz16').value) || 0) +
+                  (parseInt(document.getElementById('editSz18').value) || 0);
+    
+    document.getElementById('editTotalDisplay').textContent = total;
 }
 
 function showAlert(message, type) {
@@ -664,6 +767,8 @@ document.getElementById('editForm').addEventListener('submit', async function(e)
         type: document.getElementById('editType').value || null,
         color: document.getElementById('editColor').value || null,
         annotation: document.getElementById('editAnnotation').value || null,
+        rib: document.getElementById('editRib').value || null,
+        type_fabric: document.getElementById('editTypeFabric').value || null,
         modified_by: currentUser,
         sz6_12: parseInt(document.getElementById('editSz6_12').value) || 0,
         sz12_18: parseInt(document.getElementById('editSz12_18').value) || 0,

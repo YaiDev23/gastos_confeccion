@@ -5,7 +5,7 @@ from typing import Optional
 class FactoryCreate(BaseModel):
     """Schema para crear una nueva fábrica"""
     owner: str = Field(..., min_length=1, max_length=100, description="Propietario de la fábrica")
-
+    document: Optional[str] = Field(None, max_length=50, description="Documento de la fábrica")
     class Config:
         json_schema_extra = {
             "example": {
@@ -17,7 +17,7 @@ class FactoryCreate(BaseModel):
 class FactoryUpdate(BaseModel):
     """Schema para actualizar una fábrica"""
     owner: Optional[str] = Field(None, min_length=1, max_length=100, description="Propietario de la fábrica")
-
+    document: Optional[str] = Field(None, max_length=50, description="Documento de la fábrica")
     class Config:
         json_schema_extra = {
             "example": {
@@ -30,7 +30,7 @@ class FactoryResponse(BaseModel):
     """Schema para respuesta de fábrica"""
     id_factory: int = Field(..., description="ID de la fábrica")
     owner: str = Field(..., description="Propietario de la fábrica")
-
+    document: Optional[str] = Field(None, description="Documento de la fábrica")
     class Config:
         from_attributes = True
         json_schema_extra = {

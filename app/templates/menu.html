@@ -397,6 +397,18 @@
 
 
 <script>
+    // Redirigir talleres directamente a entregas
+    function verificarAccesoTaller() {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const rol = user?.rol;
+
+        if (rol === 'taller') {
+            // Redirigir directamente a entregas
+            window.location.href = '/menu_entrega';
+            return;
+        }
+    }
+
     // Controlar visibilidad de módulos según el rol
     function mostrarModulosPorRol() {
         const user = JSON.parse(sessionStorage.getItem('user'));
@@ -425,7 +437,7 @@
             moduloTalleres.style.display = 'block';
             moduloTrabajadores.style.display = 'none';
         } else if (rol === 'taller') {
-            // Admin solo a entregas
+            // Los talleres no deberían llegar aquí (redirigidos a entregas)
             moduloAsistencias.style.display = 'none';
             moduloCalculos.style.display = 'none';
             moduloEntregas.style.display = 'block';
@@ -442,7 +454,10 @@
     }
 
     // Ejecutar cuando cargue la página
-    window.addEventListener('load', mostrarModulosPorRol);
+    window.addEventListener('load', function() {
+        verificarAccesoTaller();
+        mostrarModulosPorRol();
+    });
 </script>
 
 {% endblock %}
