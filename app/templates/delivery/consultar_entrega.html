@@ -6,7 +6,98 @@
 
 
 <style>
+.delivery-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
 
+.delivery-card:hover {
+    border-color: #0B1023;
+    box-shadow: 0 4px 12px rgba(11, 16, 35, 0.1);
+}
+
+.delivery-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.delivery-card-header h5 {
+    margin: 0;
+    color: #0B1023;
+    font-weight: 600;
+}
+
+.btn-remove-delivery {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-remove-delivery:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+.table-sizes-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.table-sizes-responsive table {
+    margin-bottom: 0;
+    min-width: 100%;
+    width: 100%;
+}
+
+.table-sizes-responsive thead {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+}
+
+.table-sizes-responsive th {
+    color: #0B1023;
+    font-weight: 600;
+    padding: 0.6rem 0.4rem !important;
+    text-align: center;
+    border-color: #dee2e6;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table-sizes-responsive td {
+    padding: 0.4rem !important;
+    border-color: #dee2e6;
+    vertical-align: middle;
+}
+
+.table-sizes-responsive td input {
+    text-align: center;
+    font-weight: 500;
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
 </style>
 
 <div class="header-nav">
@@ -105,108 +196,51 @@
     <div class="modal-content" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
         <div class="modal-header">
             <span class="close" onclick="closeModal('editModal')">&times;</span>
-            <h3>✏️ Editar Entrega</h3>
+            <h3>✏️ Editar Entregas</h3>
         </div>
         <div class="modal-body">
             <form id="editForm">
-                <!-- Encabezado con información general -->
+                <!-- Información General -->
                 <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #0B1023;">
                     <h3 style="color: #0B1023; margin: 0 0 10px 0;">📋 EDITAR GUÍA DE CORTE</h3>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
                         <div>
-                            <strong style="color: #0B1023;">LOTE:</strong>
-                            <input type="text" id="editLot" class="form-control" placeholder="Lote (Opcional)" style="margin-top: 5px;">
+                            <strong style="color: #0B1023;">RESPONSABLE:</strong>
+                            <input type="text" id="editOwner" class="form-control" required style="margin-top: 5px;">
                         </div>
                         <div>
                             <strong style="color: #0B1023;">FECHA:</strong>
                             <input type="date" id="editDate" class="form-control" required style="margin-top: 5px;">
                         </div>
                         <div>
-                            <strong style="color: #0B1023;">RESPONSABLE:</strong>
-                            <input type="text" id="editOwner" class="form-control" required style="margin-top: 5px;">
+                            <strong style="color: #0B1023;">LOTE:</strong>
+                            <input type="text" id="editLot" class="form-control" placeholder="Lote (Opcional)" style="margin-top: 5px;">
                         </div>
                     </div>
                 </div>
 
-                <!-- Información de la prenda -->
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                    <h4 style="color: #0B1023; margin: 0 0 15px 0;">📦 Información de la Prenda</h4>
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">Tipo de Producto:</label>
-                            <input type="text" id="editType" class="form-control" placeholder="Ej: Jogger, Pantalón">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">Color:</label>
-                            <input type="text" id="editColor" class="form-control" placeholder="Ej: Rojo, Azul">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">RIB:</label>
-                            <input type="text" id="editRib" class="form-control" placeholder="RIB">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">Tipo de Tela:</label>
-                            <input type="text" id="editTypeFabric" class="form-control" placeholder="Algodón, Poliéster...">
-                        </div>
-                    </div>
-                    <div class="form-group" style="margin-top: 15px; margin-bottom: 0;">
-                        <label class="form-label">Observación:</label>
-                        <textarea id="editAnnotation" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
-                    </div>
-                </div>
-
-                <!-- Tabla de Tallas -->
+                <!-- Observaciones generales -->
                 <div style="margin-bottom: 20px;">
-                    <h4 style="background: #0B1023; color: white; padding: 10px; margin: 0 0 10px 0; text-transform: uppercase;">📏 Cantidades por Talla</h4>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #e8e8e8;">
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 6-12</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 12-18</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 18-24</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 24-36</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">Bebé 36-48</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-2</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-4</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-6</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-8</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-10</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-12</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-14</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-16</th>
-                                <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 12px; font-weight: bold;">T-18</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz6_12" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz12_18" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz18_24" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz24_36" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz36_48" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz2" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz4" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz6" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz8" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz10" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz12" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz14" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz16" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                                <td style="border: 1px solid #999; padding: 5px;"><input type="number" id="editSz18" class="form-control" min="0" value="0" style="text-align: center;"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">📝 Observaciones (Opcional):</label>
+                    <textarea id="editGeneralObservations" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
                 </div>
 
-                <!-- Total -->
-                <div style="background: #0B1023; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
-                    <h4 style="margin: 0;">📊 Total Piezas: <span id="editTotalDisplay">0</span></h4>
+                <!-- Entregas -->
+                <div id="editDeliveriesContainer" style="margin-bottom: 2rem;">
+                    <!-- Las entregas se agregarán aquí -->
                 </div>
 
-                <!-- Botones -->
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn btn-primary flex-grow-1" style="flex: 1;">💾 Guardar Cambios</button>
-                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')" style="flex: 1;">❌ Cancelar</button>
+                <!-- Botón para agregar entregas -->
+                <div style="margin-top: 2rem; text-align: center; margin-bottom: 2rem;">
+                    <button type="button" id="editAddDeliveryBtn" class="btn btn-outline-primary" style="padding: 12px 40px; font-size: 1rem; border-width: 2px;">
+                        <strong>+ Añadir otra entrega</strong>
+                    </button>
+                </div>
+
+                <!-- Botones de acción -->
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary flex-grow-1">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')">❌ Cancelar</button>
                 </div>
             </form>
         </div>
@@ -215,7 +249,124 @@
 
 <script>
 let allDeliveries = []; // Almacenar todas las entregas
+let allDeliveriesOriginal = []; // Almacenar todas las entregas sin filtrar
 let currentEditingDeliveryId = null;
+let currentEditingGroupId = null;
+let editDeliveryCount = 0;
+let originalGroupDeliveries = []; // Guardar entregas originales del grupo al abrir el modal
+
+// Crear HTML para una fila de entrega en edición
+function createEditDeliveryCardHTML(index, data = {}) {
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    const displaySizes = ['6-12', '12-18', '18-24', '24-36', '36-48', '2', '4', '6', '8', '10', '12', '14', '16', '18'];
+    const idDelivery = data.id_delivery || null;
+    
+    let sizeInputsHTML = sizeNames.map((size, i) => 
+        `<th style="font-size: 0.75rem;">${displaySizes[i]}</th>`
+    ).join('');
+    
+    let sizeInputsTableHTML = sizeNames.map(size => 
+        `<td><input type="number" name="edit_delivery_${index}_${size}" class="form-control" min="0" value="${data[size] || 0}"></td>`
+    ).join('');
+    
+    return `
+    <div class="delivery-card" data-edit-delivery-index="${index}" data-id-delivery="${idDelivery}">
+        <div class="delivery-card-header">
+            <h5>📦 Entrega #${index + 1}</h5>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn-remove-delivery" onclick="cloneEditDelivery(${index})" style="background: #667eea;">📋 Clonar</button>
+                ${index > 0 ? `<button type="button" class="btn-remove-delivery" onclick="removeEditDelivery(${index})">❌ Eliminar</button>` : ''}
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #dee2e6;">
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Producto:</label>
+                <input type="text" name="edit_delivery_${index}_type" class="form-control" placeholder="Ej: Jogger, Pantalón" value="${data.type || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Color:</label>
+                <input type="text" name="edit_delivery_${index}_color" class="form-control" placeholder="Rojo, Azul..." value="${data.color || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">RIB:</label>
+                <input type="text" name="edit_delivery_${index}_rib" class="form-control" placeholder="RIB" value="${data.rib || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Tela:</label>
+                <input type="text" name="edit_delivery_${index}_type_fabric" class="form-control" placeholder="Algodón..." value="${data.type_fabric || ''}">
+            </div>
+        </div>
+        
+        <div class="table-sizes-responsive">
+            <table class="table table-bordered table-sm" style="margin-bottom: 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        ${sizeInputsHTML}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        ${sizeInputsTableHTML}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+}
+
+// Agregar entrega en edición
+function addEditDelivery(data = {}) {
+    const container = document.getElementById('editDeliveriesContainer');
+    container.insertAdjacentHTML('beforeend', createEditDeliveryCardHTML(editDeliveryCount, data));
+    editDeliveryCount++;
+}
+
+// Clonar entrega en edición
+function cloneEditDelivery(sourceIndex) {
+    const sourceCard = document.querySelector(`[data-edit-delivery-index="${sourceIndex}"]`);
+    if (!sourceCard) return;
+    
+    const sourceData = {
+        type: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_type"]`)?.value || '',
+        color: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_color"]`)?.value || '',
+        rib: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_rib"]`)?.value || '',
+        type_fabric: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_type_fabric"]`)?.value || '',
+        sizes: {}
+    };
+    
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    sizeNames.forEach(size => {
+        const input = sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_${size}"]`);
+        sourceData.sizes[size] = input ? input.value : '0';
+    });
+    
+    sourceData.sz6_12 = sourceData.sizes.sz6_12;
+    sourceData.sz12_18 = sourceData.sizes.sz12_18;
+    sourceData.sz18_24 = sourceData.sizes.sz18_24;
+    sourceData.sz24_36 = sourceData.sizes.sz24_36;
+    sourceData.sz36_48 = sourceData.sizes.sz36_48;
+    sourceData.sz2 = sourceData.sizes.sz2;
+    sourceData.sz4 = sourceData.sizes.sz4;
+    sourceData.sz6 = sourceData.sizes.sz6;
+    sourceData.sz8 = sourceData.sizes.sz8;
+    sourceData.sz10 = sourceData.sizes.sz10;
+    sourceData.sz12 = sourceData.sizes.sz12;
+    sourceData.sz14 = sourceData.sizes.sz14;
+    sourceData.sz16 = sourceData.sizes.sz16;
+    sourceData.sz18 = sourceData.sizes.sz18;
+    
+    addEditDelivery(sourceData);
+}
+
+// Eliminar entrega en edición
+function removeEditDelivery(index) {
+    const card = document.querySelector(`[data-edit-delivery-index="${index}"]`);
+    if (card) {
+        card.remove();
+    }
+}
 
 function getCurrentUser() {
     // Obtener el usuario del sessionStorage (como en base.html)
@@ -247,7 +398,18 @@ function getCurrentUser() {
 async function loadDeliveries() {
     try {
         const response = await fetch('/api/deliveries');
-        allDeliveries = await response.json();
+        let deliveries = await response.json();
+        
+        // Filtrar entregas según el rol del usuario
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user && user.rol === 'taller') {
+            // Cortador: mostrar solo sus entregas
+            deliveries = deliveries.filter(d => d.owner === user.owner);
+        }
+        // Admin: mostrar todas
+        
+        allDeliveries = deliveries;
+        allDeliveriesOriginal = [...allDeliveries]; // Guardar copia de todas las entregas
         
         const loadingMessage = document.getElementById('loadingMessage');
         loadingMessage.style.display = 'none';
@@ -364,23 +526,41 @@ function renderDeliveries(deliveries) {
     emptyState.style.display = 'none';
     tbody.innerHTML = '';
     
-    deliveries.forEach(delivery => {
-        const totalPiezas = calculateTotalPiezas(delivery);
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${delivery.owner}</td>
-            <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
-            <td>${delivery.lot || '—'}</td>
-            <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${totalPiezas}</span></td>
-            <td>
-                <button class="btn-action btn-view" onclick="viewDetailsGroup('${delivery.id_group}')">👁️ Ver</button>
-                <button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>
-                <button class="btn-action btn-delete" onclick="deleteDeliveryGroup('${delivery.id_group}')">🗑️ Eliminar</button>
-            </td>
-        `;
-        tbody.appendChild(row);
+    // Crear promesas para obtener el total de cada grupo
+    const renderPromises = deliveries.map(delivery => {
+        return fetch(`/api/deliveries/group/${delivery.id_group}`)
+            .then(response => response.json())
+            .then(groupDeliveries => {
+                const groupTotal = groupDeliveries.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+                
+                // Determinar botones según el rol del usuario
+                const user = JSON.parse(sessionStorage.getItem('user'));
+                let actionsHTML = `<button class="btn-action btn-view" onclick="viewDetailsGroup('${delivery.id_group}')">👁️ Ver</button>`;
+                
+                // Solo mostrar editar y eliminar si es admin o si es el responsable (taller)
+                if (!user || user.rol === 'admin' || (user.rol === 'taller' && delivery.owner === user.owner)) {
+                    actionsHTML += `<button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>`;
+                }
+                
+                if (!user || user.rol === 'admin') {
+                    actionsHTML += `<button class="btn-action btn-delete" onclick="deleteDeliveryGroup('${delivery.id_group}')">🗑️ Eliminar</button>`;
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${delivery.owner}</td>
+                    <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
+                    <td>${delivery.lot || '—'}</td>
+                    <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${groupTotal}</span></td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(row);
+            })
+            .catch(error => console.error('Error fetching group total:', error));
     });
+    
+    // Esperar a que se completen todas las promesas
+    Promise.all(renderPromises).catch(error => console.error('Error rendering deliveries:', error));
 }
 
 // Event listeners para búsqueda y ordenamiento
@@ -640,99 +820,53 @@ function editDelivery(deliveryId) {
         return;
     }
     
-    // Abrir modal de edición
-    openEditModal(delivery);
-}
-
-function deleteDelivery(deliveryId) {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta entrega? Esta acción no se puede deshacer.')) {
+    // Verificar permisos: cortador solo puede editar sus entregas
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (user && user.rol === 'taller' && delivery.owner !== user.owner) {
+        showAlert('❌ No tienes permiso para editar entregas de otro responsable', 'error');
         return;
     }
     
-    // Obtener usuario actual
-    const currentUser = getCurrentUser();
-    
-    fetch(`/api/deliveries/${deliveryId}?modified_by=${encodeURIComponent(currentUser)}`, {
-        method: 'DELETE'
-    })
-    .then(response => {
-        if (response.ok) {
-            showAlert('Entrega marcada como inactiva correctamente', 'success');
-            setTimeout(() => {
-                loadDeliveries();
-            }, 1500);
-        } else {
-            showAlert('Error al eliminar la entrega', 'error');
-        }
-    })
-    .catch(error => {
-        showAlert('Error: ' + error.message, 'error');
-    });
+    // Cargar todas las entregas del grupo
+    fetch(`/api/deliveries/group/${delivery.id_group}`)
+        .then(response => response.json())
+        .then(groupDeliveries => {
+            openEditModal(groupDeliveries);
+        })
+        .catch(error => {
+            showAlert('Error al cargar entregas: ' + error.message, 'error');
+        });
 }
 
-function openEditModal(delivery) {
-    currentEditingDeliveryId = delivery.id_delivery;
+function openEditModal(groupDeliveries) {
+    currentEditingGroupId = groupDeliveries[0]?.id_group;
+    currentEditingDeliveryId = null; // No es necesario para edición de grupo
+    editDeliveryCount = 0;
     
-    // Llenar el formulario con los datos actuales
-    document.getElementById('editOwner').value = delivery.owner;
-    document.getElementById('editDate').value = delivery.date;
-    document.getElementById('editLot').value = delivery.lot || '';
-    document.getElementById('editType').value = delivery.type || '';
-    document.getElementById('editColor').value = delivery.color || '';
-    document.getElementById('editAnnotation').value = delivery.annotation || '';
+    // Guardar entregas originales del grupo para detectar eliminaciones
+    originalGroupDeliveries = [...groupDeliveries];
     
-    document.getElementById('editSz6_12').value = delivery.sz6_12 || 0;
-    document.getElementById('editSz12_18').value = delivery.sz12_18 || 0;
-    document.getElementById('editSz18_24').value = delivery.sz18_24 || 0;
-    document.getElementById('editSz24_36').value = delivery.sz24_36 || 0;
-    document.getElementById('editSz36_48').value = delivery.sz36_48 || 0;
-    document.getElementById('editSz2').value = delivery.sz2 || 0;
-    document.getElementById('editSz4').value = delivery.sz4 || 0;
-    document.getElementById('editSz6').value = delivery.sz6 || 0;
-    document.getElementById('editSz8').value = delivery.sz8 || 0;
-    document.getElementById('editSz10').value = delivery.sz10 || 0;
-    document.getElementById('editSz12').value = delivery.sz12 || 0;
-    document.getElementById('editSz14').value = delivery.sz14 || 0;
-    document.getElementById('editSz16').value = delivery.sz16 || 0;
-    document.getElementById('editSz18').value = delivery.sz18 || 0;
-    document.getElementById('editRib').value = delivery.rib || '';
-    document.getElementById('editTypeFabric').value = delivery.type_fabric || '';
+    // Llenar información general
+    const firstDelivery = groupDeliveries[0];
+    document.getElementById('editOwner').value = firstDelivery.owner || '';
+    document.getElementById('editDate').value = firstDelivery.date || '';
+    document.getElementById('editLot').value = firstDelivery.lot || '';
+    document.getElementById('editGeneralObservations').value = firstDelivery.annotation || '';
     
-    // Calcular y mostrar total inicial
-    updateEditTotalDisplay();
+    // Limpiar contenedor de entregas
+    document.getElementById('editDeliveriesContainer').innerHTML = '';
     
-    // Agregar listeners para actualizar total en tiempo real
-    const sizeInputs = [
-        'editSz6_12', 'editSz12_18', 'editSz18_24', 'editSz24_36', 'editSz36_48',
-        'editSz2', 'editSz4', 'editSz6', 'editSz8', 'editSz10', 'editSz12', 'editSz14', 'editSz16', 'editSz18'
-    ];
-    
-    sizeInputs.forEach(id => {
-        const element = document.getElementById(id);
-        element.removeEventListener('input', updateEditTotalDisplay);
-        element.addEventListener('input', updateEditTotalDisplay);
+    // Agregar cada entrega del grupo
+    groupDeliveries.forEach(delivery => {
+        addEditDelivery(delivery);
     });
+    
+    // Event listener para agregar entregas
+    document.getElementById('editAddDeliveryBtn').onclick = function() {
+        addEditDelivery();
+    };
     
     document.getElementById('editModal').style.display = 'block';
-}
-
-function updateEditTotalDisplay() {
-    const total = (parseInt(document.getElementById('editSz6_12').value) || 0) +
-                  (parseInt(document.getElementById('editSz12_18').value) || 0) +
-                  (parseInt(document.getElementById('editSz18_24').value) || 0) +
-                  (parseInt(document.getElementById('editSz24_36').value) || 0) +
-                  (parseInt(document.getElementById('editSz36_48').value) || 0) +
-                  (parseInt(document.getElementById('editSz2').value) || 0) +
-                  (parseInt(document.getElementById('editSz4').value) || 0) +
-                  (parseInt(document.getElementById('editSz6').value) || 0) +
-                  (parseInt(document.getElementById('editSz8').value) || 0) +
-                  (parseInt(document.getElementById('editSz10').value) || 0) +
-                  (parseInt(document.getElementById('editSz12').value) || 0) +
-                  (parseInt(document.getElementById('editSz14').value) || 0) +
-                  (parseInt(document.getElementById('editSz16').value) || 0) +
-                  (parseInt(document.getElementById('editSz18').value) || 0);
-    
-    document.getElementById('editTotalDisplay').textContent = total;
 }
 
 function showAlert(message, type) {
@@ -765,60 +899,124 @@ window.onclick = function(event) {
 document.getElementById('editForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    if (!currentEditingDeliveryId) {
-        showAlert('Error: ID de entrega no encontrado', 'error');
+    if (!currentEditingGroupId) {
+        showAlert('Error: ID de grupo no encontrado', 'error');
         return;
     }
     
     // Obtener usuario actual
     const currentUser = getCurrentUser();
     
-    const updatedData = {
-        owner: document.getElementById('editOwner').value,
-        date: document.getElementById('editDate').value,
-        lot: document.getElementById('editLot').value || null,
-        type: document.getElementById('editType').value || null,
-        color: document.getElementById('editColor').value || null,
-        annotation: document.getElementById('editAnnotation').value || null,
-        rib: document.getElementById('editRib').value || null,
-        type_fabric: document.getElementById('editTypeFabric').value || null,
-        modified_by: currentUser,
-        sz6_12: parseInt(document.getElementById('editSz6_12').value) || 0,
-        sz12_18: parseInt(document.getElementById('editSz12_18').value) || 0,
-        sz18_24: parseInt(document.getElementById('editSz18_24').value) || 0,
-        sz24_36: parseInt(document.getElementById('editSz24_36').value) || 0,
-        sz36_48: parseInt(document.getElementById('editSz36_48').value) || 0,
-        sz2: parseInt(document.getElementById('editSz2').value) || 0,
-        sz4: parseInt(document.getElementById('editSz4').value) || 0,
-        sz6: parseInt(document.getElementById('editSz6').value) || 0,
-        sz8: parseInt(document.getElementById('editSz8').value) || 0,
-        sz10: parseInt(document.getElementById('editSz10').value) || 0,
-        sz12: parseInt(document.getElementById('editSz12').value) || 0,
-        sz14: parseInt(document.getElementById('editSz14').value) || 0,
-        sz16: parseInt(document.getElementById('editSz16').value) || 0,
-        sz18: parseInt(document.getElementById('editSz18').value) || 0
-    };
+    // Obtener información general
+    const owner = document.getElementById('editOwner').value;
+    const date = document.getElementById('editDate').value;
+    const lot = document.getElementById('editLot').value || null;
+    const annotation = document.getElementById('editGeneralObservations').value || null;
     
-    try {
-        const response = await fetch(`/api/deliveries/${currentEditingDeliveryId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
+    // Obtener todas las tarjetas de entrega
+    const deliveryCards = document.querySelectorAll('[data-edit-delivery-index]');
+    
+    if (deliveryCards.length === 0) {
+        showAlert('Por favor agrega al menos una entrega', 'error');
+        return;
+    }
+    
+    let successCount = 0;
+    let errorMessages = [];
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    
+    // Rastrear entregas existentes que aún están en el modal
+    const currentDeliveryIds = new Set();
+    
+    // Procesar cada entrega
+    for (let card of deliveryCards) {
+        const index = card.dataset.editDeliveryIndex;
+        const idDelivery = card.dataset.idDelivery; // Obtener ID si existe
+        
+        if (idDelivery && idDelivery !== 'null') {
+            currentDeliveryIds.add(parseInt(idDelivery));
+        }
+        
+        const formData = {
+            owner: owner,
+            date: date,
+            lot: lot,
+            type: document.querySelector(`input[name="edit_delivery_${index}_type"]`)?.value || null,
+            color: document.querySelector(`input[name="edit_delivery_${index}_color"]`)?.value || null,
+            type_fabric: document.querySelector(`input[name="edit_delivery_${index}_type_fabric"]`)?.value || null,
+            rib: document.querySelector(`input[name="edit_delivery_${index}_rib"]`)?.value || null,
+            annotation: annotation,
+            modified_by: currentUser,
+            id_group: currentEditingGroupId
+        };
+        
+        // Agregar tamaños
+        sizeNames.forEach(size => {
+            formData[size] = parseInt(document.querySelector(`input[name="edit_delivery_${index}_${size}"]`)?.value) || 0;
         });
         
-        if (response.ok) {
-            showAlert('✅ Entrega actualizada correctamente', 'success');
-            closeModal('editModal');
-            loadDeliveries();
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            const error = await response.json();
-            showAlert(`❌ Error: ${error.detail || 'Error al actualizar'}`, 'error');
+        try {
+            let response;
+            let method = 'POST';
+            let url = '/api/deliveries';
+            
+            // Si tiene ID válido, actualizar; si no, crear
+            if (idDelivery && idDelivery !== 'null') {
+                method = 'PUT';
+                url = `/api/deliveries/${idDelivery}`;
+            }
+            
+            response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                successCount++;
+            } else {
+                const error = await response.json();
+                errorMessages.push(`Entrega #${parseInt(index) + 1}: ${error.detail || 'Error'}`);
+            }
+        } catch (error) {
+            errorMessages.push(`Entrega #${parseInt(index) + 1}: ${error.message}`);
+        }
+    }
+    
+    // Eliminar entregas que fueron borradas del modal
+    try {
+        for (let delivery of originalGroupDeliveries) {
+            if (!currentDeliveryIds.has(delivery.id_delivery)) {
+                // Esta entrega fue eliminada del modal, así que la marcamos como inactiva
+                const deleteResponse = await fetch(`/api/deliveries/${delivery.id_delivery}?modified_by=${encodeURIComponent(currentUser)}`, {
+                    method: 'DELETE'
+                });
+                if (!deleteResponse.ok) {
+                    console.error(`Error eliminando entrega ${delivery.id_delivery}`);
+                }
+            }
         }
     } catch (error) {
-        showAlert(`❌ Error: ${error.message}`, 'error');
+        console.error('Error eliminando entregas:', error);
+    }
+    
+    // Mostrar resultado
+    if (successCount === deliveryCards.length && errorMessages.length === 0) {
+        showAlert(`✅ ${successCount} entrega${successCount > 1 ? 's' : ''} actualizada${successCount > 1 ? 's' : ''} correctamente`, 'success');
+        closeModal('editModal');
+        setTimeout(() => {
+            loadDeliveries();
+        }, 1500);
+    } else if (successCount > 0) {
+        showAlert(`⚠️ ${successCount} de ${deliveryCards.length} entrega(s) actualizada(s). Errores: ${errorMessages.join('; ')}`, 'warning');
+        closeModal('editModal');
+        setTimeout(() => {
+            loadDeliveries();
+        }, 1500);
+    } else {
+        showAlert(`❌ Error al actualizar entregas. ${errorMessages.join('; ')}`, 'error');
     }
 });
 

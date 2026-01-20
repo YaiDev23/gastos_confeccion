@@ -78,15 +78,12 @@
         </a>
     </div>
 
-    <!-- Consultar Entregas (Solo Admins) -->
-    <div id="consultarEntregasCard" style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="!isRestricted() && (this.style.transform='translateY(-8px)', this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)')" onmouseout="!isRestricted() && (this.style.transform='translateY(0)', this.style.boxShadow='none')">
-        <div id="restrictedBadge" style="display: none; margin-bottom: 15px;">
-            <span class="restricted-badge">Solo Administrador</span>
-        </div>
+    <!-- Consultar Entregas -->
+    <div id="consultarEntregasCard" style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
         <div style="font-size: 60px; margin-bottom: 20px;">📋</div>
         <h2 style="color: #0B1023; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Ver Entregas</h2>
         <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
-            Visualiza todas las entregas registradas, consulta detalles específicos, edita información o elimina entregas
+            <span id="consultarText">Visualiza todas las entregas registradas, consulta detalles específicos, edita información o elimina entregas</span>
         </p>
         <a id="consultarEntregasBtn" href="/consultar_entrega" class="btn" style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: #f0f0f0; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
             Ver Entregas
@@ -109,29 +106,13 @@
 </div>
 
 <script>
-    function isRestricted() {
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        return user && user.rol !== 'admin';
-    }
-
     function initializePermissions() {
         const user = JSON.parse(sessionStorage.getItem('user'));
-        const consultarEntregasCard = document.getElementById('consultarEntregasCard');
-        const consultarEntregasBtn = document.getElementById('consultarEntregasBtn');
-        const restrictedBadge = document.getElementById('restrictedBadge');
-
-        if (user && user.rol !== 'admin') {
-            // Usuario no es admin, desabilitar la opción
-            consultarEntregasCard.classList.add('card-disabled');
-            restrictedBadge.style.display = 'block';
-            consultarEntregasBtn.style.cursor = 'not-allowed';
-            consultarEntregasBtn.style.opacity = '0.6';
-            consultarEntregasBtn.style.pointerEvents = 'none';
-            consultarEntregasBtn.onclick = (e) => {
-                e.preventDefault();
-                alert('Solo los administradores pueden ver y gestionar las entregas registradas.');
-                return false;
-            };
+        const consultarText = document.getElementById('consultarText');
+        
+        if (user && user.rol === 'taller') {
+            // Usuario es cortador, mostrar texto personalizado
+            consultarText.textContent = 'Consulta y edita tus entregas registradas en el sistema';
         }
     }
 

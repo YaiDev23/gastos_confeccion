@@ -373,7 +373,10 @@ function createDeliveryCardHTML(index) {
     <div class="delivery-card" data-delivery-index="${index}">
         <div class="delivery-card-header">
             <h5>📦 Entrega #${index + 1}</h5>
-            ${index > 0 ? `<button type="button" class="btn-remove-delivery" onclick="removeDelivery(${index})">❌ Eliminar</button>` : ''}
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn-remove-delivery" onclick="cloneDelivery(${index})" style="background: #667eea;" title="Clonar esta entrega">📋 Clonar</button>
+                ${index > 0 ? `<button type="button" class="btn-remove-delivery" onclick="removeDelivery(${index})">❌ Eliminar</button>` : ''}
+            </div>
         </div>
         
         <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #dee2e6;">
@@ -445,6 +448,60 @@ function addDelivery() {
     const container = document.getElementById('deliveriesContainer');
     container.insertAdjacentHTML('beforeend', createDeliveryCardHTML(deliveryCount));
     deliveryCount++;
+}
+
+// Clonar una entrega con los datos de otra
+function cloneDelivery(sourceIndex) {
+    const sourceCard = document.querySelector(`[data-delivery-index="${sourceIndex}"]`);
+    if (!sourceCard) return;
+    
+    // Obtener datos de la entrega fuente
+    const sourceData = {
+        type: sourceCard.querySelector(`input[name="delivery_${sourceIndex}_type"]`)?.value || '',
+        color: sourceCard.querySelector(`input[name="delivery_${sourceIndex}_color"]`)?.value || '',
+        rib: sourceCard.querySelector(`input[name="delivery_${sourceIndex}_rib"]`)?.value || '',
+        type_fabric: sourceCard.querySelector(`input[name="delivery_${sourceIndex}_type_fabric"]`)?.value || '',
+        sizes: {}
+    };
+    
+    // Obtener todos los tamaños
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    sizeNames.forEach(size => {
+        const input = sourceCard.querySelector(`input[name="delivery_${sourceIndex}_${size}"]`);
+        sourceData.sizes[size] = input ? input.value : '0';
+    });
+    
+    // Crear nueva entrega
+    addDelivery();
+    
+    // Obtener índice de la nueva entrega
+    const newIndex = deliveryCount - 1;
+    
+    // Esperar a que el DOM se actualice
+    setTimeout(() => {
+        // Rellenar datos en la nueva entrega
+        const typeInput = document.querySelector(`input[name="delivery_${newIndex}_type"]`);
+        const colorInput = document.querySelector(`input[name="delivery_${newIndex}_color"]`);
+        const ribInput = document.querySelector(`input[name="delivery_${newIndex}_rib"]`);
+        const fabricInput = document.querySelector(`input[name="delivery_${newIndex}_type_fabric"]`);
+        
+        if (typeInput) typeInput.value = sourceData.type;
+        if (colorInput) colorInput.value = sourceData.color;
+        if (ribInput) ribInput.value = sourceData.rib;
+        if (fabricInput) fabricInput.value = sourceData.type_fabric;
+        
+        // Rellenar tamaños
+        sizeNames.forEach(size => {
+            const input = document.querySelector(`input[name="delivery_${newIndex}_${size}"]`);
+            if (input) input.value = sourceData.sizes[size];
+        });
+        
+        // Scroll a la nueva entrega
+        const newCard = document.querySelector(`[data-delivery-index="${newIndex}"]`);
+        if (newCard) {
+            newCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 0);
 }
 
 // Eliminar una entrega
