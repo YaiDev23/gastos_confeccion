@@ -221,15 +221,20 @@
                     </div>
                 </div>
 
-              
+                <!-- Observaciones generales -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="generalObservations" style="margin-bottom: 0.5rem; display: block;">📝 Observaciones (Opcional):</label>
+                            <textarea id="generalObservations" name="generalObservations" class="form-control" placeholder="" rows="3" style="resize: vertical;"></textarea>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Tabla de Tallas -->
                 <div class="mt-5 mb-4">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                        <div style="flex: 1; min-width: 250px;">
-                            <h4 style="color: #0B1023; font-weight: 600; margin: 0 0 0.5rem 0;">📏 Cantidades por Talla</h4>
-                            <p style="color: #666; font-size: 0.9rem; margin: 0;"><strong>Ingresa la cantidad de piezas para cada talla:</strong></p>
-                        </div>
+                        
                     </div>
                     
                     <div id="deliveriesContainer" class="deliveries-container" style="margin-bottom: 2rem;">
@@ -376,23 +381,25 @@ function createDeliveryCardHTML(index) {
                 <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Producto:</label>
                 <input type="text" id="delivery_${index}_type" name="delivery_${index}_type" class="form-control" placeholder="Ej: Jogger, Pantalón, Blusa" value="">
             </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Color:</label>
+                <input type="text" name="delivery_${index}_color" class="form-control" placeholder="Rojo, Azul...">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">RIB:</label>
+                <input type="text" name="delivery_${index}_rib" class="form-control" placeholder="RIB">
+           </div>
+           <div class="form-group" style="margin-bottom: 0;">
+                <label for="delivery_${index}_type" style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Tela:</label>
+                <input type="text" name="delivery_${index}_type_fabric" class="form-control" placeholder="Algodón...">
+           </div>
         </div>
         
         <div class="table-sizes-responsive">
             <table class="table table-bordered table-sm" style="margin-bottom: 0;">
                 <thead>
+               
                     <tr style="background-color: #f8f9fa;">
-                        <th style="width: 12%;">Color</th>
-                        <th style="width: 8%;">RIB</th>
-                        <th style="width: 12%;">Tipo de Tela</th>
-                        <th colspan="5" style="text-align: center; background-color: #e9ecef; width: 20%;">👶 Bebé (meses)</th>
-                        <th colspan="9" style="text-align: center; background-color: #e9ecef; width: 36%;">👧 Niñ@s (tallas)</th>
-                        <th style="width: 12%;">Observaciones</th>
-                    </tr>
-                    <tr style="background-color: #f8f9fa;">
-                        <th>-</th>
-                        <th>-</th>
-                        <th>-</th>
                         <th style="font-size: 0.75rem;">6-12</th>
                         <th style="font-size: 0.75rem;">12-18</th>
                         <th style="font-size: 0.75rem;">18-24</th>
@@ -407,14 +414,10 @@ function createDeliveryCardHTML(index) {
                         <th style="font-size: 0.75rem;">14</th>
                         <th style="font-size: 0.75rem;">16</th>
                         <th style="font-size: 0.75rem;">18</th>
-                        <th>-</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><input type="text" name="delivery_${index}_color" class="form-control" placeholder="Rojo, Azul..."></td>
-                        <td><input type="text" name="delivery_${index}_rib" class="form-control" placeholder="RIB"></td>
-                        <td><input type="text" name="delivery_${index}_type_fabric" class="form-control" placeholder="Algodón..."></td>
                         <td><input type="number" name="delivery_${index}_sz6_12" class="form-control" min="0" value="0"></td>
                         <td><input type="number" name="delivery_${index}_sz12_18" class="form-control" min="0" value="0"></td>
                         <td><input type="number" name="delivery_${index}_sz18_24" class="form-control" min="0" value="0"></td>
@@ -429,7 +432,6 @@ function createDeliveryCardHTML(index) {
                         <td><input type="number" name="delivery_${index}_sz14" class="form-control" min="0" value="0"></td>
                         <td><input type="number" name="delivery_${index}_sz16" class="form-control" min="0" value="0"></td>
                         <td><input type="number" name="delivery_${index}_sz18" class="form-control" min="0" value="0"></td>
-                        <td><textarea name="delivery_${index}_annotation" class="form-control" placeholder="Notas..." rows="2" style="resize: vertical;"></textarea></td>
                     </tr>
                 </tbody>
             </table>
@@ -518,7 +520,7 @@ document.getElementById('deliveryForm').addEventListener('submit', async functio
             color: document.querySelector(`input[name="delivery_${index}_color"]`).value || null,
             type_fabric: document.querySelector(`input[name="delivery_${index}_type_fabric"]`).value || null,
             rib: document.querySelector(`input[name="delivery_${index}_rib"]`).value || null,
-            annotation: document.querySelector(`textarea[name="delivery_${index}_annotation"]`).value || null,
+            annotation: document.getElementById('generalObservations').value || null,
             modified_by: currentUser,
             sz6_12: parseInt(document.querySelector(`input[name="delivery_${index}_sz6_12"]`).value) || 0,
             sz12_18: parseInt(document.querySelector(`input[name="delivery_${index}_sz12_18"]`).value) || 0,

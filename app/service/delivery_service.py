@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.db.models.delivery_models import DeliveredPieces
 from app.api.schemas.delivery_schemas import DeliveredPiecesCreate, DeliveredPiecesUpdate
 from datetime import datetime
@@ -36,6 +37,28 @@ class DeliveryService:
     def get_all_deliveries(db: Session):
         """Obtener todas las entregas activas"""
         return db.query(DeliveredPieces).filter(DeliveredPieces.status == 'active').all()
+    
+    @staticmethod
+    def get_deliveries_one_per_group(db: Session):
+        """Obtener una entrega activa por cada id_group (la más reciente)"""
+        # Subquery para obtener el id_delivery más reciente de cada id_group
+        subquery = db.query(
+            func.max(DeliveredPieces.id_delivery).label('max_id')
+        ).filter(
+            DeliveredPieces.status == 'active'
+        ).group_by(DeliveredPieces.id_group).subquery()
+        
+        return db.query(DeliveredPieces).join(
+            subquery, DeliveredPieces.id_delivery == subquery.c.max_id
+        ).all()
+    
+    @staticmethod
+    def get_deliveries_by_group(db: Session, id_group: str):
+        """Obtener todas las entregas activas de un grupo"""
+        return db.query(DeliveredPieces).filter(
+            DeliveredPieces.id_group == id_group,
+            DeliveredPieces.status == 'active'
+        ).all()
     
     @staticmethod
     def get_delivery_by_id(db: Session, delivery_id: int) -> DeliveredPieces:

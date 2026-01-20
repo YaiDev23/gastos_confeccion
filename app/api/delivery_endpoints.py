@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.get("/deliveries")
 async def get_deliveries(db: Session = Depends(get_db)):
-    """Obtener todas las entregas activas"""
-    deliveries = DeliveryService.get_all_deliveries(db)
+    """Obtener una entrega activa por cada id_group"""
+    deliveries = DeliveryService.get_deliveries_one_per_group(db)
     return deliveries
 
 
@@ -27,6 +27,15 @@ async def create_delivery(delivery: DeliveredPiecesCreate, db: Session = Depends
     except Exception as e:
         logger.error(f"Error al crear entrega: {str(e)}", exc_info=True)
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/deliveries/group/{id_group}")
+async def get_deliveries_by_group(id_group: str, db: Session = Depends(get_db)):
+    """Obtener todas las entregas activas de un grupo"""
+    deliveries = DeliveryService.get_deliveries_by_group(db, id_group)
+    if not deliveries:
+        raise HTTPException(status_code=404, detail="Grupo de entregas no encontrado")
+    return deliveries
 
 
 @router.get("/deliveries/{delivery_id}", response_model=DeliveredPiecesResponse)

@@ -393,13 +393,22 @@ document.getElementById('clearFilters').addEventListener('click', function() {
     filterAndSortDeliveries();
 });
 
-function viewDetailsGroup(idGroup) {
-    const deliveriesInGroup = allDeliveries.filter(d => d.id_group === idGroup);
-    
-    if (!deliveriesInGroup || deliveriesInGroup.length === 0) {
-        showAlert('Grupo de entregas no encontrado', 'error');
-        return;
-    }
+async function viewDetailsGroup(idGroup) {
+    try {
+        // Obtener todos los deliveries del grupo desde la API
+        const response = await fetch(`/api/deliveries/group/${idGroup}`);
+        
+        if (!response.ok) {
+            showAlert('Grupo de entregas no encontrado', 'error');
+            return;
+        }
+        
+        const deliveriesInGroup = await response.json();
+        
+        if (!deliveriesInGroup || deliveriesInGroup.length === 0) {
+            showAlert('Grupo de entregas no encontrado', 'error');
+            return;
+        }
     
     const detailsContent = document.getElementById('detailsContent');
     const firstDelivery = deliveriesInGroup[0];
@@ -515,6 +524,10 @@ function viewDetailsGroup(idGroup) {
     
     detailsContent.innerHTML = detailsHTML;
     document.getElementById('detailsModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al obtener detalles del grupo: ' + error.message, 'error');
+    }
 }
 
 function deleteDeliveryGroup(idGroup) {

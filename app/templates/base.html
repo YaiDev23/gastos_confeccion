@@ -923,15 +923,8 @@
 
         function toggleMinimizeSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
             
             sidebar.classList.toggle('minimized');
-            
-            if (sidebar.classList.contains('minimized')) {
-                mainContent.style.marginLeft = '90px';
-            } else {
-                mainContent.style.marginLeft = '280px';
-            }
         }
 
         function toggleSidebar() {
@@ -950,32 +943,17 @@
             }
         });
 
-        // Set initial margin for main content
+        // Initialize on page load
         window.addEventListener('load', function() {
             checkAuth();
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            
-            if (sidebar.classList.contains('minimized')) {
-                mainContent.style.marginLeft = '90px';
-            } else {
-                mainContent.style.marginLeft = '280px';
-            }
         });
 
         // Handle window resize
         window.addEventListener('resize', function() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
             
             if (window.innerWidth > 768) {
                 sidebar.classList.remove('hidden');
-            }
-
-            if (sidebar.classList.contains('minimized')) {
-                mainContent.style.marginLeft = '90px';
-            } else {
-                mainContent.style.marginLeft = '280px';
             }
         });
     </script>
