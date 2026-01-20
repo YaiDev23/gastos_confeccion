@@ -18,7 +18,10 @@ class FactoryService:
     def create_delivery(db: Session, factory_data):
         """Crear un nuevo taller"""
         try:
-            new_factory = Factory(owner=factory_data.owner)
+            new_factory = Factory(
+                owner=factory_data.owner,
+                document=factory_data.document if hasattr(factory_data, 'document') else None
+            )
             db.add(new_factory)
             db.commit()
             db.refresh(new_factory)
@@ -59,6 +62,8 @@ class FactoryService:
                 return None
             if factory_data.owner:
                 factory.owner = factory_data.owner
+            if hasattr(factory_data, 'document') and factory_data.document is not None:
+                factory.document = factory_data.document
             db.commit()
             db.refresh(factory)
             return factory

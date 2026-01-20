@@ -87,6 +87,9 @@ async def mostrar_menu_entrega(request: Request):
 async def mostrar_menu_entrega(request: Request):
     return templates.TemplateResponse("delivery/lista_talleres.html", {"request": request})
 
+@router.get("/editar-taller", response_class=HTMLResponse)
+async def mostrar_editar_taller(request: Request):
+    return templates.TemplateResponse("delivery/editar_taller.html", {"request": request})
 
 @router.get("/entrega_corte", response_class=HTMLResponse)
 async def mostrar_entrega_corte(request: Request):

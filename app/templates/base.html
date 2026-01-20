@@ -400,13 +400,15 @@
             flex-direction: column;
             overflow: hidden;
             transition: var(--transition);
-            margin-left: 280px;
+            width: calc(100% - 280px);
         }
 
         .container {
             flex: 1;
             overflow-y: auto;
-            padding: 30px;
+            padding: clamp(15px, 4vw, 30px);
+            width: 100%;
+            max-width: 100%;
         }
 
         /* ========== TYPOGRAPHY ========== */
