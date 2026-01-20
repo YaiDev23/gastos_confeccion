@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Gastos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-container p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0B1023;
+            box-shadow: 0 0 5px rgba(11, 16, 35, 0.3);
+        }
+
+        .error-message {
+            display: none;
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(11, 16, 35, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0B1023;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .login-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .type-btn:hover {
+            border-color: #0B1023;
+            color: #0B1023;
+        }
+
+        .type-btn.active {
+            background: linear-gradient(135deg, #0B1023 0%, #000000 100%);
+            color: white;
+            border-color: #0B1023;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Sistema de Gastos</h1>
+        <p>Inicia sesión para continuar</p>
+        
+        <!-- Selector de tipo de login -->
+        <div class="login-type-selector">
+            <button type="button" class="type-btn active" data-type="user">
+                Usuario
+            </button>
+            <button type="button" class="type-btn" data-type="factory">
+                Taller
+            </button>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Formulario de login de usuario -->
+        <form id="userLoginForm" class="login-form active">
+            <div class="form-group">
+                <label for="username">Usuario</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    placeholder="Ingresa tu usuario"
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="psw">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="psw" 
+                    name="psw" 
+                    required 
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="login-btn">Iniciar Sesión</button>
+
+            <div class="loading" id="userLoading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <!-- Formulario de login de taller -->
+        <form id="factoryLoginForm" class="login-form">
+            <div class="form-group">
+                <label for="document">Número de Documento del Taller</label>
+                <input 
+                    type="text" 
+                    id="document" 
+                    name="document" 
+                    required 
+                    placeholder="Ingresa el número de documento"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button type="submit" class="login-btn">Acceder como Taller</button>
+
+            <div class="loading" id="factoryLoading">
+                <div class="spinner"></div>
+            </div>
+        </form>
+
+        <div class="footer-text">
+            © 2025 Sistema desarrollado por YaiDev   
+        </div>
+    </div>
+
+    <script>
+        // Selectores de tipo de login
+        const typeButtons = document.querySelectorAll('.type-btn');
+        const userLoginForm = document.getElementById('userLoginForm');
+        const factoryLoginForm = document.getElementById('factoryLoginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Manejar cambio entre tipos de login
+        typeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                typeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const type = btn.dataset.type;
+                
+                // Mostrar/ocultar formularios
+                if (type === 'user') {
+                    userLoginForm.classList.add('active');
+                    factoryLoginForm.classList.remove('active');
+                } else {
+                    userLoginForm.classList.remove('active');
+                    factoryLoginForm.classList.add('active');
+                }
+                
+                errorMessage.classList.remove('show');
+                errorMessage.textContent = '';
+            });
+        });
+
+        // Manejador de login de usuario
+        userLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            const loading = document.getElementById('userLoading');
+            loading.style.display = 'block';
+
+            const username = document.getElementById('username').value;
+            const psw = document.getElementById('psw').value;
+
+            try {
+                const response = await fetch('/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        psw: psw
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('user', JSON.stringify(data.data));
+                    sessionStorage.setItem('userRole', data.data.rol);
+                    window.location.href = '/menu';
+                } else {
+                    errorMessage.textContent = data.error || 'Usuario o contraseña incorrectos.';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Error de conexión. Intenta nuevamente.';
+                errorMessage.classList.add('show');
+                console.error('Error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Manejador de login de taller
+        factoryLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('show');
+            errorMessage.textContent = '';
+            const loading = document.getElementById('factoryLoading');
+            loading.style.display = 'block';
+
+            const factoryDocument = document.getElementById('document').value;
+
+            try {
+                const response = await fetch('/factory/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        document: factoryDocument
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    sessionStorage.setItem('user', JSON.stringify(data.data));
+                    sessionStorage.setItem('userRole', data.data.rol);
+                    window.location.href = '/menu';
+                } else {
+                    errorMessage.textContent = data.error || 'Número de documento no encontrado.';
+                    errorMessage.classList.add('show');
+                }
+            } catch (error) {
+                errorMessage.textContent = 'Error de conexión. Intenta nuevamente.';
+                errorMessage.classList.add('show');
+                console.error('Error:', error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Limpiar error cuando el usuario comience a escribir
+        document.getElementById('username').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+        document.getElementById('psw').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+        document.getElementById('document').addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

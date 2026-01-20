@@ -1,0 +1,1027 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/styles.css">
+<link rel="stylesheet" href="/static/css/delivery.css">
+
+
+<style>
+.delivery-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.delivery-card:hover {
+    border-color: #0B1023;
+    box-shadow: 0 4px 12px rgba(11, 16, 35, 0.1);
+}
+
+.delivery-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.delivery-card-header h5 {
+    margin: 0;
+    color: #0B1023;
+    font-weight: 600;
+}
+
+.btn-remove-delivery {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-remove-delivery:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+.table-sizes-responsive {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}
+
+.table-sizes-responsive table {
+    margin-bottom: 0;
+    min-width: 100%;
+    width: 100%;
+}
+
+.table-sizes-responsive thead {
+    background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
+}
+
+.table-sizes-responsive th {
+    color: #0B1023;
+    font-weight: 600;
+    padding: 0.6rem 0.4rem !important;
+    text-align: center;
+    border-color: #dee2e6;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table-sizes-responsive td {
+    padding: 0.4rem !important;
+    border-color: #dee2e6;
+    vertical-align: middle;
+}
+
+.table-sizes-responsive td input {
+    text-align: center;
+    font-weight: 500;
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 0.9rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+</style>
+
+<div class="header-nav">
+    <h2>📋 Consultar Entregas</h2>
+    <div>
+        <a href="/entrega_corte" class="btn-nav btn-add">➕ Nueva Entrega</a>
+        <a href="/menu_entrega" class="btn-nav btn-menu">← Menú de Entregas</a>
+    </div>
+</div>
+
+<div id="alertBox" class="alert"></div>
+
+<!-- Sección de Búsqueda y Filtros -->
+<div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="searchInput" style="color: #0B1023; font-weight: 600;">🔍 Buscar Entrega:</label>
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    class="form-control" 
+                    placeholder="Buscar por responsable, lote, tipo o color..."
+                    style="padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px;">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="sortSelect" style="color: #0B1023; font-weight: 600;">📊 Ordenar por:</label>
+                <select id="sortSelect" class="form-control" style="padding: 10px 15px; border: 2px solid #ecf0f1; border-radius: 8px;">
+                    <option value="fecha-desc">Fecha (Más Reciente)</option>
+                    <option value="fecha-asc">Fecha (Más Antigua)</option>
+                    <option value="responsable-asc">Responsable (A-Z)</option>
+                    <option value="responsable-desc">Responsable (Z-A)</option>
+                    <option value="lote-asc">Lote (A-Z)</option>
+                    <option value="total-desc">Total Piezas (Mayor)</option>
+                    <option value="total-asc">Total Piezas (Menor)</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label style="color: #0B1023; font-weight: 600;">&nbsp;</label>
+                <button id="clearFilters" class="btn btn-secondary w-100" style="padding: 10px 15px; border-radius: 8px;">🔄 Limpiar Filtros</button>
+            </div>
+        </div>
+    </div>
+    <div id="filterStatus" style="font-size: 0.9rem; color: #666; display: none;">
+        Mostrando <strong id="resultCount">0</strong> de <strong id="totalCount">0</strong> entregas
+    </div>
+</div>
+
+<div class="table-container">
+    <div id="loadingMessage" class="loading">
+        ⏳ Cargando entregas...
+    </div>
+    
+    <table id="deliveriesTable" class="table table-striped" style="display: none;">
+        <thead>
+            <tr>
+                <th>Responsable</th>
+                <th>Fecha</th>
+                <th>Lote</th>
+                <th>Total Piezas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="deliveriesBody">
+        </tbody>
+    </table>
+    
+    <div id="emptyState" class="empty-state" style="display: none;">
+        <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+        <h3>No hay entregas registradas</h3>
+        <p>Comienza registrando una nueva entrega</p>
+        <a href="/entrega_corte" class="btn btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 30px; text-decoration: none;">
+            Crear Primera Entrega
+        </a>
+    </div>
+</div>
+
+<!-- Modal para ver detalles -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <span class="close" onclick="closeModal('detailsModal')">&times;</span>
+            <h3>📦 Detalles de la Entrega</h3>
+        </div>
+        <div class="modal-body" id="detailsContent">
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar entrega -->
+<div id="editModal" class="modal">
+    <div class="modal-content" style="width: 90%; max-width: 1200px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <span class="close" onclick="closeModal('editModal')">&times;</span>
+            <h3>✏️ Editar Entregas</h3>
+        </div>
+        <div class="modal-body">
+            <form id="editForm">
+                <!-- Información General -->
+                <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #0B1023;">
+                    <h3 style="color: #0B1023; margin: 0 0 10px 0;">📋 EDITAR GUÍA DE CORTE</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <div>
+                            <strong style="color: #0B1023;">RESPONSABLE:</strong>
+                            <input type="text" id="editOwner" class="form-control" required style="margin-top: 5px;">
+                        </div>
+                        <div>
+                            <strong style="color: #0B1023;">FECHA:</strong>
+                            <input type="date" id="editDate" class="form-control" required style="margin-top: 5px;">
+                        </div>
+                        <div>
+                            <strong style="color: #0B1023;">LOTE:</strong>
+                            <input type="text" id="editLot" class="form-control" placeholder="Lote (Opcional)" style="margin-top: 5px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones generales -->
+                <div style="margin-bottom: 20px;">
+                    <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">📝 Observaciones (Opcional):</label>
+                    <textarea id="editGeneralObservations" class="form-control" rows="2" placeholder="Notas adicionales..."></textarea>
+                </div>
+
+                <!-- Entregas -->
+                <div id="editDeliveriesContainer" style="margin-bottom: 2rem;">
+                    <!-- Las entregas se agregarán aquí -->
+                </div>
+
+                <!-- Botón para agregar entregas -->
+                <div style="margin-top: 2rem; text-align: center; margin-bottom: 2rem;">
+                    <button type="button" id="editAddDeliveryBtn" class="btn btn-outline-primary" style="padding: 12px 40px; font-size: 1rem; border-width: 2px;">
+                        <strong>+ Añadir otra entrega</strong>
+                    </button>
+                </div>
+
+                <!-- Botones de acción -->
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary flex-grow-1">💾 Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary flex-grow-1" onclick="closeModal('editModal')">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let allDeliveries = []; // Almacenar todas las entregas
+let allDeliveriesOriginal = []; // Almacenar todas las entregas sin filtrar
+let currentEditingDeliveryId = null;
+let currentEditingGroupId = null;
+let editDeliveryCount = 0;
+let originalGroupDeliveries = []; // Guardar entregas originales del grupo al abrir el modal
+
+// Crear HTML para una fila de entrega en edición
+function createEditDeliveryCardHTML(index, data = {}) {
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    const displaySizes = ['6-12', '12-18', '18-24', '24-36', '36-48', '2', '4', '6', '8', '10', '12', '14', '16', '18'];
+    const idDelivery = data.id_delivery || null;
+    
+    let sizeInputsHTML = sizeNames.map((size, i) => 
+        `<th style="font-size: 0.75rem;">${displaySizes[i]}</th>`
+    ).join('');
+    
+    let sizeInputsTableHTML = sizeNames.map(size => 
+        `<td><input type="number" name="edit_delivery_${index}_${size}" class="form-control" min="0" value="${data[size] || 0}"></td>`
+    ).join('');
+    
+    return `
+    <div class="delivery-card" data-edit-delivery-index="${index}" data-id-delivery="${idDelivery}">
+        <div class="delivery-card-header">
+            <h5>📦 Entrega #${index + 1}</h5>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn-remove-delivery" onclick="cloneEditDelivery(${index})" style="background: #667eea;">📋 Clonar</button>
+                ${index > 0 ? `<button type="button" class="btn-remove-delivery" onclick="removeEditDelivery(${index})">❌ Eliminar</button>` : ''}
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #dee2e6;">
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Producto:</label>
+                <input type="text" name="edit_delivery_${index}_type" class="form-control" placeholder="Ej: Jogger, Pantalón" value="${data.type || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Color:</label>
+                <input type="text" name="edit_delivery_${index}_color" class="form-control" placeholder="Rojo, Azul..." value="${data.color || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">RIB:</label>
+                <input type="text" name="edit_delivery_${index}_rib" class="form-control" placeholder="RIB" value="${data.rib || ''}">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="color: #0B1023; font-weight: 600; margin-bottom: 0.5rem; display: block;">Tipo de Tela:</label>
+                <input type="text" name="edit_delivery_${index}_type_fabric" class="form-control" placeholder="Algodón..." value="${data.type_fabric || ''}">
+            </div>
+        </div>
+        
+        <div class="table-sizes-responsive">
+            <table class="table table-bordered table-sm" style="margin-bottom: 0;">
+                <thead>
+                    <tr style="background-color: #f8f9fa;">
+                        ${sizeInputsHTML}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        ${sizeInputsTableHTML}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+}
+
+// Agregar entrega en edición
+function addEditDelivery(data = {}) {
+    const container = document.getElementById('editDeliveriesContainer');
+    container.insertAdjacentHTML('beforeend', createEditDeliveryCardHTML(editDeliveryCount, data));
+    editDeliveryCount++;
+}
+
+// Clonar entrega en edición
+function cloneEditDelivery(sourceIndex) {
+    const sourceCard = document.querySelector(`[data-edit-delivery-index="${sourceIndex}"]`);
+    if (!sourceCard) return;
+    
+    const sourceData = {
+        type: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_type"]`)?.value || '',
+        color: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_color"]`)?.value || '',
+        rib: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_rib"]`)?.value || '',
+        type_fabric: sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_type_fabric"]`)?.value || '',
+        sizes: {}
+    };
+    
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    sizeNames.forEach(size => {
+        const input = sourceCard.querySelector(`input[name="edit_delivery_${sourceIndex}_${size}"]`);
+        sourceData.sizes[size] = input ? input.value : '0';
+    });
+    
+    sourceData.sz6_12 = sourceData.sizes.sz6_12;
+    sourceData.sz12_18 = sourceData.sizes.sz12_18;
+    sourceData.sz18_24 = sourceData.sizes.sz18_24;
+    sourceData.sz24_36 = sourceData.sizes.sz24_36;
+    sourceData.sz36_48 = sourceData.sizes.sz36_48;
+    sourceData.sz2 = sourceData.sizes.sz2;
+    sourceData.sz4 = sourceData.sizes.sz4;
+    sourceData.sz6 = sourceData.sizes.sz6;
+    sourceData.sz8 = sourceData.sizes.sz8;
+    sourceData.sz10 = sourceData.sizes.sz10;
+    sourceData.sz12 = sourceData.sizes.sz12;
+    sourceData.sz14 = sourceData.sizes.sz14;
+    sourceData.sz16 = sourceData.sizes.sz16;
+    sourceData.sz18 = sourceData.sizes.sz18;
+    
+    addEditDelivery(sourceData);
+}
+
+// Eliminar entrega en edición
+function removeEditDelivery(index) {
+    const card = document.querySelector(`[data-edit-delivery-index="${index}"]`);
+    if (card) {
+        card.remove();
+    }
+}
+
+function getCurrentUser() {
+    // Obtener el usuario del sessionStorage (como en base.html)
+    try {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user && user.username) {
+            return user.username;
+        }
+    } catch (e) {
+        console.log('Error al obtener usuario del sessionStorage:', e);
+    }
+    
+    // Alternativa: obtener del elemento HTML
+    const userElement = document.getElementById('currentUser');
+    if (userElement) {
+        return userElement.value;
+    }
+    
+    // Alternativa: obtener del meta tag
+    const userMeta = document.querySelector('meta[name="current-user"]');
+    if (userMeta) {
+        return userMeta.getAttribute('content');
+    }
+    
+    // Si no hay usuario disponible, usar 'unknown'
+    return localStorage.getItem('currentUser') || sessionStorage.getItem('currentUser') || 'unknown';
+}
+
+async function loadDeliveries() {
+    try {
+        const response = await fetch('/api/deliveries');
+        let deliveries = await response.json();
+        
+        // Filtrar entregas según el rol del usuario
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user && user.rol === 'taller') {
+            // Cortador: mostrar solo sus entregas
+            deliveries = deliveries.filter(d => d.owner === user.owner);
+        }
+        // Admin: mostrar todas
+        
+        allDeliveries = deliveries;
+        allDeliveriesOriginal = [...allDeliveries]; // Guardar copia de todas las entregas
+        
+        const loadingMessage = document.getElementById('loadingMessage');
+        loadingMessage.style.display = 'none';
+        
+        if (!allDeliveries || allDeliveries.length === 0) {
+            document.getElementById('emptyState').style.display = 'block';
+            return;
+        }
+        
+        renderDeliveries(allDeliveries);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('loadingMessage').style.display = 'none';
+        showAlert('Error al cargar las entregas: ' + error.message, 'error');
+    }
+}
+
+function calculateTotalPiezas(delivery) {
+    return (delivery.sz6_12 || 0) +
+           (delivery.sz12_18 || 0) +
+           (delivery.sz18_24 || 0) +
+           (delivery.sz24_36 || 0) +
+           (delivery.sz36_48 || 0) +
+           (delivery.sz2 || 0) +
+           (delivery.sz4 || 0) +
+           (delivery.sz6 || 0) +
+           (delivery.sz8 || 0) +
+           (delivery.sz10 || 0) +
+           (delivery.sz12 || 0) +
+           (delivery.sz14 || 0) +
+           (delivery.sz16 || 0) +
+           (delivery.sz18 || 0);
+}
+
+function groupByIdGroup(deliveries) {
+    const grouped = {};
+    
+    deliveries.forEach(delivery => {
+        if (!grouped[delivery.id_group]) {
+            grouped[delivery.id_group] = delivery; // Guardar la primera del grupo
+        }
+    });
+    
+    return Object.values(grouped);
+}
+
+function filterAndSortDeliveries() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortOption = document.getElementById('sortSelect').value;
+    
+    // Filtrar
+    let filtered = allDeliveries.filter(delivery => {
+        const searchString = `${delivery.owner || ''} ${delivery.lot || ''} ${delivery.type || ''} ${delivery.color || ''}`.toLowerCase();
+        return searchString.includes(searchTerm);
+    });
+    
+    // Agrupar por id_group (mostrar solo una por grupo)
+    filtered = groupByIdGroup(filtered);
+    
+    // Ordenar
+    filtered.sort((a, b) => {
+        switch(sortOption) {
+            case 'fecha-desc':
+                return new Date(b.date) - new Date(a.date);
+            case 'fecha-asc':
+                return new Date(a.date) - new Date(b.date);
+            case 'responsable-asc':
+                return (a.owner || '').localeCompare(b.owner || '');
+            case 'responsable-desc':
+                return (b.owner || '').localeCompare(a.owner || '');
+            case 'lote-asc':
+                return (a.lot || '').localeCompare(b.lot || '');
+            case 'total-desc':
+                return calculateTotalPiezas(b) - calculateTotalPiezas(a);
+            case 'total-asc':
+                return calculateTotalPiezas(a) - calculateTotalPiezas(b);
+            default:
+                return 0;
+        }
+    });
+    
+    // Actualizar estado de filtros
+    const filterStatus = document.getElementById('filterStatus');
+    const uniqueGroupCount = groupByIdGroup(allDeliveries).length;
+    if (searchTerm || sortOption !== 'fecha-desc') {
+        filterStatus.style.display = 'block';
+        document.getElementById('resultCount').textContent = filtered.length;
+        document.getElementById('totalCount').textContent = uniqueGroupCount;
+    } else {
+        filterStatus.style.display = 'none';
+    }
+    
+    renderDeliveries(filtered);
+}
+
+function renderDeliveries(deliveries) {
+    const emptyState = document.getElementById('emptyState');
+    const table = document.getElementById('deliveriesTable');
+    const tbody = document.getElementById('deliveriesBody');
+    
+    if (!deliveries || deliveries.length === 0) {
+        table.style.display = 'none';
+        emptyState.style.display = 'block';
+        emptyState.innerHTML = `
+            <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+            <h3>No se encontraron entregas</h3>
+            <p>Intenta con otros términos de búsqueda</p>
+        `;
+        return;
+    }
+    
+    table.style.display = 'table';
+    emptyState.style.display = 'none';
+    tbody.innerHTML = '';
+    
+    // Crear promesas para obtener el total de cada grupo
+    const renderPromises = deliveries.map(delivery => {
+        return fetch(`/api/deliveries/group/${delivery.id_group}`)
+            .then(response => response.json())
+            .then(groupDeliveries => {
+                const groupTotal = groupDeliveries.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+                
+                // Determinar botones según el rol del usuario
+                const user = JSON.parse(sessionStorage.getItem('user'));
+                let actionsHTML = `<button class="btn-action btn-view" onclick="viewDetailsGroup('${delivery.id_group}')">👁️ Ver</button>`;
+                
+                // Solo mostrar editar y eliminar si es admin o si es el responsable (taller)
+                if (!user || user.rol === 'admin' || (user.rol === 'taller' && delivery.owner === user.owner)) {
+                    actionsHTML += `<button class="btn-action btn-edit" onclick="editDelivery(${delivery.id_delivery})">✏️ Editar</button>`;
+                }
+                
+                if (!user || user.rol === 'admin') {
+                    actionsHTML += `<button class="btn-action btn-delete" onclick="deleteDeliveryGroup('${delivery.id_group}')">🗑️ Eliminar</button>`;
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${delivery.owner}</td>
+                    <td>${new Date(delivery.date).toLocaleDateString('es-ES')}</td>
+                    <td>${delivery.lot || '—'}</td>
+                    <td><span style="background: #0B1023; color: #f0f0f0; padding: 4px 8px; border-radius: 4px;">${groupTotal}</span></td>
+                    <td>${actionsHTML}</td>
+                `;
+                tbody.appendChild(row);
+            })
+            .catch(error => console.error('Error fetching group total:', error));
+    });
+    
+    // Esperar a que se completen todas las promesas
+    Promise.all(renderPromises).catch(error => console.error('Error rendering deliveries:', error));
+}
+
+// Event listeners para búsqueda y ordenamiento
+document.getElementById('searchInput').addEventListener('input', filterAndSortDeliveries);
+document.getElementById('sortSelect').addEventListener('change', filterAndSortDeliveries);
+
+document.getElementById('clearFilters').addEventListener('click', function() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('sortSelect').value = 'fecha-desc';
+    filterAndSortDeliveries();
+});
+
+async function viewDetailsGroup(idGroup) {
+    try {
+        // Obtener todos los deliveries del grupo desde la API
+        const response = await fetch(`/api/deliveries/group/${idGroup}`);
+        
+        if (!response.ok) {
+            showAlert('Grupo de entregas no encontrado', 'error');
+            return;
+        }
+        
+        const deliveriesInGroup = await response.json();
+        
+        if (!deliveriesInGroup || deliveriesInGroup.length === 0) {
+            showAlert('Grupo de entregas no encontrado', 'error');
+            return;
+        }
+    
+    const detailsContent = document.getElementById('detailsContent');
+    const firstDelivery = deliveriesInGroup[0];
+    
+    // Encabezado con información general
+    let detailsHTML = `
+        <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #0B1023;">
+            <h3 style="color: #0B1023; margin: 0 0 10px 0;">📋 GUÍA DE CORTE</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <div>
+                    <strong style="color: #0B1023;">LOTE:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${firstDelivery.lot || '—'}</span>
+                </div>
+                <div>
+                    <strong style="color: #0B1023;">FECHA:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${new Date(firstDelivery.date).toLocaleDateString('es-ES')}</span>
+                </div>
+                <div>
+                    <strong style="color: #0B1023;">RESPONSABLE:</strong>
+                    <span style="font-size: 18px; margin-left: 10px;">${firstDelivery.owner}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agrupar entregas por tipo de prenda
+    const groupedByType = {};
+    deliveriesInGroup.forEach(delivery => {
+        const type = delivery.type || 'SIN ESPECIFICAR';
+        if (!groupedByType[type]) {
+            groupedByType[type] = [];
+        }
+        groupedByType[type].push(delivery);
+    });
+    
+    // Crear tabla para cada tipo de prenda
+    Object.entries(groupedByType).forEach(([type, deliveries]) => {
+        detailsHTML += `
+            <div style="margin-bottom: 30px;">
+                <h4 style="background: #0B1023; color: white; padding: 10px; margin: 0; text-transform: uppercase;">PRENDA: ${type}</h4>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 0;">
+                    <thead>
+                        <tr style="background: #e8e8e8;">
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">RIB</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">COLORES</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: left; font-size: 12px;">TIPO TELA</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">2</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">4</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">6</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">8</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">10</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">12</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">14</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">16</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px;">18</th>
+                            <th style="border: 1px solid #999; padding: 8px; text-align: center; font-size: 11px; font-weight: bold;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        // Agregar filas para cada entrega del tipo
+        deliveries.forEach(delivery => {
+            const total = calculateTotalPiezas(delivery);
+            detailsHTML += `
+                        <tr>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.rib || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px;">${delivery.color || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px;">${delivery.type_fabric || '—'}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz2 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz4 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz6 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz8 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz10 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz12 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz14 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz16 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz18 || 0}</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center; background: #f0f0f0; font-weight: bold;">${total}</td>
+                        </tr>
+                        ${delivery.annotation ? `
+                        <tr style="background: #fff9e6; border: 1px solid #999;">
+                            <td colspan="13" style="border: 1px solid #999; padding: 8px; padding-left: 12px;">
+                                <strong style="color: #0B1023;">Observación:</strong> <span style="color: #555;">${delivery.annotation}</span>
+                            </td>
+                        </tr>
+                        ` : ''}
+            `;
+        });
+        
+        // Fila de total por tipo
+        const typeTotal = deliveries.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+        detailsHTML += `
+                        <tr style="background: #f0f0f0; font-weight: bold;">
+                            <td colspan="12" style="border: 1px solid #999; padding: 8px; text-align: right;">TOTAL ${type.toUpperCase()}:</td>
+                            <td style="border: 1px solid #999; padding: 8px; text-align: center; background: #d0d0d0;">${typeTotal}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    });
+    
+  
+    
+    // Total general del grupo
+    const groupTotal = deliveriesInGroup.reduce((sum, d) => sum + calculateTotalPiezas(d), 0);
+    detailsHTML += `
+        <div style="background: #0B1023; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
+            <h4 style="margin: 0;">📊 TOTAL GENERAL: ${groupTotal} piezas</h4>
+        </div>
+    `;
+    
+    detailsContent.innerHTML = detailsHTML;
+    document.getElementById('detailsModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error al obtener detalles del grupo: ' + error.message, 'error');
+    }
+}
+
+function deleteDeliveryGroup(idGroup) {
+    const deliveriesInGroup = allDeliveries.filter(d => d.id_group === idGroup);
+    
+    if (!confirm(`¿Estás seguro de que deseas eliminar todas las ${deliveriesInGroup.length} entregas de este grupo? Esta acción no se puede deshacer.`)) {
+        return;
+    }
+    
+    // Obtener usuario actual
+    const currentUser = getCurrentUser();
+    
+    // Eliminar todas las entregas del grupo
+    let deleteCount = 0;
+    
+    deliveriesInGroup.forEach(delivery => {
+        fetch(`/api/deliveries/${delivery.id_delivery}?modified_by=${encodeURIComponent(currentUser)}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                deleteCount++;
+                if (deleteCount === deliveriesInGroup.length) {
+                    showAlert('✅ Grupo de entregas marcado como inactivo correctamente', 'success');
+                    setTimeout(() => {
+                        loadDeliveries();
+                    }, 1500);
+                }
+            }
+        })
+        .catch(error => {
+            showAlert('Error: ' + error.message, 'error');
+        });
+    });
+}
+
+function viewDetails(deliveryId) {
+    const delivery = allDeliveries.find(d => d.id_delivery === deliveryId);
+    
+    if (!delivery) {
+        showAlert('Entrega no encontrada', 'error');
+        return;
+    }
+    
+    const totalPiezas = calculateTotalPiezas(delivery);
+    
+    const detailsContent = document.getElementById('detailsContent');
+    detailsContent.innerHTML = `
+        <div class="detail-row">
+            <span class="detail-label">ID Entrega:</span>
+            <span>#${delivery.id_delivery}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Responsable:</span>
+            <span>${delivery.owner}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Fecha:</span>
+            <span>${new Date(delivery.date).toLocaleDateString('es-ES')}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Lote:</span>
+            <span>${delivery.lot || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Tipo:</span>
+            <span>${delivery.type || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Color:</span>
+            <span>${delivery.color || '—'}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Observacion:</span>
+            <span>${delivery.annotation || '—'}</span>
+        </div>
+        <hr>
+        <h4 style="color: #0B1023; margin-top: 20px;">📏 Cantidades por Talla</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="detail-row"><span class="detail-label">6-12:</span> <span>${delivery.sz6_12 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">12-18:</span> <span>${delivery.sz12_18 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">18-24:</span> <span>${delivery.sz18_24 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">24-36:</span> <span>${delivery.sz24_36 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">36-48:</span> <span>${delivery.sz36_48 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 2:</span> <span>${delivery.sz2 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 4:</span> <span>${delivery.sz4 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 6:</span> <span>${delivery.sz6 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 8:</span> <span>${delivery.sz8 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 10:</span> <span>${delivery.sz10 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 12:</span> <span>${delivery.sz12 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 14:</span> <span>${delivery.sz14 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 16:</span> <span>${delivery.sz16 || 0}</span></div>
+            <div class="detail-row"><span class="detail-label">Talla 18:</span> <span>${delivery.sz18 || 0}</span></div>
+        </div>
+        <hr>
+        <div class="detail-row" style="background: #ecf0f1; padding: 10px; border-radius: 5px; border-bottom: none;">
+            <span class="detail-label" style="font-size: 16px;">Total Piezas:</span>
+            <span style="font-size: 16px; font-weight: bold; color: #0B1023;">${totalPiezas}</span>
+        </div>
+    `;
+    
+    document.getElementById('detailsModal').style.display = 'block';
+}
+
+function editDelivery(deliveryId) {
+    const delivery = allDeliveries.find(d => d.id_delivery === deliveryId);
+    
+    if (!delivery) {
+        showAlert('Entrega no encontrada', 'error');
+        return;
+    }
+    
+    // Verificar permisos: cortador solo puede editar sus entregas
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    if (user && user.rol === 'taller' && delivery.owner !== user.owner) {
+        showAlert('❌ No tienes permiso para editar entregas de otro responsable', 'error');
+        return;
+    }
+    
+    // Cargar todas las entregas del grupo
+    fetch(`/api/deliveries/group/${delivery.id_group}`)
+        .then(response => response.json())
+        .then(groupDeliveries => {
+            openEditModal(groupDeliveries);
+        })
+        .catch(error => {
+            showAlert('Error al cargar entregas: ' + error.message, 'error');
+        });
+}
+
+function openEditModal(groupDeliveries) {
+    currentEditingGroupId = groupDeliveries[0]?.id_group;
+    currentEditingDeliveryId = null; // No es necesario para edición de grupo
+    editDeliveryCount = 0;
+    
+    // Guardar entregas originales del grupo para detectar eliminaciones
+    originalGroupDeliveries = [...groupDeliveries];
+    
+    // Llenar información general
+    const firstDelivery = groupDeliveries[0];
+    document.getElementById('editOwner').value = firstDelivery.owner || '';
+    document.getElementById('editDate').value = firstDelivery.date || '';
+    document.getElementById('editLot').value = firstDelivery.lot || '';
+    document.getElementById('editGeneralObservations').value = firstDelivery.annotation || '';
+    
+    // Limpiar contenedor de entregas
+    document.getElementById('editDeliveriesContainer').innerHTML = '';
+    
+    // Agregar cada entrega del grupo
+    groupDeliveries.forEach(delivery => {
+        addEditDelivery(delivery);
+    });
+    
+    // Event listener para agregar entregas
+    document.getElementById('editAddDeliveryBtn').onclick = function() {
+        addEditDelivery();
+    };
+    
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function showAlert(message, type) {
+    const alertBox = document.getElementById('alertBox');
+    alertBox.textContent = message;
+    alertBox.className = `alert alert-${type}`;
+    
+    setTimeout(() => {
+        alertBox.style.display = 'none';
+    }, 5000);
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event) {
+    const modal = document.getElementById('detailsModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+    const editModal = document.getElementById('editModal');
+    if (event.target === editModal) {
+        editModal.style.display = 'none';
+    }
+}
+
+// Manejador del formulario de edición
+document.getElementById('editForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    if (!currentEditingGroupId) {
+        showAlert('Error: ID de grupo no encontrado', 'error');
+        return;
+    }
+    
+    // Obtener usuario actual
+    const currentUser = getCurrentUser();
+    
+    // Obtener información general
+    const owner = document.getElementById('editOwner').value;
+    const date = document.getElementById('editDate').value;
+    const lot = document.getElementById('editLot').value || null;
+    const annotation = document.getElementById('editGeneralObservations').value || null;
+    
+    // Obtener todas las tarjetas de entrega
+    const deliveryCards = document.querySelectorAll('[data-edit-delivery-index]');
+    
+    if (deliveryCards.length === 0) {
+        showAlert('Por favor agrega al menos una entrega', 'error');
+        return;
+    }
+    
+    let successCount = 0;
+    let errorMessages = [];
+    const sizeNames = ['sz6_12', 'sz12_18', 'sz18_24', 'sz24_36', 'sz36_48', 'sz2', 'sz4', 'sz6', 'sz8', 'sz10', 'sz12', 'sz14', 'sz16', 'sz18'];
+    
+    // Rastrear entregas existentes que aún están en el modal
+    const currentDeliveryIds = new Set();
+    
+    // Procesar cada entrega
+    for (let card of deliveryCards) {
+        const index = card.dataset.editDeliveryIndex;
+        const idDelivery = card.dataset.idDelivery; // Obtener ID si existe
+        
+        if (idDelivery && idDelivery !== 'null') {
+            currentDeliveryIds.add(parseInt(idDelivery));
+        }
+        
+        const formData = {
+            owner: owner,
+            date: date,
+            lot: lot,
+            type: document.querySelector(`input[name="edit_delivery_${index}_type"]`)?.value || null,
+            color: document.querySelector(`input[name="edit_delivery_${index}_color"]`)?.value || null,
+            type_fabric: document.querySelector(`input[name="edit_delivery_${index}_type_fabric"]`)?.value || null,
+            rib: document.querySelector(`input[name="edit_delivery_${index}_rib"]`)?.value || null,
+            annotation: annotation,
+            modified_by: currentUser,
+            id_group: currentEditingGroupId
+        };
+        
+        // Agregar tamaños
+        sizeNames.forEach(size => {
+            formData[size] = parseInt(document.querySelector(`input[name="edit_delivery_${index}_${size}"]`)?.value) || 0;
+        });
+        
+        try {
+            let response;
+            let method = 'POST';
+            let url = '/api/deliveries';
+            
+            // Si tiene ID válido, actualizar; si no, crear
+            if (idDelivery && idDelivery !== 'null') {
+                method = 'PUT';
+                url = `/api/deliveries/${idDelivery}`;
+            }
+            
+            response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                successCount++;
+            } else {
+                const error = await response.json();
+                errorMessages.push(`Entrega #${parseInt(index) + 1}: ${error.detail || 'Error'}`);
+            }
+        } catch (error) {
+            errorMessages.push(`Entrega #${parseInt(index) + 1}: ${error.message}`);
+        }
+    }
+    
+    // Eliminar entregas que fueron borradas del modal
+    try {
+        for (let delivery of originalGroupDeliveries) {
+            if (!currentDeliveryIds.has(delivery.id_delivery)) {
+                // Esta entrega fue eliminada del modal, así que la marcamos como inactiva
+                const deleteResponse = await fetch(`/api/deliveries/${delivery.id_delivery}?modified_by=${encodeURIComponent(currentUser)}`, {
+                    method: 'DELETE'
+                });
+                if (!deleteResponse.ok) {
+                    console.error(`Error eliminando entrega ${delivery.id_delivery}`);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error eliminando entregas:', error);
+    }
+    
+    // Mostrar resultado
+    if (successCount === deliveryCards.length && errorMessages.length === 0) {
+        showAlert(`✅ ${successCount} entrega${successCount > 1 ? 's' : ''} actualizada${successCount > 1 ? 's' : ''} correctamente`, 'success');
+        closeModal('editModal');
+        setTimeout(() => {
+            loadDeliveries();
+        }, 1500);
+    } else if (successCount > 0) {
+        showAlert(`⚠️ ${successCount} de ${deliveryCards.length} entrega(s) actualizada(s). Errores: ${errorMessages.join('; ')}`, 'warning');
+        closeModal('editModal');
+        setTimeout(() => {
+            loadDeliveries();
+        }, 1500);
+    } else {
+        showAlert(`❌ Error al actualizar entregas. ${errorMessages.join('; ')}`, 'error');
+    }
+});
+
+// Cargar entregas al iniciar
+document.addEventListener('DOMContentLoaded', loadDeliveries);
+</script>
+
+{% endblock %}

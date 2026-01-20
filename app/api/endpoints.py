@@ -6,8 +6,14 @@ import io
 import json
 
 from app.api.schemas.gastos_schema import GastoSchema
+
 from app.db.connection import get_db
-from app.service.worker_service import crear_trabajador, listar_trabajadores, obtener_trabajador, actualizar_trabajador, eliminar_trabajador
+from app.service.assistence_service import (
+    marcar_llegada, 
+    marcar_salida, 
+    obtener_asistencias_hoy,
+    obtener_trabajadores_activos
+)
 import pytz
 
 templates = Jinja2Templates(directory="app/templates")
@@ -21,26 +27,6 @@ def obtener_fecha_hora_bogota():
     bogota_tz = pytz.timezone('America/Bogota')
     ahora = datetime.now(bogota_tz)
     return ahora.strftime("%d/%m/%Y - %I:%M:%S %p")
-
-@router.get("/", response_class=HTMLResponse)
-async def mostrar_menu(request: Request):
-    return templates.TemplateResponse("menu.html", {"request": request})
-
-@router.get("/agregar-trabajador", response_class=HTMLResponse)
-async def mostrar_agregar_trabajador(request: Request):
-    return templates.TemplateResponse("agregar_trabajador.html", {"request": request})
-
-@router.get("/trabajadores", response_class=HTMLResponse)
-async def mostrar_lista_trabajadores(request: Request):
-    return templates.TemplateResponse("lista_trabajadores.html", {"request": request})
-
-@router.get("/editar-trabajador", response_class=HTMLResponse)
-async def mostrar_editar_trabajador(request: Request):
-    return templates.TemplateResponse("editar_trabajador.html", {"request": request})
-
-@router.get("/produccion", response_class=HTMLResponse)
-async def mostrar_produccion(request: Request):
-    return templates.TemplateResponse("produccion.html", {"request": request})
 
 @router.post("/calcular-produccion", response_class=HTMLResponse)
 async def calcular_produccion(request: Request):
@@ -155,7 +141,7 @@ async def descargar_produccion_pdf(request: Request):
             'CustomTitle',
             parent=styles['Heading1'],
             fontSize=18,
-            textColor=colors.HexColor('#667eea'),
+            textColor=colors.HexColor('#0B1023'),
             spaceAfter=10,
             alignment=1  # Centro
         )
@@ -219,7 +205,7 @@ async def descargar_produccion_pdf(request: Request):
         # Crear tabla
         table = Table(table_data, colWidths=[1*inch]*15)
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#667eea')),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0B1023')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
@@ -256,14 +242,6 @@ async def descargar_produccion_pdf(request: Request):
             detail=f"Error al generar PDF: {str(e)}"
         )
 
-@router.get("/costo-operacion", response_class=HTMLResponse)
-async def mostrar_formulario(request: Request):
-    return templates.TemplateResponse("calcular_ costo_operacion.html", {"request": request})
-
-@router.get("/punto-equilibrio", response_class=HTMLResponse)
-async def mostrar_punto_equilibrio(request: Request):
-    return templates.TemplateResponse("punto_equilibrio.html", {"request": request})
-
 @router.post("/calcular-costo-operacion", response_class=HTMLResponse)
 #calculo de costo de operacion
 async def calcular_costo(request: Request):
@@ -280,7 +258,7 @@ async def calcular_costo(request: Request):
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return templates.TemplateResponse("error.html", {
@@ -366,7 +344,7 @@ async def calcular_punto_equilibrio(
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return templates.TemplateResponse("error.html", {
@@ -472,7 +450,7 @@ async def get_cost_operation(cantidad_trabajadoras: int, cantidad_trabajadoras_p
     
     try:
         # Obtener trabajadores de la base de datos
-        resultado_trabajadores = listar_trabajadores(db)
+        resultado_trabajadores = obtener_trabajadores_activos(db)
         
         if not resultado_trabajadores["success"]:
             return JSONResponse(
@@ -558,177 +536,3 @@ async def calcular_justicia_pago(
         "fecha_hora_bogota": fecha_hora_bogota
     })
 
-
-# =====================
-# ENDPOINTS DE TRABAJADORES
-# =====================
-
-@router.post("/api/trabajadores/crear", response_class=JSONResponse)
-async def crear_nuevo_trabajador(
-    nombre: str = Form(...),
-    apellido: str = Form(...),
-    cedula: str = Form(...),
-    cargo: str = Form(...),
-    salario: float = Form(...),
-    email: str = Form(None),
-    telefono: str = Form(None)
-):
-    """
-    Crea un nuevo trabajador en la base de datos.
-    
-    Parámetros:
-    - nombre: Nombre del trabajador
-    - apellido: Apellido del trabajador
-    - cedula: Cédula del trabajador (única)
-    - cargo: Cargo del trabajador
-    - salario: Salario del trabajador
-    - email: Email del trabajador (opcional)
-    - telefono: Teléfono del trabajador (opcional)
-    """
-    db = get_db()
-    if db is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="No se pudo conectar a la base de datos"
-        )
-    
-    try:
-        resultado = crear_trabajador(
-            db=db,
-            nombre=nombre,
-            apellido=apellido,
-            cedula=cedula,
-            cargo=cargo,
-            salario=salario,
-            email=email,
-            telefono=telefono
-        )
-        
-        if resultado["success"]:
-            return JSONResponse(
-                status_code=status.HTTP_201_CREATED,
-                content=resultado
-            )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content=resultado
-            )
-    finally:
-        from app.db.connection import close_connection
-        close_connection(db)
-
-
-@router.get("/api/trabajadores", response_class=JSONResponse)
-async def obtener_lista_trabajadores():
-    """Obtiene la lista de todos los trabajadores activos"""
-    db = get_db()
-    if db is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="No se pudo conectar a la base de datos"
-        )
-    
-    try:
-        resultado = listar_trabajadores(db)
-        return JSONResponse(content=resultado)
-    finally:
-        from app.db.connection import close_connection
-        close_connection(db)
-
-
-@router.get("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
-async def obtener_info_trabajador(trabajador_id: int):
-    """Obtiene la información de un trabajador específico"""
-    db = get_db()
-    if db is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="No se pudo conectar a la base de datos"
-        )
-    
-    try:
-        resultado = obtener_trabajador(db, trabajador_id)
-        
-        if resultado["success"]:
-            return JSONResponse(content=resultado)
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
-            )
-    finally:
-        from app.db.connection import close_connection
-        close_connection(db)
-
-
-@router.put("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
-async def actualizar_info_trabajador(
-    trabajador_id: int,
-    nombre: str = Form(None),
-    apellido: str = Form(None),
-    email: str = Form(None),
-    telefono: str = Form(None),
-    cargo: str = Form(None),
-    salario: float = Form(None),
-    activo: bool = Form(None)
-):
-    """Actualiza la información de un trabajador"""
-    db = get_db()
-    if db is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="No se pudo conectar a la base de datos"
-        )
-    
-    try:
-        kwargs = {
-            "nombre": nombre,
-            "apellido": apellido,
-            "email": email,
-            "telefono": telefono,
-            "cargo": cargo,
-            "salario": salario,
-            "activo": activo
-        }
-        
-        resultado = actualizar_trabajador(db, trabajador_id, **kwargs)
-        
-        if resultado["success"]:
-            return JSONResponse(content=resultado)
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
-            )
-    finally:
-        from app.db.connection import close_connection
-        close_connection(db)
-
-
-@router.delete("/api/trabajadores/{trabajador_id}", response_class=JSONResponse)
-async def eliminar_info_trabajador(trabajador_id: int):
-    """Elimina (desactiva) un trabajador"""
-    db = get_db()
-    if db is None:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="No se pudo conectar a la base de datos"
-        )
-    
-    try:
-        resultado = eliminar_trabajador(db, trabajador_id)
-        
-        if resultado["success"]:
-            return JSONResponse(
-                status_code=status.HTTP_200_OK,
-                content=resultado
-            )
-        else:
-            return JSONResponse(
-                status_code=status.HTTP_404_NOT_FOUND,
-                content=resultado
-            )
-    finally:
-        from app.db.connection import close_connection
-        close_connection(db)

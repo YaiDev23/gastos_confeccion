@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="/static/css/styles.css">
 
 <div class="container mt-5">
-    <h2 class="mb-4" style="color: #667eea; font-weight: 700;">📊 Cálculo de Producción</h2>
+    <h2 class="mb-4" style="color: #0B1023; font-weight: 700;">📊 Entrega de Producción</h2>
     
     <div class="card mb-4">
         <div class="card-header">
@@ -13,25 +13,28 @@
         <div class="card-body">
             <form action="/calcular-produccion" method="post" enctype="multipart/form-data">
                 <div id="colores-container">
-                    <div class="color-group mb-4">
-                        <h4>📦 Lote #1</h4>
+                    <div class="color-group mb-4" data-lote-id="1">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h4 style="margin: 0;">📦 Lote #1</h4>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="eliminarLote(1)" style="display: none;" id="btn-eliminar-1">🗑️ Eliminar</button>
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="tipo_lote_1">Tipo de Lote:</label>
-                                    <input type="text" id="tipo_lote_1" name="tipo_lote_1" class="form-control" placeholder="Ej: jogger, pantalon, blusa" required>
+                                    <input type="text" id="tipo_lote_1" name="tipo_lote_1" class="form-control tipo-lote" placeholder="Ej: jogger, pantalon, blusa" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="color_1">Color:</label>
-                                    <input type="text" id="color_1" name="color_1" class="form-control" placeholder="Ej: rojo, azul, blanco" required>
+                                    <input type="text" id="color_1" name="color_1" class="form-control color-lote" placeholder="Ej: rojo, azul, blanco" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="precio_1">Precio Unitario ($):</label>
-                                    <input type="number" id="precio_1" name="precio_1" class="form-control" placeholder="Ej: 25000" step="0.01" min="0" required>
+                                    <input type="number" id="precio_1" name="precio_1" class="form-control precio-lote" placeholder="Ej: 25000" step="0.01" min="0" required>
                                 </div>
                             </div>
                         </div>
@@ -41,18 +44,18 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr style="background-color: #f8f9fa;">
-                                            <th style="color: #667eea; font-weight: 600;">18-24</th>
-                                            <th style="color: #667eea; font-weight: 600;">24-36</th>
-                                            <th style="color: #667eea; font-weight: 600;">36-48</th>
-                                            <th style="color: #667eea; font-weight: 600;">2</th>
-                                            <th style="color: #667eea; font-weight: 600;">4</th>
-                                            <th style="color: #667eea; font-weight: 600;">6</th>
-                                            <th style="color: #667eea; font-weight: 600;">8</th>
-                                            <th style="color: #667eea; font-weight: 600;">10</th>
-                                            <th style="color: #667eea; font-weight: 600;">12</th>
-                                            <th style="color: #667eea; font-weight: 600;">14</th>
-                                            <th style="color: #667eea; font-weight: 600;">16</th>
-                                            <th style="color: #667eea; font-weight: 600;">18</th>
+                                            <th style="color: #0B1023; font-weight: 600;">18-24</th>
+                                            <th style="color: #0B1023; font-weight: 600;">24-36</th>
+                                            <th style="color: #0B1023; font-weight: 600;">36-48</th>
+                                            <th style="color: #0B1023; font-weight: 600;">2</th>
+                                            <th style="color: #0B1023; font-weight: 600;">4</th>
+                                            <th style="color: #0B1023; font-weight: 600;">6</th>
+                                            <th style="color: #0B1023; font-weight: 600;">8</th>
+                                            <th style="color: #0B1023; font-weight: 600;">10</th>
+                                            <th style="color: #0B1023; font-weight: 600;">12</th>
+                                            <th style="color: #0B1023; font-weight: 600;">14</th>
+                                            <th style="color: #0B1023; font-weight: 600;">16</th>
+                                            <th style="color: #0B1023; font-weight: 600;">18</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -89,30 +92,106 @@
 
 <script>
 let colorCount = 1;
+let lotesGuardados = {};
+
+// Función para guardar datos del lote actual cuando cambia
+function guardarDatosLote(loteId) {
+    const tipoLote = document.getElementById(`tipo_lote_${loteId}`)?.value || '';
+    const colorLote = document.getElementById(`color_${loteId}`)?.value || '';
+    const precioLote = document.getElementById(`precio_${loteId}`)?.value || '';
+    
+    if (tipoLote && colorLote && precioLote) {
+        lotesGuardados[loteId] = {
+            tipo: tipoLote,
+            color: colorLote,
+            precio: precioLote
+        };
+    }
+}
+
+// Actualizar campos listeners para guardar datos
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('tipo-lote') || e.target.classList.contains('color-lote') || e.target.classList.contains('precio-lote')) {
+        const inputId = e.target.id;
+        const loteId = inputId.split('_').pop();
+        guardarDatosLote(loteId);
+        actualizarSelectoresLotes();
+    }
+});
+
+function actualizarSelectoresLotes() {
+    const selectores = document.querySelectorAll('.selector-lote-existente');
+    selectores.forEach(selector => {
+        const loteIdActual = selector.closest('.color-group').getAttribute('data-lote-id');
+        const seleccionActual = selector.value;
+        
+        selector.innerHTML = '<option value="">-- Seleccionar lote existente --</option>';
+        
+        for (const [loteId, datos] of Object.entries(lotesGuardados)) {
+            if (loteId !== loteIdActual) {
+                const option = document.createElement('option');
+                option.value = loteId;
+                option.textContent = `${datos.tipo} - ${datos.color} ($${datos.precio})`;
+                selector.appendChild(option);
+            }
+        }
+        
+        selector.value = seleccionActual;
+    });
+}
+
+function aplicarLoteExistente(loteId) {
+    const selector = document.querySelector(`[data-lote-id="${loteId}"] .selector-lote-existente`);
+    const loteSeleccionado = selector.value;
+    
+    if (loteSeleccionado && lotesGuardados[loteSeleccionado]) {
+        const datos = lotesGuardados[loteSeleccionado];
+        document.getElementById(`tipo_lote_${loteId}`).value = datos.tipo;
+        document.getElementById(`color_${loteId}`).value = datos.color;
+        document.getElementById(`precio_${loteId}`).value = datos.precio;
+    }
+}
 
 function agregarColor() {
     colorCount++;
+    guardarDatosLote(colorCount - 1);
+    
     const container = document.getElementById('colores-container');
     const nuevoColor = `
-        <div class="color-group mb-4">
-            <h4>📦 Lote #${colorCount}</h4>
+        <div class="color-group mb-4" data-lote-id="${colorCount}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h4 style="margin: 0;">📦 Lote #${colorCount}</h4>
+                <button type="button" class="btn btn-sm btn-danger" onclick="eliminarLote(${colorCount})">🗑️ Eliminar</button>
+            </div>
+            
+            <div style="background-color: #f0f4ff; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                <p style="margin: 0 0 0.5rem 0; color: #0B1023; font-weight: 600;">📋 O selecciona un lote ya creado:</p>
+                <div class="row">
+                    <div class="col-md-8">
+                        <select class="form-control selector-lote-existente" onchange="aplicarLoteExistente(${colorCount})">
+                            <option value="">-- Seleccionar lote existente --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="tipo_lote_${colorCount}">Tipo de Lote:</label>
-                        <input type="text" id="tipo_lote_${colorCount}" name="tipo_lote_${colorCount}" class="form-control" placeholder="Ej: jogger, pantalon, blusa" required>
+                        <input type="text" id="tipo_lote_${colorCount}" name="tipo_lote_${colorCount}" class="form-control tipo-lote" placeholder="Ej: jogger, pantalon, blusa" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="color_${colorCount}">Color:</label>
-                        <input type="text" id="color_${colorCount}" name="color_${colorCount}" class="form-control" placeholder="Ej: rojo, azul, blanco" required>
+                        <input type="text" id="color_${colorCount}" name="color_${colorCount}" class="form-control color-lote" placeholder="Ej: rojo, azul, blanco" required>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="precio_${colorCount}">Precio Unitario ($):</label>
-                        <input type="number" id="precio_${colorCount}" name="precio_${colorCount}" class="form-control" placeholder="Ej: 25000" step="0.01" min="0" required>
+                        <input type="number" id="precio_${colorCount}" name="precio_${colorCount}" class="form-control precio-lote" placeholder="Ej: 25000" step="0.01" min="0" required>
                     </div>
                 </div>
             </div>
@@ -122,18 +201,18 @@ function agregarColor() {
                     <table class="table table-bordered">
                         <thead>
                             <tr style="background-color: #f8f9fa;">
-                                <th style="color: #667eea; font-weight: 600;">18-24</th>
-                                <th style="color: #667eea; font-weight: 600;">24-36</th>
-                                <th style="color: #667eea; font-weight: 600;">36-48</th>
-                                <th style="color: #667eea; font-weight: 600;">2</th>
-                                <th style="color: #667eea; font-weight: 600;">4</th>
-                                <th style="color: #667eea; font-weight: 600;">6</th>
-                                <th style="color: #667eea; font-weight: 600;">8</th>
-                                <th style="color: #667eea; font-weight: 600;">10</th>
-                                <th style="color: #667eea; font-weight: 600;">12</th>
-                                <th style="color: #667eea; font-weight: 600;">14</th>
-                                <th style="color: #667eea; font-weight: 600;">16</th>
-                                <th style="color: #667eea; font-weight: 600;">18</th>
+                                <th style="color: #0B1023; font-weight: 600;">18-24</th>
+                                <th style="color: #0B1023; font-weight: 600;">24-36</th>
+                                <th style="color: #0B1023; font-weight: 600;">36-48</th>
+                                <th style="color: #0B1023; font-weight: 600;">2</th>
+                                <th style="color: #0B1023; font-weight: 600;">4</th>
+                                <th style="color: #0B1023; font-weight: 600;">6</th>
+                                <th style="color: #0B1023; font-weight: 600;">8</th>
+                                <th style="color: #0B1023; font-weight: 600;">10</th>
+                                <th style="color: #0B1023; font-weight: 600;">12</th>
+                                <th style="color: #0B1023; font-weight: 600;">14</th>
+                                <th style="color: #0B1023; font-weight: 600;">16</th>
+                                <th style="color: #0B1023; font-weight: 600;">18</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,6 +237,31 @@ function agregarColor() {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', nuevoColor);
+    actualizarSelectoresLotes();
 }
+
+function eliminarLote(loteId) {
+    const loteElement = document.querySelector(`[data-lote-id="${loteId}"]`);
+    if (loteElement) {
+        loteElement.remove();
+        delete lotesGuardados[loteId];
+        actualizarSelectoresLotes();
+    }
+}
+
+// Mostrar botón eliminar cuando haya más de un lote
+function actualizarBotoneEliminar() {
+    const lotes = document.querySelectorAll('.color-group');
+    lotes.forEach(lote => {
+        const btnEliminar = lote.querySelector('.btn-danger');
+        if (btnEliminar) {
+            btnEliminar.style.display = lotes.length > 1 ? 'inline-block' : 'none';
+        }
+    });
+}
+
+// Inicializar
+actualizarBotoneEliminar();
+guardarDatosLote(1);
 </script>
 {% endblock %}

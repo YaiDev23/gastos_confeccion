@@ -69,6 +69,23 @@
             <input type="number" id="salario" name="salario" step="0.01" required style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
         </div>
 
+        <div style="margin-bottom: 20px;">
+            <label for="reference_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                ID de Referencia
+            </label>
+            <input type="text" id="reference_id" name="reference_id" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="activo" style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                Estado
+            </label>
+            <select id="activo" name="activo" style="width: 100%; padding: 12px; border: 2px solid #ecf0f1; border-radius: 8px; font-size: 14px; box-sizing: border-box;">
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+            </select>
+        </div>
+
         <div style="display: flex; gap: 10px; margin-top: 30px;">
             <button type="submit" class="btn" style="flex: 1; background: linear-gradient(135deg, #27ae60 0%, #229954 100%);">
                 💾 Guardar Cambios
@@ -112,6 +129,8 @@ async function cargarTrabajador() {
             document.getElementById('telefono').value = trabajador.telefono || '';
             document.getElementById('cargo').value = trabajador.cargo || '';
             document.getElementById('salario').value = trabajador.salario || '';
+            document.getElementById('reference_id').value = trabajador.reference_id || '';
+            document.getElementById('activo').value = trabajador.activo ? 'true' : 'false';
 
             // Mostrar formulario
             document.getElementById('contenedor_carga').style.display = 'none';
@@ -129,18 +148,24 @@ async function cargarTrabajador() {
 document.getElementById('formulario_editar').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('nombre', document.getElementById('nombre').value);
-    formData.append('apellido', document.getElementById('apellido').value);
-    formData.append('email', document.getElementById('email').value);
-    formData.append('telefono', document.getElementById('telefono').value);
-    formData.append('cargo', document.getElementById('cargo').value);
-    formData.append('salario', document.getElementById('salario').value);
+    const payload = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        email: document.getElementById('email').value || null,
+        telefono: document.getElementById('telefono').value || null,
+        cargo: document.getElementById('cargo').value,
+        salario: parseFloat(document.getElementById('salario').value),
+        reference_id: document.getElementById('reference_id').value || null,
+        activo: document.getElementById('activo').value === 'true'
+    };
 
     try {
         const response = await fetch(`/api/trabajadores/${trabajadorId}`, {
             method: 'PUT',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         });
 
         const resultado = await response.json();

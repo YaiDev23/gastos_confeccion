@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Menú de Entregas - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<style>
+    .header-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #0B1023;
+    }
+    
+    .header-nav h1 {
+        margin: 0;
+        color: #0B1023;
+        font-size: 32px;
+        font-weight: 700;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #000000 100%);
+        text-decoration: none;
+        display: inline-block;
+        padding: 12px 25px;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .restricted-badge {
+        display: inline-block;
+        background-color: #e74c3c;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="header-nav">
+    <h1>📦 Gestión de Entregas</h1>
+    <a href="/menu" class="btn-back">← Volver al Menú Principal</a>
+</div>
+
+<p style="text-align: center; color: #7f8c8d; font-size: 18px; margin-bottom: 60px;">
+    Selecciona una opción para gestionar las entregas de corte
+</p>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 35px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+    
+    <!-- Registrar Entrega -->
+    <div style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">➕</div>
+        <h2 style="color: #0B1023; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Registrar Entrega</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            Registra una nueva entrega de corte indicando responsable, fecha, tipo de producto y cantidades por talla
+        </p>
+        <a href="/entrega_corte" class="btn" style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: #f0f0f0; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Crear Entrega
+        </a>
+    </div>
+
+    <!-- Consultar Entregas -->
+    <div id="consultarEntregasCard" style="background: white; border: 3px solid #0B1023; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(11,16,35,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">📋</div>
+        <h2 style="color: #0B1023; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Ver Entregas</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            <span id="consultarText">Visualiza todas las entregas registradas, consulta detalles específicos, edita información o elimina entregas</span>
+        </p>
+        <a id="consultarEntregasBtn" href="/consultar_entrega" class="btn" style="background: linear-gradient(135deg, #0B1023 0%, #000000 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: #f0f0f0; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Ver Entregas
+        </a>
+    </div>
+
+    <!-- Reportes y Estadísticas -->
+     <!--<div style="background: white; border: 3px solid #e67e22; border-radius: 15px; padding: 35px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 20px 40px rgba(230,126,34,0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+        <div style="font-size: 60px; margin-bottom: 20px;">📊</div>
+        <h2 style="color: #e67e22; margin-top: 0; margin-bottom: 15px; font-size: 26px; font-weight: bold;">Reportes</h2>
+        <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 15px; line-height: 1.6;">
+            Genera reportes y estadísticas sobre las entregas, análisis de producción por talla y responsable
+        </p>
+        <a href="#" class="btn" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); text-decoration: none; display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: bold; color: white; border-radius: 8px; width: 100%; box-sizing: border-box; transition: all 0.3s;">
+            Ver Reportes
+        </a>
+    </div>
+</div> -->
+
+</div>
+
+<script>
+    function initializePermissions() {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        const consultarText = document.getElementById('consultarText');
+        
+        if (user && user.rol === 'taller') {
+            // Usuario es cortador, mostrar texto personalizado
+            consultarText.textContent = 'Consulta y edita tus entregas registradas en el sistema';
+        }
+    }
+
+    window.addEventListener('load', initializePermissions);
+</script>
+
+{% endblock %}

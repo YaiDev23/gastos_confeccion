@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios - Sistema de Gestión{% endblock %}
+
+{% block content %}
+<style>
+    .header-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .header-section h1 {
+        margin: 0;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .btn-agregar {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-agregar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+    }
+
+    .filtros {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .filtros input, .filtros select {
+        padding: 10px;
+        border: 2px solid #ecf0f1;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .tabla-responsive {
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #0B1023 0%, #1a1f3a 100%);
+        color: white;
+    }
+
+    th {
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 3px solid #0B1023;
+    }
+
+    td {
+        padding: 15px;
+        border-bottom: 1px solid #ecf0f1;
+    }
+
+    tbody tr {
+        transition: background-color 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .badge-admin {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .badge-user {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .badge-active {
+        background-color: #27ae60;
+        color: white;
+    }
+
+    .badge-inactive {
+        background-color: #95a5a6;
+        color: white;
+    }
+
+    .acciones {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-accion {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+    }
+
+    .btn-editar {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-editar:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-eliminar {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-eliminar:hover {
+        background-color: #c0392b;
+    }
+
+    .mensaje {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .mensaje-exito {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .mensaje-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .sin-datos {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+    }
+
+    .sin-datos i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        display: block;
+        color: #bdc3c7;
+    }
+
+    .paginacion {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-top: 20px;
+    }
+
+    .paginacion a, .paginacion button {
+        padding: 8px 12px;
+        border: 1px solid #ecf0f1;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        color: #0B1023;
+        transition: all 0.3s ease;
+    }
+
+    .paginacion a:hover, .paginacion button:hover {
+        background-color: #0B1023;
+        color: white;
+    }
+
+    .paginacion .activa {
+        background-color: #0B1023;
+        color: white;
+        border-color: #0B1023;
+    }
+
+    @media (max-width: 768px) {
+        .header-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .btn-agregar {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .filtros {
+            grid-template-columns: 1fr;
+        }
+
+        .tabla-responsive {
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        .acciones {
+            flex-direction: column;
+        }
+
+        .btn-accion {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="header-section">
+    <h1>
+        <i class="fas fa-users"></i>
+        Gestión de Usuarios
+    </h1>
+    <a href="/admin/usuarios/nuevo" class="btn-agregar">
+        <i class="fas fa-plus"></i>
+        Agregar Usuario
+    </a>
+</div>
+
+<div id="mensaje"></div>
+
+<div class="filtros">
+    <input type="text" id="filtroNombre" placeholder="Buscar por nombre de usuario...">
+    <input type="text" id="filtroEmail" placeholder="Buscar por email...">
+    <select id="filtroRol">
+        <option value="">Todos los roles</option>
+        <option value="admin">Administrador</option>
+        <option value="taller">Taller</option>
+        <option value="usuario">Usuario</option>
+    </select>
+    <select id="filtroEstado">
+        <option value="">Todos los estados</option>
+        <option value="activo">Activo</option>
+        <option value="inactivo">Inactivo</option>
+    </select>
+</div>
+
+<div class="tabla-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre de Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="usuariosTableBody">
+            <tr>
+                <td colspan="6" class="sin-datos">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Cargando usuarios...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="paginacion" id="paginacion"></div>
+
+<script>
+    let usuariosActuales = [];
+    let paginaActual = 1;
+    const usuariosPorPagina = 10;
+
+    async function cargarUsuarios() {
+        try {
+            const response = await fetch('/users/active');
+            if (!response.ok) throw new Error('Error al cargar usuarios');
+            
+            const usuarios = await response.json();
+            usuariosActuales = usuarios;
+            mostrarPagina(1);
+            actualizarPaginacion();
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al cargar los usuarios', 'error');
+        }
+    }
+
+    function filtrarUsuarios() {
+        const nombre = document.getElementById('filtroNombre').value.toLowerCase();
+        const email = document.getElementById('filtroEmail').value.toLowerCase();
+        const rol = document.getElementById('filtroRol').value;
+        const estado = document.getElementById('filtroEstado').value;
+
+        let usuariosFiltrados = usuariosActuales.filter(usuario => {
+            const cumpleNombre = usuario.username.toLowerCase().includes(nombre);
+            const cumpleEmail = usuario.email?.toLowerCase().includes(email) || true;
+            const cumpleRol = !rol || usuario.rol === rol;
+            const cumpleEstado = !estado || (estado === 'activo' ? usuario.estado === 1 : usuario.estado === 0);
+            
+            return cumpleNombre && cumpleEmail && cumpleRol && cumpleEstado;
+        });
+
+        usuariosActuales = usuariosFiltrados;
+        paginaActual = 1;
+        mostrarPagina(1);
+        actualizarPaginacion();
+    }
+
+    function mostrarPagina(numero) {
+        paginaActual = numero;
+        const inicio = (numero - 1) * usuariosPorPagina;
+        const fin = inicio + usuariosPorPagina;
+        const usuariosPagina = usuariosActuales.slice(inicio, fin);
+
+        const tbody = document.getElementById('usuariosTableBody');
+        
+        if (usuariosPagina.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="sin-datos">
+                        <i class="fas fa-inbox"></i>
+                        No hay usuarios para mostrar
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = usuariosPagina.map(usuario => `
+            <tr>
+                <td>${usuario.id_user}</td>
+                <td><strong>${usuario.username}</strong></td>
+                <td>${usuario.email || 'N/A'}</td>
+                <td>
+                    <span class="badge ${usuario.rol === 'supera' ? 'badge-admin' : 'badge-user'}">
+                        ${usuario.rol === 'supera' ? 'Super Admin' : usuario.rol.charAt(0).toUpperCase() + usuario.rol.slice(1)}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge ${usuario.estado ? 'badge-active' : 'badge-inactive'}">
+                        ${usuario.estado ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+                <td>
+                    <div class="acciones">
+                        <a href="/admin/usuarios/editar/${usuario.id_user}" class="btn-accion btn-editar">
+                            <i class="fas fa-edit"></i>
+                            Editar
+                        </a>
+                        <button class="btn-accion btn-eliminar" onclick="eliminarUsuario(${usuario.id_user})">
+                            <i class="fas fa-trash"></i>
+                            Eliminar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function actualizarPaginacion() {
+        const totalPaginas = Math.ceil(usuariosActuales.length / usuariosPorPagina);
+        const paginacion = document.getElementById('paginacion');
+        
+        if (totalPaginas <= 1) {
+            paginacion.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        
+        if (paginaActual > 1) {
+            html += `<a href="#" onclick="mostrarPagina(1); actualizarPaginacion(); return false;">« Primera</a>`;
+            html += `<a href="#" onclick="mostrarPagina(${paginaActual - 1}); actualizarPaginacion(); return false;">‹ Anterior</a>`;
+        }
+
+        for (let i = 1; i <= totalPaginas; i++) {
+            if (i === paginaActual) {
+                html += `<button class="activa">${i}</button>`;
+            } else {
+                html += `<a href="#" onclick="mostrarPagina(${i}); actualizarPaginacion(); return false;">${i}</a>`;
+            }
+        }
+
+        if (paginaActual < totalPaginas) {
+            html += `<a href="#" onclick="mostrarPagina(${paginaActual + 1}); actualizarPaginacion(); return false;">Siguiente ›</a>`;
+            html += `<a href="#" onclick="mostrarPagina(${totalPaginas}); actualizarPaginacion(); return false;">Última »</a>`;
+        }
+
+        paginacion.innerHTML = html;
+    }
+
+    async function eliminarUsuario(id) {
+        if (!confirm('¿Está seguro de que desea eliminar este usuario?')) return;
+
+        try {
+            const response = await fetch(`/users/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) throw new Error('Error al eliminar usuario');
+            
+            mostrarMensaje('Usuario eliminado correctamente', 'exito');
+            setTimeout(() => cargarUsuarios(), 1500);
+        } catch (error) {
+            console.error('Error:', error);
+            mostrarMensaje('Error al eliminar el usuario', 'error');
+        }
+    }
+
+    function mostrarMensaje(texto, tipo) {
+        const mensajeDiv = document.getElementById('mensaje');
+        mensajeDiv.innerHTML = `
+            <div class="mensaje mensaje-${tipo}">
+                <i class="fas fa-${tipo === 'exito' ? 'check-circle' : 'exclamation-circle'}"></i>
+                ${texto}
+            </div>
+        `;
+        
+        if (tipo === 'exito') {
+            setTimeout(() => mensajeDiv.innerHTML = '', 5000);
+        }
+    }
+
+    // Event listeners para filtros
+    document.getElementById('filtroNombre').addEventListener('input', filtrarUsuarios);
+    document.getElementById('filtroEmail').addEventListener('input', filtrarUsuarios);
+    document.getElementById('filtroRol').addEventListener('change', filtrarUsuarios);
+    document.getElementById('filtroEstado').addEventListener('change', filtrarUsuarios);
+
+    // Cargar usuarios al iniciar
+    window.addEventListener('load', cargarUsuarios);
+</script>
+
+{% endblock %}
