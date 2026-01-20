@@ -7,103 +7,96 @@ from dotenv import load_dotenv
 # Cargar variables de entorno desde .env
 load_dotenv()
 
-db_config_dev = {
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "host": os.getenv("HOST"),
-    "database": os.getenv("DATABASE"),
-    "port": int(os.getenv("PORTDB"))
-}
+# Construir URL de conexión a PostgreSQL
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("HOST")
+db_name = os.getenv("DATABASE")
+db_port = os.getenv("PORT_DB", "5432")
 
-db_config_prod = {
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASSWORD"),
-    "host": os.getenv("HOST"),
-    "database": os.getenv("DATABASE"),
-    "port": int(os.getenv("PORTDB"))
-}
+# Construir la URL de conexión
+db_url = f"postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 
-def create_db_engine(is_development=True):
-    config = db_config_dev if is_development else db_config_prod
-    
-    # Use PyMySQL instead of mysql-connector for better compatibility
-    if is_development:
-        connection_string = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}"
-    else:
-        connection_string = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}/{config['database']}"
-    
-    # Create engine with additional connection options
-    engine = create_engine(
-        connection_string,
-        pool_pre_ping=True,
-        pool_recycle=3600,
-        echo=False  # Set to True for debugging SQL queries
-    )
-    return engine
+def create_db_engine():
+    """
+    Crea el motor de la base de datos PostgreSQL.
+    Retorna: Engine de SQLAlchemy
+    """
+    if not db_url:
+        print(f"Error: No se encontró la URL de conexión a la base de datos")
+        return None
 
-def get_db(is_development=True):
     try:
-        engine = create_db_engine(is_development)
-        try:
-            from models.base import Base
-        except ImportError:
-            from app.db.models.base import Base
-        
-        # Import all models to register them with Base metadata
-        try:
-            from app.db.models import Worker, Assistence
-        except ImportError:
-            from .models import Worker, Assistence
-        
-        # This ensures the metadata is bound to this engine
-        Base.metadata.bind = engine
-        
-        # Create tables if they don't exist
-        try:
-            Base.metadata.create_all(bind=engine)
-        except Exception as e:
-            print(f"Warning: Could not create tables: {e}")
+        # Crear engine con configuración optimizada para PostgreSQL
+        engine = create_engine(
+            db_url,
+            pool_pre_ping=True,
+            pool_recycle=3600,
+            echo=False  # Set to True for debugging SQL queries
+        )
+        return engine
+    except Exception as e:
+        print(f"Error al crear el motor de la base de datos: {e}")
+        return None
+
+
+def get_db():
+    """
+    Obtiene una sesión de la base de datos.
+    Uso con FastAPI: como dependencia en endpoints
+    """
+    try:
+        engine = create_db_engine()
+        if engine is None:
+            raise Exception("No se pudo crear el motor de la base de datos")
         
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         db = SessionLocal()
         
-        # Test the connection
-        db.execute(text("SELECT 1"))
-        
-        return db
+        try:
+            yield db
+        finally:
+            db.close()
     except Exception as err:
         print(f"Error al conectar a la base de datos: {err}")
-        print(f"Tipo de error: {type(err).__name__}")
-        return None
+        raise
+
 
 def close_connection(conn):
+    """Cierra la conexión a la base de datos"""
     if conn:
         conn.close()
 
-def test_db_connection(is_development=True):
+
+def test_db_connection():
     """
-    Prueba la conexión a la base de datos.
-    Retorna: (es_conectado, mensaje)
+    Prueba la conexión a la base de datos PostgreSQL.
+    Retorna: (es_conectado: bool, mensaje: str)
     """
     db = None
     try:
-        db = get_db(is_development)
-        if db is None:
-            return False, "Error: No se pudo obtener la sesión de la base de datos"
+        engine = create_db_engine()
+        if engine is None:
+            return False, "❌ Error: No se pudo crear el motor de la base de datos"
+        
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        db = SessionLocal()
         
         # Ejecutar una consulta de prueba
         db.execute(text("SELECT 1"))
-        return True, "✅ Conexión a la base de datos exitosa"
+        
+        return True, "✅ Conexión a la base de datos PostgreSQL exitosa"
     except Exception as e:
         return False, f"❌ Error al conectar a la base de datos: {str(e)}"
     finally:
         if db:
             close_connection(db)
 
+
 if __name__ == "__main__":
     # Add project root to sys.path for direct script execution
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     
-    es_conectado, mensaje = test_db_connection(is_development=True)
+    es_conectado, mensaje = test_db_connection()
     print(mensaje)
