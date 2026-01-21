@@ -70,6 +70,7 @@ async function enviarFormulario(event) {
     event.preventDefault();
 
     const owner = document.getElementById('owner').value;
+    const documentNumber = document.getElementById('document').value;
     const mensajeDiv = document.getElementById('mensaje_resultado');
 
     try {
@@ -78,7 +79,10 @@ async function enviarFormulario(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ owner: owner })
+            body: JSON.stringify({ 
+                owner: owner,
+                document: documentNumber || null
+            })
         });
 
         const resultado = await response.json();
@@ -96,6 +100,9 @@ async function enviarFormulario(event) {
                 <div style="margin: 15px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
                     <p><strong>Propietario:</strong> ${resultado.owner}</p>
                 </div>
+                ${resultado.document ? `<div style="margin: 15px 0; padding: 10px; background-color: rgba(255,255,255,0.7); border-radius: 6px;">
+                    <p><strong>Documento:</strong> ${resultado.document}</p>
+                </div>` : ''}
                 <p style="margin-bottom: 0;"><a href="/factories" style="color: #28a745; text-decoration: none; font-weight: bold;">Ver lista de talleres →</a></p>
             `;
             document.getElementById('formulario_taller').reset();
