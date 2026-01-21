@@ -51,6 +51,17 @@ def get_db():
         if engine is None:
             raise Exception("No se pudo crear el motor de la base de datos")
         
+        # Import models to register them with Base metadata
+        try:
+            from app.db.models.base import Base
+            from app.db.models import User, Worker, Assistence
+        except ImportError:
+            from .models.base import Base
+            from .models import User, Worker, Assistence
+        
+        # Create tables if they don't exist
+        Base.metadata.create_all(bind=engine)
+        
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         db = SessionLocal()
         

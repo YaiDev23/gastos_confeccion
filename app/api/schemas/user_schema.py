@@ -1,17 +1,11 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import Optional, Union
-from enum import Enum
-
-
-class EstadoEnum(str, Enum):
-    activo = "activo"
-    inactivo = "inactivo"
+from pydantic import BaseModel, Field
+from typing import Optional
 
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=1, max_length=100)
     rol: str = Field(..., min_length=1, max_length=50)
-    estado: Union[int, str] = Field(default=1)  # 1 = activo, 0 = inactivo o strings
+    estado: int = Field(default=1)  # 1 = activo, 0 = inactivo
 
 
 class UserCreate(UserBase):
@@ -24,14 +18,14 @@ class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, max_length=100)
     psw: Optional[str] = Field(None, max_length=255)
     rol: Optional[str] = Field(None, max_length=50)
-    estado: Optional[Union[int, str]] = None
+    estado: Optional[int] = None
 
 
 class UserResponse(BaseModel):
     id_user: int
     username: str
     rol: str
-    estado: Union[int, str]
+    estado: int
     
     class Config:
         from_attributes = True
