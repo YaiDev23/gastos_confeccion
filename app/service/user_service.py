@@ -73,7 +73,7 @@ class UserService:
         """
         Obtiene todos los usuarios activos
         """
-        return db.query(User).filter(User.estado == 1).all()
+        return db.query(User).filter(User.estado == '1').all()
     
     @staticmethod
     def actualizar_usuario(db: Session, usuario_id: int, user_data: UserUpdate) -> Dict[str, Any]:
@@ -156,7 +156,7 @@ class UserService:
         """
         usuario = db.query(User).filter(
             User.username == user_data.username,
-            User.estado == 1
+            User.estado == 'activo'
         ).first()
         
         if not usuario:

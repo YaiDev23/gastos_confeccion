@@ -612,6 +612,12 @@ async function viewDetailsGroup(idGroup) {
                 </div>
             </div>
         </div>
+        ${firstDelivery.annotation ? `
+        <div style="margin-bottom: 20px; padding: 15px; background: #fff9e6; border-left: 5px solid #ffc107; border-radius: 4px;">
+            <strong style="color: #0B1023;">📝 Observaciones:</strong>
+            <p style="margin: 8px 0 0 0; color: #555;">${firstDelivery.annotation}</p>
+        </div>
+        ` : ''}
     `;
     
     // Agrupar entregas por tipo de prenda
@@ -669,13 +675,6 @@ async function viewDetailsGroup(idGroup) {
                             <td style="border: 1px solid #999; padding: 8px; text-align: center;">${delivery.sz18 || 0}</td>
                             <td style="border: 1px solid #999; padding: 8px; text-align: center; background: #f0f0f0; font-weight: bold;">${total}</td>
                         </tr>
-                        ${delivery.annotation ? `
-                        <tr style="background: #fff9e6; border: 1px solid #999;">
-                            <td colspan="13" style="border: 1px solid #999; padding: 8px; padding-left: 12px;">
-                                <strong style="color: #0B1023;">Observación:</strong> <span style="color: #555;">${delivery.annotation}</span>
-                            </td>
-                        </tr>
-                        ` : ''}
             `;
         });
         
