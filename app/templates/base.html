@@ -74,7 +74,7 @@
             color: white;
             font-size: 24px;
             cursor: pointer;
-            display: none !important;
+            display: none;
             transition: var(--transition);
             padding: 8px;
             border-radius: 8px;
@@ -661,7 +661,7 @@
             }
 
             .navbar-toggle {
-                display: flex !important;
+                display: flex;
             }
 
             .navbar-spacer {
@@ -684,6 +684,7 @@
                 z-index: 998;
                 box-shadow: var(--shadow-lg);
                 width: 280px;
+                display: ;
             }
 
             .sidebar.hidden {
@@ -692,8 +693,9 @@
 
             .main-content {
                 margin-left: 0 !important;
-                width: 100% !important;
             }
+
+        
 
             .sidebar.minimized {
                 width: 280px;
@@ -722,31 +724,13 @@
         }
 
         @media (max-width: 480px) {
-            .navbar {
-                padding: 0 12px;
-            }
-
-            .navbar-toggle {
-                display: flex !important;
-                font-size: 20px;
-                padding: 6px;
-            }
-
             .navbar-brand {
-                font-size: 16px;
-            }
-
-            .navbar-brand i {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .logout-navbar-btn {
                 padding: 8px 12px;
                 font-size: 12px;
-            }
-
-            .logout-text {
-                display: none;
             }
 
             h1 {
@@ -759,10 +743,6 @@
 
             .container {
                 padding: 10px;
-            }
-
-            .sidebar {
-                width: 250px;
             }
         }
 
@@ -812,7 +792,7 @@
     <!-- MAIN LAYOUT -->
     <div class="layout-wrapper">
         <!-- SIDEBAR -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar hidden" id="sidebar">
             <!-- HEADER -->
             <div class="sidebar-header">
                 <div class="sidebar-header-content">
