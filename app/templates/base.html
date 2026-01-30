@@ -74,7 +74,7 @@
             color: white;
             font-size: 24px;
             cursor: pointer;
-            display: none;
+            display: none !important;
             transition: var(--transition);
             padding: 8px;
             border-radius: 8px;
@@ -661,7 +661,7 @@
             }
 
             .navbar-toggle {
-                display: flex;
+                display: flex !important;
             }
 
             .navbar-spacer {
@@ -692,10 +692,7 @@
 
             .main-content {
                 margin-left: 0 !important;
-            }
-
-            .layout-wrapper {
-                flex-direction: column;
+                width: 100% !important;
             }
 
             .sidebar.minimized {
@@ -725,13 +722,31 @@
         }
 
         @media (max-width: 480px) {
+            .navbar {
+                padding: 0 12px;
+            }
+
+            .navbar-toggle {
+                display: flex !important;
+                font-size: 20px;
+                padding: 6px;
+            }
+
             .navbar-brand {
-                font-size: 18px;
+                font-size: 16px;
+            }
+
+            .navbar-brand i {
+                font-size: 20px;
             }
 
             .logout-navbar-btn {
                 padding: 8px 12px;
                 font-size: 12px;
+            }
+
+            .logout-text {
+                display: none;
             }
 
             h1 {
@@ -744,6 +759,10 @@
 
             .container {
                 padding: 10px;
+            }
+
+            .sidebar {
+                width: 250px;
             }
         }
 
